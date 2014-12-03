@@ -59,7 +59,7 @@ MODULE "Patient Module" M
                       |"homo sapiens"
                       |"Ovine species"
                       |"Porcine species") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -82,7 +82,7 @@ MODULE "Patient Module" M
                       |"113111") "Code Value" 
  >(0x00080102,1,SH,1,D,"DCM") "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -4371,7 +4371,7 @@ MODULE "Patient Module" M
                       |"Zlotniki Spotted pig breed"
                       |"Zlotniki White pig breed"
                       |"Znamensk cattle breed") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -4429,7 +4429,7 @@ MODULE "Patient Module" M
                       |"Working Canine Association of Canada"
                       |"World Kennel Club"
                       |"World Wide Kennel Club") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -4972,7 +4972,7 @@ MODULE "Patient Module" M
                       |"YEMEN"
                       |"ZAMBIA"
                       |"ZIMBABWE") "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -4985,7 +4985,7 @@ MODULE "Patient Module" M
      >(0x00080100,1,SH,1) "Code Value" 
      >(0x00080102,1,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5510,7 +5510,7 @@ MODULE "Patient Module" M
                       |"YEMEN"
                       |"ZAMBIA"
                       |"ZIMBABWE") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5523,7 +5523,7 @@ MODULE "Patient Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5559,11 +5559,11 @@ MODULE "General Study Module" M
 (0x00081030,3,LO,1) "Study Description" 
 (0x00081048,3,PN,1:n) "Physician(s) of Record" 
 (0x00081060,3,PN,1:n) "Name of  Physician(s) Reading Study" 
-(0x00401012,2C,SQ,1,
+(0x00401012,3,SQ,1,
  >(0x00080100,1,SH,1) "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5576,7 +5576,7 @@ MODULE "General Study Module" M
  >(0x00080100,1,SH,1) "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5597,7 +5597,7 @@ MODULE "General Study Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5609,7 +5609,7 @@ MODULE "General Study Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5629,7 +5629,7 @@ MODULE "General Study Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5641,7 +5641,7 @@ MODULE "General Study Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5661,7 +5661,7 @@ MODULE "General Study Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5673,7 +5673,7 @@ MODULE "General Study Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5709,7 +5709,7 @@ MODULE "Patient Study Module" U
  >(0x00080102,1,SH,1,D,"SRT"
                       |"DCM") "Coding Scheme Designator"
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5726,7 +5726,7 @@ MODULE "Patient Study Module" U
  >(0x00080100,1,SH,1) "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5837,7 +5837,7 @@ MODULE "General Series Module" M
                       |"HFP"
                       |"HFS") "Patient Position"  : NOT PRESENT 0x00540410
 (0x00200060,2C,CS,1,E,"L"
-                      |"R") "Laterality" 
+                      |"R") "Laterality"  : "INFO(Required if the body part examined is a paired structure and Image Laterality (0020,0062) or Frame Laterality (0020,9072) are not sent.)"
 (0x00080021,3,DA,1) "Series Date" 
 (0x00080031,3,TM,1) "Series Time" 
 (0x0008103E,3,LO,1) "Series Description" 
@@ -5961,7 +5961,7 @@ MODULE "General Series Module" M
  >(0x00080100,1,SH,1) "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -5987,7 +5987,7 @@ MODULE "General Series Module" M
                       |"Same Anatomy"
                       |"Same Indication"
                       |"Simultaneously Acquired") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6032,7 +6032,7 @@ MODULE "General Series Module" M
          >(0x00080100,1,SH,1) "Code Value" 
          >(0x00080102,1,SH,1) "Coding Scheme Designator" 
          >(0x00080104,1,LO,1) "Code Meaning" 
-         >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+         >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
          >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
          >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
          >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6060,7 +6060,7 @@ MODULE "General Series Module" M
                       |"Standardized Uptake Value body surface area"
                       |"Standardized Uptake Value body weight"
                       |"Standardized Uptake Value lean body mass") "Code Meaning" 
-         >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+         >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
          >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
          >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
          >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6072,7 +6072,7 @@ MODULE "General Series Module" M
          >(0x00080100,1,SH,1) "Code Value" 
          >(0x00080102,1,SH,1) "Coding Scheme Designator" 
          >(0x00080104,1,LO,1) "Code Meaning" 
-         >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+         >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
          >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
          >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
          >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6102,7 +6102,7 @@ MODULE "General Series Module" M
        >(0x00080100,1,SH,1) "Code Value" 
        >(0x00080102,1,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6130,7 +6130,7 @@ MODULE "General Series Module" M
                       |"Standardized Uptake Value body surface area"
                       |"Standardized Uptake Value body weight"
                       |"Standardized Uptake Value lean body mass") "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6142,7 +6142,7 @@ MODULE "General Series Module" M
        >(0x00080100,1,SH,1) "Code Value" 
        >(0x00080102,1,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6154,7 +6154,7 @@ MODULE "General Series Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6166,7 +6166,7 @@ MODULE "General Series Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6189,7 +6189,7 @@ MODULE "General Series Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6207,7 +6207,7 @@ MODULE "General Series Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6219,7 +6219,7 @@ MODULE "General Series Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6239,7 +6239,7 @@ MODULE "General Series Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6251,7 +6251,7 @@ MODULE "General Series Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6291,7 +6291,7 @@ MODULE "General Series Module" M
        >(0x00080100,1,SH,1) "Code Value" 
        >(0x00080102,1,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6319,7 +6319,7 @@ MODULE "General Series Module" M
                       |"Standardized Uptake Value body surface area"
                       |"Standardized Uptake Value body weight"
                       |"Standardized Uptake Value lean body mass") "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6331,7 +6331,7 @@ MODULE "General Series Module" M
        >(0x00080100,1,SH,1) "Code Value" 
        >(0x00080102,1,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6361,7 +6361,7 @@ MODULE "General Series Module" M
      >(0x00080100,1,SH,1) "Code Value" 
      >(0x00080102,1,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6389,7 +6389,7 @@ MODULE "General Series Module" M
                       |"Standardized Uptake Value body surface area"
                       |"Standardized Uptake Value body weight"
                       |"Standardized Uptake Value lean body mass") "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6401,7 +6401,7 @@ MODULE "General Series Module" M
      >(0x00080100,1,SH,1) "Code Value" 
      >(0x00080102,1,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6413,7 +6413,7 @@ MODULE "General Series Module" M
  >(0x00080100,1,SH,1) "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6601,7 +6601,7 @@ MODULE "PET Isotope Module" M
                       |",82,Rubidium"
                       |",86,Yttrium"
                       |",94m,Technetium") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6647,7 +6647,7 @@ MODULE "PET Isotope Module" M
                       |"Topical route"
                       |"Transluminal route"
                       |"Vaginal route") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6725,7 +6725,7 @@ MODULE "PET Isotope Module" M
                       |"Sodium Na,22,"
                       |"Spiperone F,18,"
                       |"Thymidine (FLT)F,18,") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6825,7 +6825,7 @@ MODULE "PET Isotope Module" M
                       |"Urokinase preparation"
                       |"Verapamil"
                       |"Warfarin") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6888,7 +6888,7 @@ MODULE "NM PET Patient Orientation Module" M
                       |"stooped-over"
                       |"supine"
                       |"Trendelenburg") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6903,7 +6903,7 @@ MODULE "NM PET Patient Orientation Module" M
  >(0x00080104,1,LO,1,D,"erect"
                       |"recumbent"
                       |"semi-erect") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -6921,7 +6921,7 @@ MODULE "NM PET Patient Orientation Module" M
                       |"headfirst"
                       |"oblique"
                       |"transverse") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7017,7 +7017,7 @@ MODULE "General Image Module" M
                       |"Other partial views"
                       |"Spectral filtered image"
                       |"Spectroscopy") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7025,8 +7025,8 @@ MODULE "General Image Module" M
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
  ) "Purpose of Reference Code Sequence" 
- >(0x00081160,1C,IS,1:n) "Referenced Frame Number" 
- >(0x0062000B,1C,US,1:n) "Referenced Segment Number" 
+ >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : "INFO(Required if the Referenced SOP Instance is a multi-frame image and the reference does not apply to all frames, and Referenced Segment Number (0062,000B) is not present.)"
+ >(0x0062000B,1C,US,1:n) "Referenced Segment Number"  : "INFO(Required if the Referenced SOP Instance is a Segmentation or Surface Segmentation and the reference does not apply to all segments and Referenced Frame Number (0008,1160) is not present.)"
  ) "Referenced Image Sequence" 
 (0x0008114A,3,SQ,1,
  >(0x0040A170,1,SQ,1,
@@ -7041,7 +7041,7 @@ MODULE "General Image Module" M
                       |"Simultaneous Hemodynamic"
                       |"Simultaneous Voice Narrative"
                       |"Simultanous Respiratory Waveform") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7074,7 +7074,7 @@ MODULE "General Image Module" M
                       |"Source image for image processing operation"
                       |"Source image for montage"
                       |"Uncompressed predecessor") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7082,8 +7082,8 @@ MODULE "General Image Module" M
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
  ) "Purpose of Reference Code Sequence" 
- >(0x00081160,1C,IS,1:n) "Referenced Frame Number" 
- >(0x0062000B,1C,US,1:n) "Referenced Segment Number" 
+ >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : "INFO(Required if the Referenced SOP Instance is a multi-frame image and the reference does not apply to all frames, and Referenced Segment Number (0062,000B) is not present.)"
+ >(0x0062000B,1C,US,1:n) "Referenced Segment Number"  : "INFO(Required if the Referenced SOP Instance is a Segmentation or Surface Segmentation and the reference does not apply to all segments and Referenced Frame Number (0008,1160) is not present.)"
  ) "Source Image Sequence" 
 (0x00089215,3,SQ,1,
  >(0x00080100,1,SH,1,D,"113040"
@@ -7181,7 +7181,7 @@ MODULE "General Image Module" M
                       |"Volume editing"
                       |"Volume rendering"
                       |"Z-Score Map") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7322,7 +7322,7 @@ MODULE "Device Module" U
                       |"C-20005") "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1,D,"Gianturco coil") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7364,7 +7364,7 @@ MODULE "Specimen Module" U
                       |"Location of Specimen Z"
                       |"Position Frame of Reference"
                       |"Visual Marking of Specimen") "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7394,7 +7394,7 @@ MODULE "Specimen Module" U
                       |"Standardized Uptake Value body surface area"
                       |"Standardized Uptake Value body weight"
                       |"Standardized Uptake Value lean body mass") "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7407,7 +7407,7 @@ MODULE "Specimen Module" U
      >(0x00080100,1,SH,1) "Code Value" 
      >(0x00080102,1,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7416,7 +7416,7 @@ MODULE "Specimen Module" U
      >(0x0008010F,3,CS,1) "Context Identifier" 
      >(0x00080117,3,UI,1) "Context UID" 
  ) "Concept Code Sequence"  : VALUE 0x0040A040="CODE"
- ) "Specimen Localization Content Item Sequence" 
+ ) "Specimen Localization Content Item Sequence"  : "INFO(Required if multiple specimens present in the image. May be present otherwise.)"
  >(0x00400562,2,SQ,1,
    >(0x00400031,1C,UT,1) "Local Namespace Entity ID"  : WEAK (NOT PRESENT 0x00400032,TRUE)
    >(0x00400032,1C,UT,1) "Universal Entity ID"  : WEAK (NOT PRESENT 0x00400031,TRUE)
@@ -7479,7 +7479,7 @@ MODULE "Specimen Module" U
                       |"Specimen Staining"
                       |"Stain"
                       |"Tissue Fixative") "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7490,8 +7490,8 @@ MODULE "Specimen Module" U
        >(0x00080117,3,UI,1) "Context UID" 
  ) "Concept Name Code Sequence" 
      >(0x00081199,1C,SQ,1,
-       >(0x00081160,1C,IS,1:n) "Referenced Frame Number" 
-       >(0x0062000B,1C,US,1:n) "Referenced Segment Number" 
+       >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : "INFO(Required if the Referenced SOP Instance is a multi-frame image and the reference does not apply to all frames, and Referenced Segment Number (0062,000B) is not present.)"
+       >(0x0062000B,1C,US,1:n) "Referenced Segment Number"  : "INFO(Required if the Referenced SOP Instance is a Segmentation or Surface Segmentation and the reference does not apply to all segments and Referenced Frame Number (0008,1160) is not present.)"
        >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
        >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced SOP Sequence"  : VALUE 0x0040A040="IMAGE"
@@ -7509,7 +7509,7 @@ MODULE "Specimen Module" U
                       |"Standardized Uptake Value body surface area"
                       |"Standardized Uptake Value body weight"
                       |"Standardized Uptake Value lean body mass") "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7522,7 +7522,7 @@ MODULE "Specimen Module" U
        >(0x00080100,1,SH,1) "Code Value" 
        >(0x00080102,1,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
-       >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+       >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
        >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
        >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7585,7 +7585,7 @@ MODULE "Specimen Module" U
                       |"Tissue specimen"
                       |"Tissue spot"
                       |"Touch preparation cytologic material") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7688,7 +7688,7 @@ MODULE "Specimen Module" U
                       |"Transverse"
                       |"Unilateral"
                       |"Vertical") "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7700,7 +7700,7 @@ MODULE "Specimen Module" U
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7737,7 +7737,7 @@ MODULE "Specimen Module" U
                       |"Specimen well"
                       |"Tissue cassette"
                       |"Tissue microarray cassette") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7793,7 +7793,7 @@ MODULE "Specimen Module" U
                       |"Specimen well"
                       |"Tissue cassette"
                       |"Tissue microarray cassette") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7848,7 +7848,7 @@ MODULE "PET Image Module" M
    >(0x00080102,1,SH,1,D,"SRT") "Coding Scheme Designator" 
    >(0x00080104,1,LO,1,D,"Caudal"
                       |"Cephalic") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -7901,7 +7901,7 @@ MODULE "PET Image Module" M
                       |"Short Axis"
                       |"Transverse"
                       |"Vertical Long Axis") "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8002,7 +8002,7 @@ MODULE "PET Image Module" M
                       |"Transverse"
                       |"Unilateral"
                       |"Vertical") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8013,7 +8013,7 @@ MODULE "PET Image Module" M
  >(0x00080100,1,SH,1) "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
- >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
  >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8076,7 +8076,7 @@ MODULE "Acquisition Context Module" U
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8098,7 +8098,7 @@ MODULE "Acquisition Context Module" U
                       |"Standardized Uptake Value body surface area"
                       |"Standardized Uptake Value body weight"
                       |"Standardized Uptake Value lean body mass") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8110,7 +8110,7 @@ MODULE "Acquisition Context Module" U
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8221,7 +8221,7 @@ MODULE "SOP Common Module" M
                       |"Portable Media Importer Equipment"
                       |"Processing Equipment"
                       |"Video Tape Digitizer Equipment") "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8238,7 +8238,7 @@ MODULE "SOP Common Module" M
      >(0x00080100,1,SH,1) "Code Value" 
      >(0x00080102,1,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8251,7 +8251,7 @@ MODULE "SOP Common Module" M
      >(0x00080100,1,SH,1) "Code Value" 
      >(0x00080102,1,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
-     >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+     >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
      >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
      >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
@@ -8296,7 +8296,7 @@ MODULE "SOP Common Module" M
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
-   >(0x00080103,1C,SH,1) "Coding Scheme Version" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
    >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
    >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
