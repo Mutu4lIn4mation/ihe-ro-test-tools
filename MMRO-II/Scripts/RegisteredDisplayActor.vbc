@@ -1,0 +1,13 @@
+Class RegisteredDisplayActor
+    'Registered Display actor object
+    Inherits Actor
+
+    'Constructor
+    Public Sub New()
+        'Actor Id
+        m_id = "RegisteredDisplay"
+        'Actor name
+        m_name = "Registered Display actor"
+    End Sub
+
+End Class

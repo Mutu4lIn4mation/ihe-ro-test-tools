@@ -1,0 +1,51 @@
+Class RegisteredDisplayScenario1
+    Inherits Scenario
+    'There are 2 transactions in this scenario:
+    '- Send a Spatial Registration
+    '- Send a Registered Structure set
+    Public registeredDisplayActor As registeredDisplayActor = Nothing
+    Private dialog As RegisteredDisplayScenario1Dlg = Nothing
+    Private send As SendScenarioStep = Nothing
+    Private cleanUp As CleanUpScenarioStep = Nothing
+
+    'Constructor
+    Public Sub New()
+        registeredDisplayActor = New RegisteredDisplayActor
+        dialog = New RegisteredDisplayScenario1Dlg
+        send = New SendScenarioStep
+        cleanUp = New CleanUpScenarioStep(TestToolConfiguration.GetInstance.GetSession.ResultsRootDirectory)
+        dialog.ShowDialog()
+
+        If Not dialog.RegistratorDialogResult = DialogResult.CANCEL Then
+            'scenario dataset
+            m_scenarioDatasetXmlFileName = "NonHybridReferenceDataSet.xml"
+ 
+            'Configurate the send step
+            send.AddActor(registeredDisplayActor)
+            send.AddTransaction(New RAD_8_Transaction(IODType.CTImage))
+
+            Select Case dialog.RegistratorDialogResult
+                Case DialogResult.CT_MR
+                    send.AddTransaction(New RAD_8_Transaction(IODType.MRImage))
+                Case DialogResult.CT_PET
+                    send.AddTransaction(New RAD_8_Transaction(IODType.PETImage))
+                Case DialogResult.CT_PET_MR
+                    send.AddTransaction(New RAD_8_Transaction(IODType.MRImage))
+                    send.AddTransaction(New RAD_8_Transaction(IODType.PETImage))
+            End Select
+
+            'MMRO I
+            'send.AddTransaction(New MMRO_2_Transaction(dialog.RegistratorDialogResult))
+            'MMRO II
+            send.AddTransaction(New MMRO_II_2_Transaction(dialog.RegistratorDialogResult))
+
+            send.AddTransaction(New MMRO_4_Transaction)
+
+            m_scenarioSteps.Add(send)
+
+            If TestToolConfiguration.GetInstance.DoCleanUp = True Then
+                m_scenarioSteps.Add(cleanUp)
+            End If
+        End If
+    End Sub
+End Class

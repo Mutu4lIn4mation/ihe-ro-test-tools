@@ -1,0 +1,27 @@
+Class CleanUpScenarioStep
+    Inherits ScenarioStep
+
+    Private m_PathToClean As string
+
+    Public Sub New(ByVal PathToClean As string)
+        m_type = CLEANUP
+        m_PathToClean = PathToClean
+    End Sub
+
+    ' - validating the received transactions (Validator)
+    Public Overrides Sub Execute()
+
+        Dim DICOMFilesToDelete As String() = IO.Directory.GetFiles(m_PathToClean, "*.dcm")
+        Dim PIXFilesToDelete As String() = IO.Directory.GetFiles(m_PathToClean, "*.pix")
+
+        For Each myFile As String In DICOMFilesToDelete
+            IO.File.Delete(myFile)
+        Next
+
+        For Each myFile As String In PIXFilesToDelete
+            IO.File.Delete(myFile)
+        Next
+
+    End Sub
+
+End Class

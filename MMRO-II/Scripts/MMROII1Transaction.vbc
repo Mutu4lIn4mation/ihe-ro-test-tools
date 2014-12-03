@@ -1,0 +1,49 @@
+' Transaction MMRO-II-1 (Spatial Registration(II) Storage) class
+Class MMRO_II_1_Transaction
+    Inherits Transaction
+
+    Private m_ScenarioVariant As DialogResult = DialogResult.CANCEL
+
+    'Constructor
+    Public Sub New()
+        m_Id = "MMRO-II-1"
+        m_Description = "Spatial Registration(II) Storage"
+        m_iodtype = IODType.SpatialRegistration
+    End Sub
+
+    Public Sub New(ByVal ScenarioVariant As DialogResult)
+        m_Id = "MMRO-II-1"
+        m_Description = "Spatial Registration(II) Storage"
+        m_iodtype = IODType.SpatialRegistration
+        m_ScenarioVariant = ScenarioVariant
+    End Sub
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        'add the spatial registrations to the arraylist
+        Dim MessageArray() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        MessageArray = referenceData.GetSpatialRegistration()
+        Dim length As Integer = MessageArray.GetLength(0)
+        Dim i As Integer
+        For i = 0 To length - 1
+            Select Case m_ScenarioVariant
+                Case DialogResult.CTMR_PET
+                    If MessageArray(i).DataSet.GetValues("0x00700308[2]/0x00200052").Item(0).Equals(referenceData.GetSliceImage(1, 1, IODType.MRImage).DataSet.GetValues("0x00200052").Item(0)) Then
+                        datasetMessages.Add(MessageArray(i))
+                    End If
+                Case DialogResult.CTPET_MR
+                    If MessageArray(i).DataSet.GetValues("0x00700308[2]/0x00200052").Item(0).Equals(referenceData.GetSliceImage(1, 1, IODType.PETImage).DataSet.GetValues("0x00200052").Item(0)) Then
+                        datasetMessages.Add(MessageArray(i))
+                    End If
+                Case Else
+                    datasetMessages.Add(MessageArray(i))
+            End Select
+        Next
+
+        'return the array with dataset(s)
+        Return datasetMessages
+    End Function
+
+
+End Class

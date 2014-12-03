@@ -1,0 +1,25 @@
+' Transaction MMRO-3 (Registered Structure Set Storage) class
+Class MMRO_3_Transaction
+    Inherits Transaction
+
+    'Constructor
+    Public Sub New()
+        m_Id = "MMRO-3"
+        m_Description = "Registered Structure Set Storage"
+        m_iodtype = IODType.RTStructureSet
+    End Sub
+
+    'method which returns the related reference data messages belonging to this transaction
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        'add the structure set message to the arraylist
+        datasetMessages.Add(referenceData.GetRegisteredStructureSet())
+
+        'return the array with dataset(s)
+        Return datasetMessages
+    End Function
+
+
+End Class

@@ -1,0 +1,25 @@
+' Transaction MMRO-5 (Registered Dose Retrieve) class
+Class MMRO_5_Transaction
+    Inherits Transaction
+
+    'Constructor
+    Public Sub New()
+        m_Id = "MMRO-5"
+        m_Description = "Registered Dose Retrieve"
+        m_iodtype = IODType.RTDose
+    End Sub
+
+    'method which returns the related reference data messages belonging to this transaction
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        'add the structure set message to the arraylist
+        datasetMessages.Add(referenceData.GetRegisteredDose())
+
+        'return the array with dataset(s)
+        Return datasetMessages
+    End Function
+
+
+End Class

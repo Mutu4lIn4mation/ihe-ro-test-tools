@@ -1,0 +1,63 @@
+Class ReferencedSOPInstanceUIDStructureSetModuleRule
+    Inherits MessageCollectionRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal ctSet As CTSet)
+
+        MyBase.New("Referenced SOP Instance UID Structure Set Module Rule", iodType, severity)
+        m_ctSet = ctSet
+    End Sub
+    Private m_ctSet As Integer
+    Private m_messageCollectionHelper As messageCollectionHelper
+
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+
+        Dim structureSetDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim message As String
+        Dim referencedSOPInstanceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim ctImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+
+        If m_messageCollectionHelper.GetStructureSet() Is Nothing Then
+            message = "No RT Structure Set received"
+        Else
+            structureSetDataSet = m_messageCollectionHelper.GetStructureSet()
+
+            If structureSetDataSet.Exists(Tags.ReferencedSOPInstanceUID) = False Then
+                message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedSOPInstanceUID) + "' (" + Tags.ReferencedSOPInstanceUID + ") is not present."
+                Me.SetError(message)
+            Else
+                referencedSOPInstanceUIDAttribute = structureSetDataSet(Tags.ReferencedSOPInstanceUID)
+                'Use first CT-Image of the series for comparing
+                If Not ReferenceDataSet.GetInstance.GetDataSetXML Is Nothing Then
+                    ctImageDataSet = ReferenceDataSet.GetInstance.GetCTImage(1, 1).DataSet
+                Else
+                    ctImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, 1)
+                End If
+
+                If ctImageDataSet Is Nothing Then
+                    message = "No CT-Images received"
+                    Me.SetError(message)
+                Else
+                    If ctImageDataSet(Tags.StudyInstanceUID).Values.Equals(referencedSOPInstanceUIDAttribute.Values) Then
+                        'Dim StructureSetValue As String = referencedSOPInstanceUIDAttribute.Values.ToString
+                        'StructureSetValue = StructureSetValue.Trim(""""c)
+                        'Dim length As Integer = StructureSetValue.Length
+                        'Dim CTSetValue As String = ctImageDataSet(Tags.StudyInstanceUID).Values.ToString
+                        'CTSetValue = CTSetValue.Trim(""""c)
+                        'If Left(CTSetValue, length) = StructureSetValue Then
+                        message = "'" + Tags.GetTagName(Tags.ReferencedSOPInstanceUID) + "' (" + Tags.ReferencedSOPInstanceUID + ") matches the '" + Tags.GetTagName(Tags.StudyInstanceUID) + "' (" + Tags.StudyInstanceUID + ")"
+                        Me.SetValid(message)
+                    Else
+                        message = "'" + Tags.GetTagName(Tags.ReferencedSOPInstanceUID) + "' (" + Tags.ReferencedSOPInstanceUID + ") is not equal to the '" + Tags.GetTagName(Tags.StudyInstanceUID) + "' (" + Tags.StudyInstanceUID + ")"
+                        Me.SetError(message)
+                    End If
+                End If
+            End If
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+End Class

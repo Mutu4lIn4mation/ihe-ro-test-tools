@@ -1,0 +1,25 @@
+
+' Transaction class.  A transaction represents a IHE-RO transaction ((set of) message(s))
+MustInherit Class Transaction
+
+    'Constructor
+    Public Sub New()
+    End Sub
+	
+	'has a tranaction id
+	protected m_Id as String
+	'has a transaction description
+	protected m_Description as String
+    'has a transaction IOD type
+    Public m_iodtype As IODType
+
+    'the reference data messages belonging to this transaction
+    Public ReadOnly Property TransactionReferenceDataMessages() As ArrayList
+        Get
+            Return GetTransactionReferenceDataMessages()
+        End Get
+    End Property
+    'method which returns the related reference data messages belonging to this transaction
+    Protected MustOverride Function GetTransactionReferenceDataMessages() As ArrayList
+
+End Class

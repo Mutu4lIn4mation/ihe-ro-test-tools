@@ -1,0 +1,174 @@
+Class CorrectExpectedMatrixRule
+    Inherits MappingRule
+
+    Private m_tolerancePrecentage As Double
+    Private m_minimalToleranceValue As Double
+    Private m_TagSequence As String
+    Private m_dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+
+    Public Sub New(ByVal tagSequence As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Correct Expected Matrix Rule", iodType, severity)
+        m_TagSequence = tagSequence
+        Me.m_tolerancePrecentage = TestToolConfiguration.GetInstance.ToleranceProcentage
+        Me.m_minimalToleranceValue = TestToolConfiguration.GetInstance.minimalToleranceValue
+    End Sub
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        If iodType = Me.IODTypeRule Then
+            Dim message As String = ""
+            Dim falseMessage As String = ""
+            Dim trueMessage As String = System.Environment.NewLine
+            Dim usedToleranceValues As String
+            m_dicomMessage = dicomMessage
+
+            'get the corresponding object from the reference test data (by matching sop instance uid)
+            Dim refDataset As DvtkHighLevelInterface.Dicom.Other.DataSet
+            refDataset = GetCorrespondingRefDatasetObject(dicomMessage.DataSet)
+
+            'if the reference test data set object could not be found, report this 
+            If refDataset Is Nothing Then
+                SetError("No object which performs the same registration as the received object was found in the reference data set.")
+            Else
+                Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+                If Not dicomMessage.Exists(m_TagSequence) Then
+                    message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present in the dataset."
+                    Me.SetError(message)
+                ElseIf Not refDataset.Exists(m_TagSequence) Then
+                    message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present in the reference dataset."
+                    Me.SetError(message)
+                ElseIf Not dicomMessage.DataSet(m_TagSequence).VM = 16 Then
+                    message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") in the dataset does not contain 16 values as would be expected of a 4x4 matrix."
+                    Me.SetError(message)
+                ElseIf Not refDataset(m_TagSequence).VM = 16 Then
+                    message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") in the reference dataset does not contain 16 values as would be expected of a 4x4 matrix"
+                    Me.SetError(message)
+                Else
+                    Dim i As Integer
+                    Dim value As Double
+                    Dim refValue As Double
+                    Dim x As Integer
+                    Dim y As Integer
+
+                    For i = 0 To 15
+                        value = Me.ConvertToDouble(dicomMessage.DataSet(m_TagSequence).Values.Item(i))
+                        refValue = Me.ConvertToDouble(refDataset(m_TagSequence).Values.Item(i))
+
+                        x = ((i - x) / 4) + 1
+                        y = (i Mod 4) + 1
+
+                        If Not withinTolerance(value, refValue) Then
+                            falseMessage += "Incorrect transformation matrix value found:" + System.Environment.NewLine + "Position (" + x.ToString + "," + y.ToString + ") of the matrix in the dataset is incorrect, the value is outside the tolerance boundaries of: +- " + m_tolerancePrecentage.ToString() + "%" + System.Environment.NewLine + "Expected: " + refValue.ToString + System.Environment.NewLine + "Received: " + value.ToString + System.Environment.NewLine + System.Environment.NewLine
+                        Else
+                            trueMessage += "Position (" + x.ToString + "," + y.ToString + ") of the matrix in the dataset is correct, the value resides within the tolerance boundaries of: +-" + m_tolerancePrecentage.ToString() + "%" + System.Environment.NewLine + "Expected: " + refValue.ToString + System.Environment.NewLine + "Received: " + value.ToString + System.Environment.NewLine + System.Environment.NewLine
+                        End If
+
+                    Next
+                End If
+
+            End If
+
+
+            usedToleranceValues = "The Tolerance precentage used is: " + m_tolerancePrecentage.ToString + ", The minimum tolerance value is " + m_minimalToleranceValue.ToString
+            'Reporter, write to results, if there is anything to report
+            If Not trueMessage = "" Then
+                Me.SetValid(trueMessage)
+                Me.Report()
+            End If
+
+            If falseMessage.Equals("") Then
+                message = "The matrix in the dataset contains the correct values" + System.Environment.NewLine
+                Me.SetValid(message + usedToleranceValues)
+                Me.Report()
+            Else
+                Me.SetError(falseMessage + usedToleranceValues)
+                Me.Report()
+            End If
+        End If
+    End Sub
+    'this method retrieves the corresponding dataset object from the reference data set, based on its sop class uid
+    Protected Function GetCorrespondingRefDatasetObject(ByVal messageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet) As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Dim refDatasetObject() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim messageSOPClassUID As String
+        Dim messageBaseFOR As String
+        Dim messageReferencedFOR As String
+
+        'Determine message sop class uid
+
+
+        If Not messageDataSet.Exists(Tags.SOPClassUID) Then
+            Logger.GetInstance.LogMessage("Message received does not have a " + Tags.GetTagName(Tags.SOPClassUID) + "' (" + Tags.SOPClassUID + ")")
+            Return Nothing
+        End If
+
+        'Determine message sop instance uid
+        If Not messageDataSet.Exists(Tags.SOPInstanceUID) Then
+            Logger.GetInstance.LogMessage("Message received does not have a " + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ")")
+            Return Nothing
+        End If
+        messageSOPClassUID = messageDataSet(Tags.SOPClassUID).Values.Item(0)
+        messageBaseFOR = messageDataSet(Tags.RegistrationFrameofReferenceUID).Values.Item(0)
+        messageReferencedFOR = messageDataSet("0x00700308[2]/0x00200052").Values.Item(0)
+
+        'remove any spaces in the sop class & instance uid
+        Dim space As Char = " "c
+        messageSOPClassUID = messageSOPClassUID.TrimStart(space)
+        messageSOPClassUID = messageSOPClassUID.TrimEnd(space)
+
+        'Now we compare the received UID with all the SOPInstaceUID's in the ReferenceTestDataset
+        If messageSOPClassUID = SOPclass.SpatialRegistrationSOPClassUID Then
+
+            Logger.GetInstance.LogMessage("Looking up SpatialRegistration with Base " + Tags.GetTagName(Tags.RegistrationFrameofReferenceUID) + "' (" + messageBaseFOR + ")" + " and referenced " + Tags.GetTagName(Tags.RegistrationFrameofReferenceUID) + "' (" + messageReferencedFOR + ")" + "' in scenario reference test data")
+            Dim refData As ReferenceDataSet = ReferenceDataSet.GetInstance
+            If refData.GetDataSetXML Is Nothing Then
+                ReDim refDatasetObject(0)
+                refDatasetObject(0) = m_dicomMessage
+            Else
+                refDatasetObject = ReferenceDataSet.GetInstance.GetSpatialRegistration()
+            End If
+
+            Dim i As Integer
+
+            For i = 0 To refDatasetObject.Length() - 1
+
+                Dim dataObject = refDatasetObject(i).DataSet()
+                Dim refDatasetObjectBaseFOR As String = dataObject(Tags.RegistrationFrameofReferenceUID).Values.Item(0).ToString()
+                Dim refDatasetObjectReferencedFOR As String = dataObject("0x00700308[2]/0x00200052").Values.Item(0).ToString()
+
+                'remove any spaces in the sop instance uid
+                refDatasetObjectBaseFOR = refDatasetObjectBaseFOR.TrimStart(space)
+                refDatasetObjectBaseFOR = refDatasetObjectBaseFOR.TrimEnd(space)
+                refDatasetObjectReferencedFOR = refDatasetObjectReferencedFOR.TrimStart(space)
+                refDatasetObjectReferencedFOR = refDatasetObjectReferencedFOR.TrimEnd(space)
+                If messageBaseFOR = refDatasetObjectBaseFOR And messageReferencedFOR = refDatasetObjectReferencedFOR Then
+                    Return dataObject
+                End If
+            Next
+            Return Nothing
+        Else
+            Return Nothing
+        End If
+    End Function
+
+    Function withinTolerance(ByVal value As Double, ByVal refValue As Double) As Boolean
+        Dim tolerance As Double
+        Dim MinRefValue As Double = refValue - tolerance
+        Dim MaxRefValue As Double = refValue + tolerance
+
+        tolerance = (m_tolerancePrecentage * 0.01) * Math.Abs(value)
+
+        If tolerance < m_minimalToleranceValue Then
+            tolerance = m_minimalToleranceValue
+        End If
+
+        MinRefValue = refValue - tolerance
+        MaxRefValue = refValue + tolerance
+
+        If value >= MinRefValue And value <= MaxRefValue Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+End Class

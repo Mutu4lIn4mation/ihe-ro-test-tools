@@ -1,0 +1,45 @@
+Class NrIntOfSequenceItemRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' This rule checks if the sequence item has indeed the number of items that is given
+    ''' (for example, the controlpointsequence has the number of items that are specified in the attribute: number of control points)
+    ''' </summary>
+    ''' <param name="valueTag">the attribute that contains the sequence items</param>
+    ''' <param name="CheckNumber"> number to check</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal valueTag As String, ByVal CheckNumber As Integer, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+        MyBase.New("Nr Int Of Sequence Item Rule", valueTag, iodType, severity)
+        m_CheckNumber = CheckNumber
+
+    End Sub
+
+    Private m_CheckNumber As String
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim message As String = ""
+
+        If iodType = IODTypeRule Then
+            Dim sequenceItems As Integer = 0
+
+            If dicomMessage.Exists(m_TagSequence) Then
+                sequenceItems = dicomMessage.DataSet.GetitemCount(m_TagSequence)
+            Else
+                message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present"
+                Me.SetError(message)
+            End If
+            If m_CheckNumber = sequenceItems Then
+                message = "The '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") has a correct number of items: " + sequenceItems.ToString + " "
+                Me.SetValid(message)
+            Else
+                message = "The '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") has " + sequenceItems.ToString + " number of items, but should be " + m_CheckNumber
+                Me.SetError(message)
+            End If
+            Me.Report()
+        End If
+
+    End Sub
+
+End Class

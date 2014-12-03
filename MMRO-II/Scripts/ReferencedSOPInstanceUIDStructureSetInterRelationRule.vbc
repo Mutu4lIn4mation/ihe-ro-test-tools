@@ -1,0 +1,105 @@
+Class ReferencedSOPInstanceUIDStructureSetInterRelationRule
+    Inherits MessageCollectionRule
+
+    Private RtStruct As String = SOPclass.RTStructureSetSOPClassUID
+    Private m_studyUID As String
+    Private m_studyUIDTag As String = Tags.StudyInstanceUID
+    Private m_message As String = ""
+    Private m_messageCollectionHelper As messageCollectionHelper
+
+
+    Public Sub New(ByVal severity As ErrorSeverity, ByVal iodType As IODType)
+
+        MyBase.New("Referenced SOP Instance UID Structure Set Inter Relation Rule", iodType, severity)
+
+    End Sub
+
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+        Dim receivedDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim referencedSOPInstanceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+        Dim pass As Boolean = True
+
+        If Me.getStudyUID() Then
+            receivedDataSet = m_messageCollectionHelper.GetStructureSet()
+            If Not receivedDataSet Is Nothing Then
+                If Not receivedDataSet.Exists(Tags.ReferencedSOPInstanceUID) Then
+                    m_message = "Referenced SOP Instance UID (0008,1155) is not present"
+                    Me.SetError(m_message)
+                Else
+                    referencedSOPInstanceUIDAttribute = receivedDataSet(Tags.ReferencedSOPInstanceUID)
+
+                    If referencedSOPInstanceUIDAttribute.Values(0).Equals(m_studyUID) Then
+                        m_message = "Referenced SOP Instance UID (0008,1155) matches the Study Instance UID (0020,000D)"
+                        Me.SetValid(m_message)
+                    Else
+                        m_message = "Referenced SOP Instance UID (0008,1155) is not equal to the Study Instance UID (0020,000D)"
+                        Me.SetError(m_message)
+                    End If
+                End If
+            Else
+                m_message = "No RT Structure Set received"
+                Me.SetError(m_message)
+            End If
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+
+
+    'this function loads the study UID into m_studyUID, returns true if succesful, false if not
+    Function getStudyUID() As Boolean
+        Dim dataset As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim seriesInstanceUID As String
+        Dim pass As Boolean = True
+
+        'Get the first CT image (if there is at least one)
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage) > 0 Then
+            dataset = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, 1)
+            If Not dataset Is Nothing Then
+                If dataset.Exists(m_studyUIDTag) Then
+                    m_studyUID = dataset.GetValues(m_studyUIDTag)(0)
+                    If m_studyUID = "" Then
+                        m_message = "The CT Study instance UID is empty"
+                    End If
+                Else
+                    pass = False
+                    m_message = "The Study instance UID tag was missing in the CT"
+                End If
+            End If
+        ElseIf m_messageCollectionHelper.GetNumberOfSliceImages(IODType.MRImage) > 0 Then                       'Get the first MR image (if there is at least one)
+            dataset = m_messageCollectionHelper.GetSliceImage(IODType.MRImage, 1)
+            If Not dataset Is Nothing Then
+                If dataset.Exists(m_studyUIDTag) Then
+                    m_studyUID = dataset.GetValues(m_studyUIDTag)(0)
+                    If Not m_studyUID = "" Then
+                        m_message = "The MR Study instance UID is empty"
+                    End If
+                Else
+                    pass = False
+                    m_message = "The Study instance UID tag was missing in the MR"
+                End If
+            End If
+        ElseIf m_messageCollectionHelper.GetNumberOfSliceImages(IODType.PETImage) > 0 Then                    'Get the first PET image (if there is at least one)
+            dataset = m_messageCollectionHelper.GetSliceImage(IODType.PETImage, 1)
+            If Not dataset Is Nothing Then
+                If dataset.Exists(m_studyUIDTag) Then
+                    m_studyUID = dataset.GetValues(m_studyUIDTag)(0)
+                    If Not m_studyUID = "" Then
+                        m_message = "The PET Study instance UID is empty"
+                    End If
+                End If
+            Else
+                pass = False
+                m_message = "The Study instance UID tag was missing in the PET"
+            End If
+        End If
+
+        Return pass
+
+    End Function
+End Class

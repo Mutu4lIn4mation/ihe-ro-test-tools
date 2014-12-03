@@ -1,0 +1,50 @@
+Class RegisteredDisplayScenario2
+    Inherits Scenario
+    'There is 2 transactions in this scenario:
+    '- Send the modality images
+    '- Send a Registered Structure set
+    Public registeredDisplayActor As registeredDisplayActor = Nothing
+    Private send As SendScenarioStep = Nothing
+    Private cleanUp As CleanUpScenarioStep = Nothing
+    Private dialog As RegHybridDisplayDlg = Nothing
+    Private Cancelclicked As Boolean = False
+
+    'Constructor
+    Public Sub New()
+        registeredDisplayActor = New RegisteredDisplayActor
+        send = New SendScenarioStep
+        cleanUp = New CleanUpScenarioStep(TestToolConfiguration.GetInstance.GetSession.ResultsRootDirectory)
+        dialog = New RegHybridDisplayDlg
+
+        dialog.ShowDialog()
+
+        Select Case dialog.RegistratorDialogResult
+            Case DialogResult.CANCEL
+                Cancelclicked = True
+            Case DialogResult.CT_PET
+                send.AddActor(registeredDisplayActor)
+                send.AddTransaction(New RAD_8_Transaction(IODType.CTImage))
+                send.AddTransaction(New RAD_8_Transaction(IODType.PETImage))
+            Case DialogResult.CT_MR
+                send.AddActor(registeredDisplayActor)
+                send.AddTransaction(New RAD_8_Transaction(IODType.CTImage))
+                send.AddTransaction(New RAD_8_Transaction(IODType.MRImage))
+        End Select
+
+        If Cancelclicked = False Then
+
+            'scenario dataset
+            m_scenarioDatasetXmlFileName = "HybridReferenceDataSet.xml"
+ 
+            'Configurate the aditional send step
+            send.AddTransaction(New MMRO_4_Transaction)
+
+            m_scenarioSteps.Add(send)
+
+            If TestToolConfiguration.GetInstance.DoCleanUp = True Then
+                m_scenarioSteps.Add(cleanUp)
+            End If
+
+        End If 'Add the steps to the list
+    End Sub
+End Class

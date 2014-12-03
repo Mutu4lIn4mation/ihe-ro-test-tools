@@ -1,0 +1,95 @@
+Class ReferencedROINumberRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Referenced ROI Number Rule", "", iodType, severity)
+
+    End Sub
+    Private m_iodType As IODType
+    Private m_message As String
+    Private m_valid As Boolean = False
+
+    Private m_severity As ErrorSeverity
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim done As Boolean = False
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+        Dim referencedROINumberAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim rtROIObservationsSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim roiNumberAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim structureSetROISequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        If dicomMessage.DataSet.Exists(Tags.RTROIObservationsSequence) = False Then
+            m_valid = False
+            done = True
+            m_message = "The attribute: '" + Tags.GetTagName(Tags.RTROIObservationsSequence) + "' (" + Tags.RTROIObservationsSequence + ") is not present."
+        End If
+
+        If dicomMessage.DataSet.Exists(Tags.StructureSetROITagSequence) = False Then
+            m_valid = False
+            done = True
+            m_message = "The attribute: '" + Tags.GetTagName(Tags.StructureSetROITagSequence) + "' (" + Tags.StructureSetROITagSequence + ") is not present."
+        End If
+
+
+        If iodType = IODTypeRule And done = False Then
+            'Check if Roi Contour Sequence is present
+
+            rtROIObservationsSequenceAttribute = dicomMessage.DataSet(Tags.RTROIObservationsSequence)
+            Dim i As Integer
+            For i = 1 To rtROIObservationsSequenceAttribute.ItemCount()
+                If done = False Then
+                    seqItem = rtROIObservationsSequenceAttribute.GetItem(i)
+                    If seqItem.Exists(Tags.ReferencedROINumberTag) = False Then
+                        m_valid = False
+                        done = True
+                        m_message = "No '" + Tags.GetTagName(Tags.ReferencedROINumberTag) + "' (" + Tags.ReferencedROINumberTag + ") present in Sequence item: " + i.ToString()
+                    Else
+                        'The Referenced Roi Number 
+                        referencedROINumberAttribute = seqItem(Tags.ReferencedROINumberTag)
+
+                        structureSetROISequenceAttribute = dicomMessage.DataSet(Tags.StructureSetROITagSequence)
+                        Dim j As Integer
+                        If done = False Then
+                            Dim roiNumberFound As Boolean = False
+                            For j = 1 To structureSetROISequenceAttribute.ItemCount()
+                                If roiNumberFound = False Then
+
+                                    seqItem = structureSetROISequenceAttribute.GetItem(j)
+
+                                    If seqItem.Exists(Tags.RoiNumber) = False Then
+                                        m_valid = False
+                                        done = True
+                                        m_message = "The attribute: '" + Tags.GetTagName(Tags.RoiNumber) + "' (" + Tags.RoiNumber + ") is not present."
+                                    Else
+                                        roiNumberAttribute = seqItem(Tags.RoiNumber)
+                                        If referencedROINumberAttribute.Values.Equals(roiNumberAttribute.Values) = False Then
+                                            If roiNumberFound = False Then
+                                                m_valid = False
+                                                m_message = "'" + Tags.GetTagName(Tags.ReferencedROINumberTag) + "' (" + Tags.ReferencedROINumberTag + ") " + referencedROINumberAttribute.Values(0).ToString() + " does not match one of the '" + Tags.GetTagName(Tags.RoiNumber) + "' (" + Tags.RoiNumber + ")"
+                                            End If
+                                        Else
+                                            m_valid = True
+                                            roiNumberFound = True
+                                            m_message = "'" + Tags.GetTagName(Tags.ReferencedROINumberTag) + "' (" + Tags.ReferencedROINumberTag + ") " + referencedROINumberAttribute.Values(0).ToString() + " reference the '" + Tags.GetTagName(Tags.RoiNumber) + "' (" + Tags.RoiNumber + ")"
+                                        End If
+                                    End If
+                                End If
+                            Next
+                        End If
+                    End If
+                End If
+            Next
+        End If
+
+        If m_valid = True Then
+            Me.SetValid(m_message)
+        Else
+            Me.SetError(m_message)
+        End If
+
+        Me.Report()
+    End Sub
+End Class

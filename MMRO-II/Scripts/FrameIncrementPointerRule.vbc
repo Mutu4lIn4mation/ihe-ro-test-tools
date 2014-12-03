@@ -1,0 +1,28 @@
+Class FrameIncrementPointerRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Frame Increment Pointer Rule", "", iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim message As String = ""
+
+        If Not dicomMessage.DataSet.Exists(Tags.FrameIncrementPointer) Then
+            message = "The attribute " + Tags.GetTagName(Tags.FrameIncrementPointer) + "' (" + Tags.FrameIncrementPointer + ") is not present in the dataset."
+        ElseIf Not (dicomMessage.DataSet(Tags.FrameIncrementPointer).Values.Item(0).ToLower = Tags.GridFrameOffsetVector.ToLower) Then
+            message = "'" + Tags.GetTagName(Tags.FrameIncrementPointer) + "' (" + Tags.FrameIncrementPointer + ") does not refer to '" + Tags.GridFrameOffsetVector
+        Else
+            message = "'" + Tags.GetTagName(Tags.FrameIncrementPointer) + "' (" + Tags.FrameIncrementPointer + ") refers to '" + Tags.GridFrameOffsetVector
+            Me.SetValid(message)
+        End If
+
+        If Not Me.IsValid() Then
+            Me.SetError(message)
+        End If
+
+        Me.Report()
+    End Sub
+End Class

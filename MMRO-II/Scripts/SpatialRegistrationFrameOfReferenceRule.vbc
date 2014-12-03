@@ -1,0 +1,180 @@
+Class SpatialRegistrationFrameOfReferenceRule
+    Inherits MappingRule
+
+    Private message As String = ""
+    Private valid As Boolean
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Spatial Registration Frame Of Reference Rule", iodType, severity)
+        valid = False
+        message = ""
+
+    End Sub
+
+    Private m_mayCopy As Boolean
+
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim dataFrameOfReferenceBase As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim refDataFrameOfReference As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim dataFrameOfReferenceRegistered As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        Dim refDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim numberFound As Integer = 0
+        Dim pointToCT As Boolean = False
+        Dim pointToMR As Boolean = False
+        Dim pointToPET As Boolean = False
+
+        Dim refDataFrameOfReferenceString As String
+        Dim dataFrameOfReferenceBaseString As String
+
+        'Get the frame of reference uid
+        dataFrameOfReferenceBase = dicomMessage.DataSet(Tags.FrameofReferenceUID)
+
+        If dataFrameOfReferenceBase.Exists Then
+
+            dataFrameOfReferenceBaseString = dataFrameOfReferenceBase.Values.Item(0)
+            'Check to which frame of refecence the DataSet if pointing
+            'Get the first CT image
+            refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.CTImage).DataSet
+            refDataFrameOfReference = refDataSet(Tags.FrameofReferenceUID)
+            refDataFrameOfReferenceString = refDataFrameOfReference.Values.Item(0)
+
+            If dataFrameOfReferenceBaseString.Equals(refDataFrameOfReferenceString) Then
+                pointToCT = True
+                numberFound += 1
+            End If
+
+            'Get the first MR image
+            refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.MRImage).DataSet
+            refDataFrameOfReference = refDataSet(Tags.FrameofReferenceUID)
+            refDataFrameOfReferenceString = refDataFrameOfReference.Values.Item(0)
+
+            If dataFrameOfReferenceBaseString.Equals(refDataFrameOfReferenceString) Then
+                pointToMR = True
+                numberFound += 1
+            End If
+
+            'Get the first PET image
+            refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.PETImage).DataSet
+            refDataFrameOfReference = refDataSet(Tags.FrameofReferenceUID)
+            refDataFrameOfReferenceString = refDataFrameOfReference.Values.Item(0)
+
+            If dataFrameOfReferenceBaseString.Equals(refDataFrameOfReferenceString) Then
+                pointToPET = True
+                numberFound += 1
+            End If
+
+            If Not numberFound = 0 Then
+                message = "The '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ") of the spatial registration object is the same as "
+                If pointToCT = True Then
+                    message += "CT "
+                    If pointToMR = True Or pointToPET = True Then
+                        message += "and "
+                    End If
+                End If
+                If pointToMR = True Then
+                    message += "MR "
+                    If pointToPET = True Then
+                        message += "and "
+                    End If
+                End If
+                If pointToPET = True Then
+                    message += "PET "
+                End If
+
+                message += "if your base frame of reference is not metioned here the test has failed"
+            Else
+                message = "Critical attribute mapping: '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ") is not equal to frame of reference of the CT or MR or PET Dataset, you have no base frame of reference"
+                valid = False
+            End If
+        End If
+
+        If valid Then
+            Me.SetValid(message)
+        Else
+            Me.SetError(message)
+        End If
+
+        Me.Report()
+
+        pointToCT = False
+        pointToMR = False
+        pointToPET = False
+        numberFound = 0
+
+        'Get the registered frame of reference uid
+        dataFrameOfReferenceRegistered = dicomMessage.DataSet(Tags.RegistrationFrameofReferenceUID2)
+
+        If dataFrameOfReferenceRegistered.Exists Then
+
+            dataFrameOfReferenceBaseString = dataFrameOfReferenceRegistered.Values.Item(0)
+            'Check to which frame of refecence the DataSet if pointing
+            'Get the first CT image
+            refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.CTImage).DataSet
+            refDataFrameOfReference = refDataSet(Tags.FrameofReferenceUID)
+            refDataFrameOfReferenceString = refDataFrameOfReference.Values.Item(0)
+
+            If dataFrameOfReferenceBaseString.Equals(refDataFrameOfReferenceString) Then
+                pointToCT = True
+                numberFound += 1
+            End If
+
+            'Get the first MR image
+            refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.MRImage).DataSet
+            refDataFrameOfReference = refDataSet(Tags.FrameofReferenceUID)
+            refDataFrameOfReferenceString = refDataFrameOfReference.Values.Item(0)
+
+            If dataFrameOfReferenceBaseString.Equals(refDataFrameOfReferenceString) Then
+                pointToMR = True
+                numberFound += 1
+            End If
+
+            'Get the first PET image
+            refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.PETImage).DataSet
+            refDataFrameOfReference = refDataSet(Tags.FrameofReferenceUID)
+            refDataFrameOfReferenceString = refDataFrameOfReference.Values.Item(0)
+
+            If dataFrameOfReferenceBaseString.Equals(refDataFrameOfReferenceString) Then
+                pointToPET = True
+                numberFound += 1
+            End If
+
+            If Not numberFound = 0 Then
+                message = "The '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ") that is registered to this base is the same as "
+                If pointToCT = True Then
+                    message += "CT "
+                    If pointToMR = True Or pointToPET = True Then
+                        message += "and "
+                    End If
+                End If
+                If pointToMR = True Then
+                    message += "MR "
+                    If pointToPET = True Then
+                        message += "and "
+                    End If
+                End If
+                If pointToPET = True Then
+                    message += "PET "
+                End If
+
+                message += "if the image type you registered is not metioned here the test has failed"
+            Else
+                message = "Critical attribute mapping: '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ") is not equal to frame of reference of the CT or MR or PET Dataset, you have no registered image"
+                valid = False
+            End If
+        End If
+
+        If valid Then
+            Me.SetValid(message)
+        Else
+            Me.SetError(message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+
+End Class

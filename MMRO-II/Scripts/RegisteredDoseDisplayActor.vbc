@@ -1,0 +1,14 @@
+
+'Registered Dose Display actor object
+Class RegisteredDoseDisplayActor
+Inherits Actor
+
+   'Constructor
+   Public Sub New()
+		'Actor Id
+		m_id = "RegisteredDoseDisplay"
+		'Actor name
+        m_name = "Registered Dose Display actor"
+   End Sub
+
+End Class

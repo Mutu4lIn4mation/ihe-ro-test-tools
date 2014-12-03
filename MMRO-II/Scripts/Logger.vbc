@@ -1,0 +1,62 @@
+Class Logger
+
+    'the actual instance of the ReferenceDataSet class
+    Private Shared m_instance As Logger
+    Private m_reporter As Reporter = Reporter.GetInstance()
+	Private m_logDebugMessage As Boolean = True
+	
+    'we hide the constructor from the outside
+    Private Sub New()
+    End Sub
+
+	Public Property LogDebugMessages() As Boolean
+		Get
+			Return m_logDebugMessage
+		End Get
+		Set
+			m_logDebugMessage = Value
+		End Set
+	End Property
+
+    Public Sub LogMessage(ByVal message As System.String)
+        If m_logDebugMessage Then
+            m_reporter.ReportDebugMessage("LOG : " + message)
+        End If
+#If Not DVT_INTERPRETS_SCRIPT Then
+        Debug.WriteLine(message)
+#End If
+    End Sub
+
+    Public Sub LogWarningMessage(ByVal message As System.String)
+
+        If m_logDebugMessage Then
+            m_reporter.ReportWarningMessage("WARNING : " + message)
+        End If
+#If Not DVT_INTERPRETS_SCRIPT Then
+        Debug.WriteLine(Message)
+#End If
+
+    End Sub
+
+    Public Sub LogErrorMessage(ByVal message As System.String)
+
+        If m_logDebugMessage Then
+            m_reporter.ReportErrorMessage("ERROR : " + message)
+        End If
+#If Not DVT_INTERPRETS_SCRIPT Then
+        Debug.WriteLine(message)
+#End If
+
+    End Sub
+
+    'Static method for creating one single instance
+    Public Shared Function GetInstance() As Logger
+        ' initialize if not already done
+        If m_instance Is Nothing Then
+            m_instance = New Logger
+        End If
+        ' return the initialized instance of the Logger Class
+        Return m_instance
+    End Function 'Instance
+
+End Class

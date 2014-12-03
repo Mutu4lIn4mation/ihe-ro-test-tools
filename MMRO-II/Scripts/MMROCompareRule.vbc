@@ -1,0 +1,273 @@
+Class CompareRule
+    Inherits MappingRule
+    ''' <summary>
+    ''' This rule compares an incoming dicommessage with a dicommessage in the reference dataset
+    ''' </summary>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+        MyBase.New("Compare Rule", iodType, severity)
+    End Sub
+
+    'This method applies the rule to a dataset and reports whether it is correct or not
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        'check if message iodType corresponds to the iodtype of this rule
+        If iodType = IODTypeRule Then
+
+            'Dim scen As ARTO_Scenario = Nothing
+            'get the corresponding object from the reference test data (by matching sop instance uid)
+            Dim refMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = GetCorrespondingRefMessage(dicomMessage.DataSet)
+
+            'if the reference test data set object could not be found, report this 
+            If refMessage Is Nothing Then
+                SetError("The received object is not one of the reference data set objects sent earlier in this scenario.")
+            Else
+                ' compare the two objects
+
+                Dim messageSopClassUID As String = dicomMessage.CommandSet.GetSopClassUid()
+                Dim referenceSopClassUID As String = refMessage.DataSet(Tags.SOPClassUID).Values.Item(0)
+
+                If Not messageSopClassUID = "" And Not referenceSopClassUID = "" Then
+                    Logger.GetInstance().LogMessage(String.Format("Comparing received message with IODType '{0}' (sop class UID: {1}) " _
+                                                            & "with reference message message with IODType '{2}' (sop class UID: {3}) ", _
+                        SOPclass.GetIODType(messageSopClassUID), messageSopClassUID, SOPclass.GetIODType(referenceSopClassUID), referenceSopClassUID))
+                End If
+
+
+                If (CompareMessageWithRefTestDataObject(dicomMessage.DataSet, refMessage.DataSet) = True) Then
+                    SetValid("The received object is equal to the reference test data set counterpart")
+                Else
+                    SetError("The received object is not equal to the reference test data set counterpart")
+                End If
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Report()
+        End If
+    End Sub
+
+    'this method retrieves the corresponding dataset object from the reference data set, based on its sop class uid
+    Protected Function GetCorrespondingRefMessage(ByVal messageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+
+        'Determine message sop class uid
+        If Not messageDataSet.Exists(Tags.SOPClassUID) Then
+            Logger.GetInstance.LogMessage("Message received does not have a '" + Tags.GetTagName(Tags.SOPClassUID) + "' (" + Tags.SOPClassUID + ") attribute")
+            Return Nothing
+        End If
+        'Determine message sop instance uid
+        If Not messageDataSet.Exists(Tags.SOPInstanceUID) Then
+            Logger.GetInstance.LogMessage("Message received does not have a '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") attribute")
+            Return Nothing
+        End If
+
+        Dim messageSOPClassUID As String = messageDataSet(Tags.SOPClassUID).Values.Item(0)
+        Dim messageSOPInstanceUID As String = messageDataSet(Tags.SOPInstanceUID).Values.Item(0)
+
+        Logger.GetInstance.LogMessage(String.Format("Looking up RTPlan with '" + Tags.GetTagName(Tags.SOPClassUID) + "' '{0}' and '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' '{1}' " _
+                                                  & "in reference test data", messageSOPClassUID, messageSOPInstanceUID))
+
+        'For beamScenario As ARTO_Scenario = ARTO_Scenario.BasicStaticBeam To ARTO_Scenario.IMATVMATBeam
+
+        'remove any spaces in the sop class & instance uid
+        Dim space As Char = " "c
+        messageSOPClassUID = messageSOPClassUID.TrimStart(space)
+        messageSOPClassUID = messageSOPClassUID.TrimEnd(space)
+
+        Dim refMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = Nothing
+
+        'Now we compare the received UID with all the SOPInstaceUID's in the ReferenceTestDataset
+        Select Case messageSOPClassUID
+            Case SOPclass.RTDoseSOPClassUID
+                Logger.GetInstance.LogMessage("Looking up RTDose with '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") '" + messageSOPInstanceUID + "'in scenario reference test data")
+                refMessage = ReferenceDataSet.GetInstance.GetRTDose()
+            Case SOPclass.RTStructureSetSOPClassUID
+                Logger.GetInstance.LogMessage("Looking up RTStructureSet with '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") '" + messageSOPInstanceUID + "'in scenario reference test data")
+                refMessage = ReferenceDataSet.GetInstance.GetRTStructureSet()
+                
+            Case SOPclass.RTPlanDosimetricSOPClassUID
+                Logger.GetInstance.LogMessage("Looking up RTPlan with '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") '" + messageSOPInstanceUID + "'in scenario reference test data")
+                refMessage = ReferenceDataSet.GetInstance.GetRTPlanGeometric()
+            Case SOPclass.SpatialRegistrationSOPClassUID
+                Logger.GetInstance.LogMessage("Looking up SpatialRegistration with '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") '" + messageSOPInstanceUID + "'in scenario reference test data")
+                Dim array() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+                array = ReferenceDataSet.GetInstance.GetSpatialRegistration()
+                refMessage = array(0)
+
+            Case SOPclass.CTImageSOPClassUID
+                refMessage = ReferenceDataSet.GetInstance.GetSliceImage(1, 1, IODType.CTImage)
+            Case SOPclass.MRImageSOPClassUID
+                refMessage = ReferenceDataSet.GetInstance.GetSliceImage(1, 1, IODType.MRImage)
+            Case SOPclass.PetImageSOPClassUID
+                refMessage = ReferenceDataSet.GetInstance.GetSliceImage(1, 1, IODType.PETImage)
+            Case Else
+                Return Nothing
+        End Select
+
+        Dim refSOPInstanceUID As String = refMessage.DataSet(Tags.SOPInstanceUID).Values.Item(0)
+
+        If (refSOPInstanceUID = messageSOPInstanceUID) Then
+
+            Logger.GetInstance().LogMessage(String.Format("The received object is equal to the reference test data set counterpart."))
+            Me.removeGroupLengths(messageDataSet, "")
+            'scen = beamScenario
+            Return refMessage
+        End If
+
+        'Next
+
+        Logger.GetInstance.LogMessage("Received object has an unexpected '" + Tags.GetTagName(Tags.SOPClassUID) + "' (" + Tags.SOPClassUID + "). (" + messageSOPClassUID + ") or (see next line)")
+        Logger.GetInstance.LogMessage("Received object has an unexpected '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + "). (" + messageSOPInstanceUID + ")")
+        Logger.GetInstance.LogMessage("'" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") length = " + Len(messageSOPInstanceUID).ToString())
+        Len(messageSOPInstanceUID).ToString()
+
+        Return Nothing
+
+    End Function
+
+    'This method compares two datasets and returns true if they are the same.
+    Protected Function CompareMessageWithRefTestDataObject(ByVal messageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal refDatasetObject As DvtkHighLevelInterface.Dicom.Other.DataSet) As Boolean
+
+        'Create a compare thread
+        Dim TheCompareDicomThread As CompareDicomThread = New CompareDicomThread(messageDataSet, refDatasetObject)
+
+        'Compare message with its reference test data object
+        Logger.GetInstance.LogMessage("Comparing message (this takes a while)...")
+        TheCompareDicomThread.PerformCompare()
+
+        Return (TheCompareDicomThread.theCompareResults.DifferencesCount = 0)
+
+    End Function
+    Private Sub removeGroupLengths(ByRef attributeSet As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal tagsequence As String)
+        Dim i As Integer
+
+        'Iterate through attribute Set
+        For i = (attributeSet.Count - 1) To 0 Step -1
+            Dim uid As String = ""
+            Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+            attribute = attributeSet(i)
+
+            'is this a sequence? then parse its sequence attributes
+            If DvtkData.Dimse.VR.SQ = attribute.VR Then
+                Dim itemIndex As Integer
+                'Parse attributes for all the items in the sequence
+                For itemIndex = 1 To attribute.ItemCount
+                    Dim sequenceItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = attribute.GetItem(itemIndex)
+                    removeGroupLengthsItem(sequenceItem, tagsequence + GetTagString(attribute) + "[" + itemIndex.ToString + "]/")
+                Next itemIndex
+            End If
+
+            'is this a group length tag? 
+            If attributeSet(i).ElementNumber.ToString = "0" Then
+                attribute.Delete()
+            Else
+            End If
+        Next i
+    End Sub
+    Private Sub removeGroupLengthsItem(ByRef attributeSet As DvtkHighLevelInterface.Dicom.Other.SequenceItem, ByVal tagsequence As String)
+        Dim i As Integer
+
+        'Iterate through attribute Set
+        For i = (attributeSet.Count - 1) To 0 Step -1
+            Dim uid As String = ""
+            Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+            attribute = attributeSet(i)
+
+            'is this a sequence? then parse its sequence attributes
+            If DvtkData.Dimse.VR.SQ = attribute.VR Then
+                Dim itemIndex As Integer
+                'Parse attributes for all the items in the sequence
+                For itemIndex = 1 To attribute.ItemCount
+                    Dim sequenceItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = attribute.GetItem(itemIndex)
+                    removeGroupLengthsItem(sequenceItem, tagsequence + GetTagString(attribute) + "[" + itemIndex.ToString + "]/")
+                Next itemIndex
+            End If
+
+            'is this a group length tag? 
+            If attributeSet(i).ElementNumber.ToString = "0" Then
+                attribute.Delete()
+            Else
+            End If
+        Next i
+    End Sub
+    Private Function GetTagString(ByRef attribute As DvtkHighLevelInterface.Dicom.Other.Attribute) As String
+        Dim myString As String = ""
+
+        Try
+            myString = String.Format("0x{0:X4}{1:X4}", attribute.GroupNumber, attribute.ElementNumber)
+        Catch ex As System.Exception
+            Logger.GetInstance.LogMessage(ex.Message)
+        End Try
+
+        Return myString
+    End Function
+
+End Class
+
+
+Public Class CompareDicomThread
+    Inherits DvtkHighLevelInterface.Dicom.Threads.DicomThread
+
+    'Constructor
+    Public Sub New(ByRef messageDataset As DvtkHighLevelInterface.Dicom.Other.DataSet, ByRef referenceDataset As DvtkHighLevelInterface.Dicom.Other.DataSet)
+        Me.m_MessageDataset = messageDataset
+        Me.m_ReferenceDataset = referenceDataset
+    End Sub
+
+    'members
+
+    Private m_MessageDataset As DvtkHighLevelInterface.Dicom.Other.DataSet
+    Private m_ReferenceDataset As DvtkHighLevelInterface.Dicom.Other.DataSet
+    Public theCompareResults As DvtkHighLevelInterface.Common.Other.CompareResults = Nothing
+
+    'methods
+    ' compare  the message data object with the reference data object and generate a comparisson table
+    Public Sub PerformCompare()
+
+        Initialize(TestToolConfiguration.GetInstance.GetMainThread)
+        Options.CopyFrom(TestToolConfiguration.GetInstance.GetMainThread.Options)
+
+        Options.Name = "Comparison_reference_data_object"
+        'Options.Identifier = string.Format("Comparison of '{0}' and '{1}'" ...
+
+        Options.LogThreadStartingAndStoppingInParent = False
+        Options.AutoValidate = False
+        Options.GenerateDetailedResults = True
+
+        REM #If DVT_INTERPRETS_SCRIPT Then
+        REM Dim theHliForm As New HliForm
+        REM theHliForm.Attach(Me)
+        REM #Else
+        REM HliForm.GetSingleton().Attach(Me)
+        REM HliForm.GetSingleton().AutoExit = False
+        REM #End If
+        Options.ShowResults = False
+        Options.StartAndStopResultsGatheringEnabled = True
+        ResultsGatheringStarted = False
+
+        Start()
+        WaitForCompletion()
+
+    End Sub
+
+    Protected Overrides Sub Execute()
+
+        Dim theStaticCompare As DvtkHighLevelInterface.Common.Other.StaticCompare = New DvtkHighLevelInterface.Common.Other.StaticCompare
+
+        Dim theDataSets As New ArrayList
+        Dim theDataSetDescriptions As New Specialized.StringCollection
+
+        theDataSets.Add(m_MessageDataset)
+        theDataSetDescriptions.Add("The received message")
+        theDataSets.Add(m_ReferenceDataset)
+        theDataSetDescriptions.Add("reference test data object")
+
+        Me.theCompareResults = theStaticCompare.CompareAttributeSets("Compare results", theDataSets, theDataSetDescriptions, DvtkHighLevelInterface.Common.Other.CompareFlags.Compare_present Or DvtkHighLevelInterface.Common.Other.CompareFlags.Compare_values Or DvtkHighLevelInterface.Common.Other.CompareFlags.Compare_VR)
+        Me.NrOfValidationErrors = Convert.ToUInt32(Convert.ToInt32(Me.NrOfValidationErrors) + Me.theCompareResults.DifferencesCount)
+
+        WriteHtmlInformation(theCompareResults.Table.ConvertToHtml())
+
+    End Sub
+
+End Class

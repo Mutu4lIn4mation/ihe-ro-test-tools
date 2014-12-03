@@ -1,0 +1,39 @@
+Class SendScenarioStep
+    Inherits ScenarioStep
+
+    Private m_actors As ArrayList = New ArrayList
+    Private m_transactions As ArrayList = New ArrayList
+    Private m_sender As Sender
+
+    Public Sub New()
+        m_type = SEND
+
+        'Create sender
+        m_sender = New Sender
+    End Sub
+
+    ' - sending the transactions to the actor (Sender)
+    Public Overrides Sub Execute()
+        If m_transactions.Count > 0 Then
+            m_sender.SendTransactions(m_transactions)
+        End If
+    End Sub
+
+    'Add an actor
+    Public Sub AddActor(ByVal actor As Actor)
+        m_actors.Add(actor)
+    End Sub
+
+    'Add a transaction
+    Public Sub AddTransaction(ByVal transaction As Transaction)
+        m_transactions.Add(transaction)
+    End Sub
+
+    'The received messages of this scenario step
+    Public ReadOnly Property Actors() As ArrayList
+        Get
+            Return m_actors
+        End Get
+    End Property
+
+End Class

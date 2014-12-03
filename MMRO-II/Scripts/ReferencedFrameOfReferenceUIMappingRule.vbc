@@ -1,0 +1,173 @@
+Class ReferencedFrameOfReferenceUIDMappingRule
+    Inherits MappingRule
+    Private m_refDataIODType As DialogResult
+    Private refDatasetName As String
+    Private m_hybrid As Boolean
+    Private m_Message As String
+
+    Public Sub New(ByVal severity As ErrorSeverity, ByVal iodType As IODType, ByVal refDataSetIODType As DialogResult, ByVal hybrid As Boolean)
+
+        MyBase.New("Referenced Frame Of Reference UID Mapping Rule", iodType, severity)
+        Me.m_refDataIODType = refDataSetIODType
+        Me.m_hybrid = hybrid
+        Me.m_Message = ""
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim structureSetDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim refDataset As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim pass As Boolean = False
+        Dim multipleFORs As Boolean = False
+
+        If IODTypeRule = iodType Then
+            If dicomMessage.DataSet Is Nothing Then
+                pass = False
+                m_Message = "No RT Structure Set received"
+            Else
+                structureSetDataSet = dicomMessage.DataSet
+
+                'Get first image of the given dataset from the ReferenceDataSet
+                If m_hybrid Then
+                    refDataset = Me.getCorrespondingReferenceDataSet(iodType.CTImage)
+
+                Else
+                    Select Case m_refDataIODType
+                        Case DialogResult.CT_PET
+                            refDataset = Me.getCorrespondingReferenceDataSet(iodType.PETImage)
+                            pass = Me.checkFrameOfReference(refDataset, structureSetDataSet, multipleFORs)
+                        Case DialogResult.CT_MR
+                            refDataset = Me.getCorrespondingReferenceDataSet(iodType.MRImage)
+                            pass = Me.checkFrameOfReference(refDataset, structureSetDataSet, multipleFORs)
+                        Case DialogResult.CT_MR_PET
+                            refDataset = Me.getCorrespondingReferenceDataSet(iodType.PETImage)
+                            multipleFORs = True
+                    End Select
+                End If
+            End If
+            'Check the frame of reference now
+            If multipleFORs Then
+                pass = Me.checkFrameOfReference(refDataset, structureSetDataSet, multipleFORs)
+                If Not pass Then
+                    refDataset = Me.getCorrespondingReferenceDataSet(iodType.MRImage)
+                    pass = Me.checkFrameOfReference(refDataset, structureSetDataSet, multipleFORs)
+                End If
+            Else
+                pass = Me.checkFrameOfReference(refDataset, structureSetDataSet, False)
+            End If
+
+            If pass Then
+                If m_hybrid Then
+                    m_Message = "'" + Tags.GetTagName(Tags.ReferencedFrameOfReferenceUIDTagSequence) + "' (" + Tags.ReferencedFrameOfReferenceUIDTagSequence + ") is equal to the '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ")"
+                Else
+                    m_Message = "'" + Tags.GetTagName(Tags.ReferencedFrameOfReferenceUIDTagSequence) + "' (" + Tags.ReferencedFrameOfReferenceUIDTagSequence + ") is equal to the '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ") of " + refDatasetName
+                End If
+
+                Me.SetValid(m_Message)
+            Else
+                Me.SetError(m_Message)
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+    'Get corresponding dataset object, return MR as default
+    Private Function getCorrespondingReferenceDataSet(ByVal iodType As IODType) As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Dim Dataset As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Select Case iodType
+            Case iodType.CTImage
+                Dataset = ReferenceDataSet.GetInstance.GetSliceImage(1, 1, iodType.CTImage).DataSet
+                refDatasetName = "CT"
+            Case iodType.MRImage
+                Dataset = ReferenceDataSet.GetInstance.GetSliceImage(1, 1, iodType.MRImage).DataSet
+                refDatasetName = "MR"
+            Case iodType.PETImage
+                Dataset = ReferenceDataSet.GetInstance.GetSliceImage(1, 1, iodType.PETImage).DataSet
+                refDatasetName = "PET"
+            Case Else
+                Dataset = ReferenceDataSet.GetInstance.GetSliceImage(1, 1, iodType.MRImage).DataSet
+                refDatasetName = "MR"
+        End Select
+        Return Dataset
+    End Function
+    'check if the correct frame of reference is used
+    Private Function checkFrameOfReference(ByVal refDataset As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal structureSetDataset As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal multipleFORs As Boolean) As Boolean
+        Dim frameOfReferenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim referencedFrameOfReferenceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim structureSetROITagSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+
+        Dim oldReferencedFrameOfReferenceUIDValue As String = ""
+        Dim referencedFrameOfReferenceUIDValue As String
+        Dim frameOfReferenceUIDValue As String
+
+        Dim valid As Boolean = False
+        Dim done As Boolean = False
+
+        If Not refDataset Is Nothing Then
+            'Get frameOfReference from the ct image
+            frameOfReferenceAttribute = refDataset(Tags.FrameofReferenceUID)
+            frameOfReferenceUIDValue = frameOfReferenceAttribute.Values(0)
+
+            'Check if Structure Set ROI Sequence is present
+            If structureSetDataset.Exists(Tags.StructureSetROITagSequence) = False Then
+                valid = False
+                m_Message = "'" + Tags.GetTagName(Tags.StructureSetROITagSequence) + "' (" + Tags.StructureSetROITagSequence + ") not present"
+            Else
+                'Get Structure Set ROI Sequence from dataset
+                structureSetROITagSequenceAttribute = structureSetDataset(Tags.StructureSetROITagSequence)
+                Dim i As Integer
+                'Itterate through the items
+
+                If structureSetROITagSequenceAttribute.ItemCount() = 0 Then
+                    valid = False
+                    m_Message = "'" + Tags.GetTagName(Tags.StructureSetROITagSequence) + "' (" + Tags.StructureSetROITagSequence + ") does not contain items"
+                Else
+                    For i = 1 To structureSetROITagSequenceAttribute.ItemCount()
+                        seqItem = structureSetROITagSequenceAttribute.GetItem(i)
+                        'Get referencedFrameOfReferenceUID Value
+                        referencedFrameOfReferenceUIDValue = seqItem.GetValues(Tags.ReferencedFrameOfReferenceUIDTagSequence)(0)
+
+                        'If one referencedFrameOfReferenceUIDValue is not equal to frameOfReferenceUIDValue
+                        'Then stop searching
+                        If done = False Then
+                            If oldReferencedFrameOfReferenceUIDValue = "" Then
+                                oldReferencedFrameOfReferenceUIDValue = referencedFrameOfReferenceUIDValue
+                            End If
+
+                            If oldReferencedFrameOfReferenceUIDValue = referencedFrameOfReferenceUIDValue Then
+                                If Not referencedFrameOfReferenceUIDValue = frameOfReferenceUIDValue Then
+                                    done = True
+                                    valid = False
+                                    If m_hybrid Then
+                                        m_Message = "'" + Tags.GetTagName(Tags.ReferencedFrameOfReferenceUIDTagSequence) + "' (" + Tags.ReferencedFrameOfReferenceUIDTagSequence + ") with value: " + referencedFrameOfReferenceUIDValue + " is not equal to the '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ") value: " + frameOfReferenceUIDValue
+                                    Else
+                                        If multipleFORs Then
+                                            m_Message = "'" + Tags.GetTagName(Tags.ReferencedFrameOfReferenceUIDTagSequence) + "' (" + Tags.ReferencedFrameOfReferenceUIDTagSequence + ") with value: " + referencedFrameOfReferenceUIDValue + " does not point to the Frame of reference of PET or MR"
+                                        Else
+                                            m_Message = "'" + Tags.GetTagName(Tags.ReferencedFrameOfReferenceUIDTagSequence) + "' (" + Tags.ReferencedFrameOfReferenceUIDTagSequence + ") with value: " + referencedFrameOfReferenceUIDValue + " is not equal to the " + Me.refDatasetName + " '" + Tags.GetTagName(Tags.FrameofReferenceUID) + "' (" + Tags.FrameofReferenceUID + ") " + frameOfReferenceUIDValue
+                                        End If
+
+                                    End If
+                                Else
+                                    valid = True
+                                End If
+                            Else
+                                valid = False
+                                m_Message = "Invalid structure set: the 'referencedFrameOfReferenceUID's' (" + Tags.ReferencedFrameOfReferenceUIDTagSequence + ") do not all point to the same frame of reference" + Environment.NewLine + "Expected value: " + oldReferencedFrameOfReferenceUIDValue + " found value: " + referencedFrameOfReferenceUIDValue
+                            End If
+                        End If
+                    Next i
+                End If
+            End If
+        Else
+            valid = False
+            m_Message = "failed to retrieve the dataset form the reference data"
+        End If
+
+        Return valid
+    End Function
+End Class

@@ -1,0 +1,374 @@
+Class ArchiveScenario3
+    Inherits Scenario
+    'Different steps in this scenario:
+    '- store the reference dataset
+    '- recieve the reference dataset
+    '- compare the reference with the revieved dataset
+    Public archiveActor As archiveActor = Nothing
+    Private dialog As ArchiveDlg3 = Nothing
+    Private Cancelclicked As Boolean = False
+    Private recieve As ReceiveScenarioStep = Nothing
+    Private validate As ValidateScenarioStep = Nothing
+    Private cleanUp As CleanUpScenarioStep = Nothing
+
+    Public Sub New()
+
+        archiveActor = New ArchiveActor
+        dialog = New ArchiveDlg3
+        cleanUp = New CleanUpScenarioStep(TestToolConfiguration.GetInstance.GetSession.ResultsRootDirectory)
+
+        'Show the dialog so that the user can specify which image set(s) is/are send
+        dialog.ShowDialog()
+
+        'set the XML configuration file
+        'm_scenarioDatasetXmlFileName = "TransparencyReferenceDataSet.xml"
+
+        'configure the send scenario step
+        'No send scenario step needed
+
+        'configure the recieve scenario step
+
+        Select Case dialog.ArchiveDialogResult
+            Case DialogResult.CT_PET
+                recieve = New ReceiveScenarioStep(DialogResult.ONEOBJECT)
+                recieve.AddActor(archiveActor)
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.CTImage))
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.PETImage))
+                'MMRO I
+                'recieve.AddTransaction(New MMRO_2_Transaction(DialogResult.ONEOBJECT))
+                'MMRO II
+                recieve.AddTransaction(New MMRO_II_2_Transaction(DialogResult.ONEOBJECT))
+            Case DialogResult.CT_MR
+                recieve = New ReceiveScenarioStep(DialogResult.ONEOBJECT)
+                recieve.AddActor(archiveActor)
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.CTImage))
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.MRImage))
+                'MMRO I
+                'recieve.AddTransaction(New MMRO_2_Transaction(DialogResult.ONEOBJECT))
+                'MMRO II
+                recieve.AddTransaction(New MMRO_II_2_Transaction(DialogResult.ONEOBJECT))
+            Case DialogResult.MR_PET
+                recieve = New ReceiveScenarioStep(DialogResult.ONEOBJECT)
+                recieve.AddActor(archiveActor)
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.MRImage))
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.PETImage))
+                'MMRO I
+                'recieve.AddTransaction(New MMRO_2_Transaction(DialogResult.ONEOBJECT))
+                'MMRO II
+                recieve.AddTransaction(New MMRO_II_2_Transaction(DialogResult.ONEOBJECT))
+            Case DialogResult.CT_MR_PET
+                recieve = New ReceiveScenarioStep(DialogResult.ARCHIVE)
+                recieve.AddActor(archiveActor)
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.CTImage))
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.MRImage))
+                recieve.AddTransaction(New RAD_8_Transaction(IODType.PETImage))
+                'MMRO I
+                'recieve.AddTransaction(New MMRO_2_Transaction(DialogResult.ARCHIVE))
+                'MMRO II
+                recieve.AddTransaction(New MMRO_II_2_Transaction(DialogResult.ARCHIVE))
+            Case DialogResult.CANCEL
+                Cancelclicked = True
+        End Select
+
+        If Not Cancelclicked Then
+
+            'Add the aditional recieve steps
+            'Add Registered structure set retrieval
+            recieve.AddTransaction(New MMRO_4_Transaction)
+
+            'configure the validate scenario step
+            validate = New ValidateScenarioStep(recieve, False)
+
+            'validate.AddRule(New CriticalAttributeInterRelationRule("", True, True, ErrorSeverity.RuleError))
+
+            'C.7.1.1 Patient Module
+            'Patient's Name	(0010,0010), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientName, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Patient ID	(0010,0020), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientID, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Patient's Birthdate (0010,0030), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientsBirthDate, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Patient's Sex (0010,0040), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientSex, False, True, ErrorSeverity.RuleError, IODType.Generic))
+
+            'C.7.2.1 General Study Module		
+            'Study Instance UID (0020,000D), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyInstanceUID, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Study Date (0008,0020), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyDate, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Study Time (0008,0030), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyTime, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Referring Physician's Name (0008,0090), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.ReferringPhysiciansName, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Study ID (0020,0010), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyID, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Accession Number (0008,0050), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.AccessionNumber, False, True, ErrorSeverity.RuleError, IODType.Generic))
+            'Study Description (0008,1030), same as in other received objects
+            validate.AddRule(New StudyDescriptionInterrelationRule(False, True, ErrorSeverity.RuleError, IODType.Generic))
+
+            'C.7.3.1 General Series Module
+            'Series Instance (0020,000E), the Spatial Registration object shall be stored in a different series from images.
+            'So series instance UID in the Spatial Registration will be unique.
+            validate.AddRule(New SeriesInstanceUIDInterRelationRule(ErrorSeverity.RuleError, IODType.Generic))
+            'TODO C.7.3.1 Critical attribute rules, can we use CriticalAttributeInterRelationRule for this?
+
+            'Patient Position should be one of these values HFS, FFS, HFP, FFP.
+            Dim values(3) As String
+            values(0) = "HFS"
+            values(1) = "FFS"
+            values(2) = "HFP"
+            values(3) = "FFP"
+            validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.CTImage, ErrorSeverity.RuleError))
+            validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.MRImage, ErrorSeverity.RuleError))
+            validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.PETImage, ErrorSeverity.RuleError))
+            validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+            'C.7.4.1 Frame Of Reference Module
+            'The Frame of Reference UID (0020,0052) of the Registration instance will have the same Frame of Reference UID
+            'as the registered image set
+            '!!! Also for hybrid? !!!
+            validate.AddRule(New SameFrameOfReferenceInterRelationRule(Tags.FrameofReferenceUID, ErrorSeverity.RuleError, False))
+            'The Frame of Reference UID (0020,0052) has to be different in all other image modality types
+            '!!! Also for hybrid? !!!
+            validate.AddRule(New ImageModalityFrameOfReferenceRule(ErrorSeverity.RuleError, False, IODType.Generic))
+            'Position Reference Indicator (0020,1040), the same comments as the Frame of Reference UID apply here
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PositionReferenceIndicator, False, False, ErrorSeverity.RuleError, IODType.Generic))
+
+            'C.7.5.1 General Equipment Module
+            'no rules for this module apply
+
+            'C.7.6.2 Image Plane Module
+
+            'Slice Thickness 0018,0050 is optional
+            validate.AddRule(New OptionalRule(Tags.SliceThickness, IODType.CTImage, ErrorSeverity.RuleError))
+            'Slice Location	0020,1041 is optional
+            validate.AddRule(New OptionalRule(Tags.SliceLocation, IODType.CTImage, ErrorSeverity.RuleError))
+            'Slice Thickness 0018,0050 is optional
+            validate.AddRule(New OptionalRule(Tags.SliceThickness, IODType.MRImage, ErrorSeverity.RuleError))
+            'Slice Location	0020,1041 is optional
+            validate.AddRule(New OptionalRule(Tags.SliceLocation, IODType.MRImage, ErrorSeverity.RuleError))
+            'Slice Thickness 0018,0050 is optional
+            validate.AddRule(New OptionalRule(Tags.SliceThickness, IODType.PETImage, ErrorSeverity.RuleError))
+            'Slice Location	0020,1041 is optional
+            validate.AddRule(New OptionalRule(Tags.SliceLocation, IODType.PETImage, ErrorSeverity.RuleError))
+
+            '1. For CTImage IOD, non-isotropic pixels are outside the scope of the profile
+            '2. For RT Dose IOD, pixel spacing may be non-isotropic
+            '3. For IHE-RO 2008 (MR, PET): We do require the X and Y resolutions are equal, the z resolution may be different
+            validate.AddRule(New PixelSpacingRule(IODType.CTImage, ErrorSeverity.RuleError))
+            validate.AddRule(New PixelSpacingRule(IODType.MRImage, ErrorSeverity.RuleError))
+            validate.AddRule(New PixelSpacingRule(IODType.PETImage, ErrorSeverity.RuleError))
+
+            'C.8.8.5 Structure Set Module
+            'Structure Set Label 3006,0002 is required
+            validate.AddRule(New IsRequiredRule(Tags.StructureSetLabel, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Structure Set Date	3006,0008 is required
+            validate.AddRule(New IsRequiredRule(Tags.StructureSetDate, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Structure Set Time	3006,0009 is required
+            validate.AddRule(New IsRequiredRule(Tags.StructureSetTime, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'Referenced Frame of Reference Sequence (0x30060010), may only contain one item
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.ReferencedFrameofReferenceSequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'RT Referenced Study Sequence (0x30060012), may only contain one item
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.RTReferencedStudySequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Referenced SOP Instance UID, This Study Instance UID shall be the same as the Study Instance UID of the related CT instances.
+            'Based on the single CT-Series input CT-Images
+            'BRTO RULE -> validate.AddRule(New ReferencedSOPInstanceUIDStructureSetModuleRule(IODType.Generic, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+            validate.AddRule(New ReferencedSOPInstanceUIDStructureSetInterRelationRule(ErrorSeverity.RuleError, IODType.RTStructureSet))
+            'RT Referenced Series Sequence, Only one item allowed in this sequence
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.RTReferencedSeriesSequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Series Instance UID (0020,000E), Shall contain the series to which the set of CT images upon which the structure set is based belong. 
+            'Contains an item fo each CT image in the volume up which the structure set is based.
+            validate.AddRule(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, Nothing))
+
+            'Referenced SOP Class UID if present shall be the value 1.2.840.10008.5.1.4.1.1.2 or
+            '1.2.840.10008.5.1.4.1.1.4 or 1.2.840.10008.5.1.4.1.1.128
+            validate.AddRule(New IsRequiredRule(Tags.RTReferencedSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            Dim values4(2) As String
+            values4(0) = SOPclass.CTImageSOPClassUID
+            values4(1) = SOPclass.MRImageSOPClassUID
+            values4(2) = SOPclass.PetImageSOPClassUID
+            validate.AddRule(New ValueListRule(Tags.RTReferencedSOPClassUID, values4, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'Referenced Frame Number (0x00081160), 	Shall not be present, so test the the attribute is not included
+            validate.AddRule(New NotPresentRule(Tags.ReferencedFrameNumberTag, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'StructureSetROITagSequence 3006,0020 is required
+            validate.AddRule(New IsRequiredRule(Tags.StructureSetROITagSequence, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'ROI Number	(0x30060022), This defines an index to be used for referencing a particular ROI item from other sequences. 
+            'It is required to be unique within the scope of this message.  No limitation on values other than uniqueness within sequence"
+            validate.AddRule(New ROINumberRule(IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Referenced Frame of Reference UID (0x30060024), This frame of reference UID shall be the same as the frame of reference of 
+            'the CT series from which the RTSTRUCT was constructed
+            'BRTO RULE -> validate.AddRule(New ReferencedFrameOfReferenceUIDRule(IODType.Generic, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+            validate.AddRule(New ReferencedFrameOfReferenceUIDInterRelationRule(ErrorSeverity.RuleError, IODType.Generic))
+            'ROI Name (0x30060026),	Must be unique within ROI sequence
+            validate.AddRule(New ROINameRule(IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            '>ROI Description 3006,0028	is optinal
+            validate.AddRule(New OptionalRule(Tags.ROIDescription, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            '>ROI Volume 3006,002C is optional
+            validate.AddRule(New OptionalRule(Tags.ROIVolume, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'ROI Generation Algorithm should be one of these values AUTOMATIC, SEMIAUTOMATIC or MANUAL.
+            Dim values2(3) As String
+            values2(0) = "AUTOMATIC"
+            values2(1) = "SEMIAUTOMATIC"
+            values2(2) = "MANUAL"
+            values2(3) = "RESAMPLED"
+            validate.AddRule(New ValueListRule(Tags.ROIGenerationAlgorithm, values2, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+
+            'C.8.8.6 ROI Contour Module
+
+            '>ROI Display Color 3006,002A is optional
+            validate.AddRule(New OptionalRule(Tags.ROIDisplayColor, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'ContourReferencedSOPClassUID 0008,1155	should have value = 1.2.840.10008.5.1.4.1.1.2
+            validate.AddRule(New IsRequiredRule(Tags.ContourReferencedSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            validate.AddRule(New ValueRule(Tags.ContourReferencedSOPClassUID, SOPclass.CTImageSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'Referenced Frame Number (0x00081160), This attribute shall not be present.
+            validate.AddRule(New ReferencedFrameNumberRule(IODType.Generic, ErrorSeverity.RuleError))
+
+            'Contour Geometric Type should be one of these values POINT or CLOSED_PLANAR
+            validate.AddRule(New IsRequiredRule(Tags.ContourGeometricType, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            Dim values1(1) As String
+            values1(0) = "POINT"
+            values1(1) = "CLOSED_PLANAR"
+            validate.AddRule(New ValueListRule(Tags.ContourGeometricType, values1, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            '>>Contour Slab Thickness 3006,0044 is optional
+            validate.AddRule(New OptionalRule(Tags.ContourSlabThickness, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            '>>Contour Offset Vector 3006,0045 should have value 0
+            validate.AddRule(New ValueRule(Tags.ContourOffsetVector, "0", IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'Number of Contour Points (0x30060046) 
+            '1. Must match the actual number of points in Contour Data.
+            validate.AddRule(New NumberofContourPointsRule(IODType.Generic, ErrorSeverity.RuleError))
+
+
+            'C.8.8.8 RT ROI Observations Module
+
+            'Referenced ROI Number	(3006,0084)	
+            '1. Referenced ROI Number(3006,0084) of RT ROI Observations Sequence(3006,0080) 
+            'should contain a ROI Number(3006,0022) of the Structure Set ROI Sequence (3006,0020)
+            '2. More then one Referenced ROI Number with the same value can be present
+            validate.AddRule(New ReferencedROINumberRule(IODType.Generic, ErrorSeverity.RuleError))
+
+            'RT ROI Interpreted Type (3006,00A4) 
+            '1. When there are Referenced ROI numbers with the same value OR ROI Physical Properties Sequence(3006,00B0) 
+            'is PRESENT in this sequence item, this attribute should be present in at least once in those sequence items 
+            '2. If Contour Geometric Type of the observed ROI of the ROI CONTOUR MODULE has value CLOSED_PLANAR then this attribute should have one of the following values
+            'EXTERNAL, PTV, CTV, GTV, TREATED_VOLUME, IRRAD_VOLUME, BOLUS, AVOIDANCE, ORGAN, MARKER, CONTRAST_AGENT, CAVITY
+            '3.  If Contour Geometric Type of the observed ROI of ROI CONTOUR MODULE has value POINT then this attribute should
+            ' have one of the following values: MARKER, REGISTRATION, ISOCENTER
+            validate.AddRule(New RTROIInterpretedTypeRule(IODType.Generic, ErrorSeverity.RuleError))
+
+            '>>ROI Physical Property 3006,00B2 should have value = REL_ELEC_DENSITY
+            validate.AddRule(New OptionalRule(Tags.ROIPhysicalPropertiesSequence, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            validate.AddRule(New ValueRule(Tags.ROIPhysicalProperty, "REL_ELEC_DENSITY", IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'C.12.1 SOP Common Module
+            'Specific Character Set (0008,0005) if present shall be the value "ISO_IR 100".
+            validate.AddRule(New ValueRule(Tags.SpecificCharacterSet, "ISO_IR 100", IODType.CTImage, ErrorSeverity.RuleError))
+            'SOP Class UID (0008,0016) if present shall be the value "1.2.840.10008.5.1.4.1.1.2".
+            validate.AddRule(New ValueRule(Tags.SOPClassUID, SOPclass.CTImageSOPClassUID, IODType.CTImage, ErrorSeverity.RuleError))
+            'Specific Character Set (0008,0005) if present shall be the value "ISO_IR 100".
+            validate.AddRule(New ValueRule(Tags.SpecificCharacterSet, "ISO_IR 100", IODType.MRImage, ErrorSeverity.RuleError))
+            'SOP Class UID (0008,0016) if present shall be the value "1.2.840.10008.5.1.4.1.1.4".
+            validate.AddRule(New ValueRule(Tags.SOPClassUID, SOPclass.MRImageSOPClassUID, IODType.MRImage, ErrorSeverity.RuleError))
+            'Specific Character Set (0008,0005) if present shall be the value "ISO_IR 100".
+            validate.AddRule(New ValueRule(Tags.SpecificCharacterSet, "ISO_IR 100", IODType.PETImage, ErrorSeverity.RuleError))
+            'SOP Class UID (0008,0016) if present shall be the value "1.2.840.10008.5.1.4.1.1.128".
+            validate.AddRule(New ValueRule(Tags.SOPClassUID, SOPclass.PetImageSOPClassUID, IODType.PETImage, ErrorSeverity.RuleError))
+            'Specific Character Set (0008,0005) if present shall be the value "ISO_IR 100".
+            validate.AddRule(New ValueRule(Tags.SpecificCharacterSet, "ISO_IR 100", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            'SOP Class UID (0008,0016) if present shall be the value "1.2.840.10008.5.1.4.1.1.66.1".
+            validate.AddRule(New ValueRule(Tags.SOPClassUID, SOPclass.SpatialRegistrationSOPClassUID, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            'Specific Character Set (0008,0005) if present shall be the value "ISO_IR 100".
+            validate.AddRule(New ValueRule(Tags.SpecificCharacterSet, "ISO_IR 100", IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'SOP Class UID (0008,0016) if present shall be the value "1.2.840.10008.5.1.4.1.1.481.3".
+            validate.AddRule(New ValueRule(Tags.SOPClassUID, SOPclass.RTStructureSetSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'Instance Creation Date	0008,0012 is optional
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationDate, IODType.CTImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationDate, IODType.MRImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationDate, IODType.PETImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationDate, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationDate, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Instance Creation Time	0008,0013 is optional
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationTime, IODType.CTImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationTime, IODType.MRImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationTime, IODType.PETImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationTime, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreationTime, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Instance Creator UID 0008,0014 is optional
+            validate.AddRule(New OptionalRule(Tags.InstanceCreatorUID, IODType.CTImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreatorUID, IODType.MRImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreatorUID, IODType.PETImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreatorUID, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceCreatorUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            'Instance Number 0020,0013 is optional
+            validate.AddRule(New OptionalRule(Tags.InstanceNumber, IODType.CTImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceNumber, IODType.MRImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceNumber, IODType.PETImage, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceNumber, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New OptionalRule(Tags.InstanceNumber, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            'C.20.1 Spatial Registration Series Module
+            'Modality (0008,0060) shall be the value "REG".
+            validate.AddRule(New IsRequiredRule(Tags.Modality, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New ValueRule(Tags.Modality, "REG", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+            'C.20.2 Spatial Registration
+            'Registration sequence (0070,0308) must contain exactly 2 items
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.RegistrationSequence, 2, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+            'each item in (0070,0308) must contain 1 item in (0070,0309)
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.MatrixRegistrationSequence, 1, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.MatrixRegistrationSequence2, 1, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+            'each item in (0070,0309) must contain 1 item in (0070,030A)
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.MatrixSequence, 1, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New NrIntOfSequenceItemRule(Tags.MatrixSequence2, 1, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            'each item in (0070,030A) must contain a 4x4 matrix in (3006,00C6) of which the last 4 positions are 0/0/0/1
+            validate.AddRule(New CorrectMatrixRule(Tags.FrameofReferenceTransformationMatrix, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New CorrectMatrixRule(Tags.FrameofReferenceTransformationMatrix2, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            'the matrix in the first item in the registration sequence must contain the values 1/0/0/0/0/1/0/0/0/0/1/0/0/0/0/1
+            validate.AddRule(New CorrectIdentityMatrixRule(Tags.FrameofReferenceTransformationMatrix, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            'the matrix in the second item in the registration sequence must contain the same values as the registration item in the reference dataset
+            validate.AddRule(New CorrectExpectedMatrixRule(Tags.FrameofReferenceTransformationMatrix2, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            'the value of the frame of reference UID must be the same both in the base of the object and in the first registration object
+            validate.AddRule(New EqualToRule(Tags.FrameofReferenceUID, IODType.SpatialRegistration, ErrorSeverity.RuleError, Tags.RegistrationFrameofReferenceUID))
+            'check for each of the FoRUIDs whether there is an image with the same FoRUID
+            validate.AddRule(New SameFrameOfReferenceInterRelationRule(Tags.RegistrationFrameofReferenceUID, ErrorSeverity.RuleError, False))
+            validate.AddRule(New SameFrameOfReferenceInterRelationRule(Tags.RegistrationFrameofReferenceUID2, ErrorSeverity.RuleError, False))
+
+            'MMRO I
+            'the referenced image sequence (0008,1140) must not exist
+            'validate.AddRule(New NotPresentRule(Tags.ReferencedImageSequence, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            'validate.AddRule(New NotPresentRule(Tags.ReferencedImageSequence2, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+            'MMRO 2
+            'the referenced image sequence (0008,1140) items must reference to the correct image sets
+            'validate.AddRule(New ReferencedImageSequenceRule(IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+            'Frame of Reference Transformation Matrix Type (0070,030C) if present shall be the value "RIGID".
+            validate.AddRule(New IsRequiredRule(Tags.FrameofReferenceTransformationMatrixType, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+            validate.AddRule(New ValueRule(Tags.FrameofReferenceTransformationMatrixType, "RIGID", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+            'Add the scenario steps in the correct order
+            m_scenarioSteps.Add(recieve)
+            m_scenarioSteps.Add(validate)
+
+            If TestToolConfiguration.GetInstance.DoCleanUp = True Then
+                m_scenarioSteps.Add(cleanUp)
+            End If
+        End If
+    End Sub
+End Class

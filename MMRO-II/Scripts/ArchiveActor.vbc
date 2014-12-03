@@ -1,0 +1,14 @@
+
+'Contourer actor object
+Class ArchiveActor
+Inherits Actor
+
+   'Constructor
+   Public Sub New()
+		'Actor Id
+		m_id = "Archive"
+		'Actor name
+        m_name = "Archive actor"
+   End Sub
+
+End Class

@@ -1,0 +1,56 @@
+Class CorrectMatrixRule
+    Inherits AttributeRule
+
+    'every transformationmatrix must have vm 16 with values */*/*/*/*/*/*/*/*/*/*/*/0/0/0/1
+
+    Public Sub New(ByVal TagSequence As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Correct Matrix Rule", TagSequence, iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        If iodType = Me.IODTypeRule Then
+            Dim message As String = ""
+
+            Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+            If Not dicomMessage.Exists(m_TagSequence) Then
+                message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present."
+                Me.SetError(message)
+            ElseIf Not dicomMessage.DataSet(m_TagSequence).VM = 16 Then
+                message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain 16 values as would be expected of a 4x4 matrix"
+                Me.SetError(message)
+            Else
+                Dim firstValue As Double = Me.ConvertToDouble(dicomMessage.DataSet(m_TagSequence).Values.Item(12))
+                Dim secondValue As Double = Me.ConvertToDouble(dicomMessage.DataSet(m_TagSequence).Values.Item(13))
+                Dim thirdValue As Double = Me.ConvertToDouble(dicomMessage.DataSet(m_TagSequence).Values.Item(14))
+                Dim fourthValue As Double = Me.ConvertToDouble(dicomMessage.DataSet(m_TagSequence).Values.Item(15))
+                If Not firstValue = 0 Then
+                    message += "Position (4,1) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not secondValue = 0 Then
+                    message += "Position (4,2) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not thirdValue = 0 Then
+                    message += "Position (4,3) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not fourthValue = 1 Then
+                    message += "Position (4,4) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 1" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If message = "" Then
+                    message = "The '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains a valid rigid transformation"
+                    Me.SetValid(message)
+                End If
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

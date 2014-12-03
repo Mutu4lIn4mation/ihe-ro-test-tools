@@ -1,0 +1,129 @@
+Class ImageModalityFrameOfReferenceRule
+    Inherits MessageCollectionRule
+
+    Private m_hybrid As Boolean
+    Private m_messageCollectionHelper As messageCollectionHelper
+
+    Public Sub New(ByVal severity As ErrorSeverity, ByVal hybrid As Boolean, iodType As IODType)
+
+        MyBase.New("Image Modality Frame Of Reference Rule", iodType, severity)
+        m_hybrid = hybrid
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+        Dim message As String = ""
+        Dim ctFrameOfReferenceUIDValue As String = Nothing
+        Dim mrFrameOfReferenceUIDValue As String = Nothing
+        Dim petFrameOfReferenceUIDValue As String = Nothing
+        Dim pass As Boolean = True
+        Dim modalityImagesCount As Integer = 0
+        Dim ctImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim mrImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim petImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+
+        'Store the data set collection global
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+        'Check if there are one or more CT images, if so, then get the Frame Of Reference UID
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage) > 0 Then
+            ctImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, 1)
+            ctFrameOfReferenceUIDValue = GetFrameOfReferenceUID(ctImageDataSet)
+            modalityImagesCount = modalityImagesCount + 1
+        End If
+
+        'Check if there are one or more MR images. Than check if the Frame of Reference 
+        'UID is the same as the other modality images (If there are any).
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.MRImage) > 0 Then
+            mrImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.MRImage, 1)
+            mrFrameOfReferenceUIDValue = GetFrameOfReferenceUID(mrImageDataSet)
+            modalityImagesCount = modalityImagesCount + 1
+
+            If Not ctFrameOfReferenceUIDValue = Nothing Then
+                'Check CT -> MR
+                pass = checkFrameOfReferenceUID(ctFrameOfReferenceUIDValue, mrFrameOfReferenceUIDValue)
+            End If
+        End If
+
+        'Check if there are one or more PET images. 
+        'Than check if the Frame of Reference UID is the same as the other modality images.
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.PETImage) > 0 And pass Then
+            petImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.PETImage, 1)
+            petFrameOfReferenceUIDValue = GetFrameOfReferenceUID(petImageDataSet)
+            modalityImagesCount = modalityImagesCount + 1
+
+            'If ctFrameOfReferenceUIDValue and mrFrameOfReferenceUIDValue are empty, then
+            'there are no other modality images and nothing can be checked
+            If ctFrameOfReferenceUIDValue = Nothing And mrFrameOfReferenceUIDValue = Nothing Then
+                pass = False
+            Else
+                If Not ctFrameOfReferenceUIDValue = Nothing Then
+                    'Check CT -> PET
+                    pass = checkFrameOfReferenceUID(ctFrameOfReferenceUIDValue, petFrameOfReferenceUIDValue)
+                End If
+
+                If Not mrFrameOfReferenceUIDValue = Nothing And pass Then
+                    'Check MR -> PET
+                    pass = checkFrameOfReferenceUID(mrFrameOfReferenceUIDValue, petFrameOfReferenceUIDValue)
+                End If
+            End If
+        End If
+
+        'If there is only 1 type of modality images or there are none modality images 
+        'then this check will not pass
+        If modalityImagesCount <= 1 And pass Then
+            pass = False
+        End If
+
+        'If every modality is passed, then SetValid, else SetError
+        If pass Then
+            If m_hybrid Then
+                message = "Every image modality has the same Frame of Reference"
+            Else
+                message = "Every image modality has a different Frame of Reference"
+            End If
+            Me.SetValid(message)
+        Else
+            'If there is only 1 type of modality images or there are none modality images
+            'then give the following message
+            If modalityImagesCount <= 1 Then
+                message = "Not enough modality image types to check with"
+            Else
+                If m_hybrid Then
+                    message = "Not every image modality has the same Frame of Reference"
+                Else
+                    message = "Not every image modality has a different Frame of Reference"
+                End If
+            End If
+            Me.SetError(message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+
+    Private Function checkFrameOfReferenceUID(ByVal uidValue1 As String, ByVal uidValue2 As String) As Boolean
+        Dim pass As Boolean = True
+
+        If uidValue1.Equals(uidValue2) Then
+            If Not m_hybrid Then
+                pass = False
+            End If
+        Else
+            If m_hybrid Then
+                pass = False
+            End If
+        End If
+
+        Return pass
+    End Function
+
+    Private Function GetFrameOfReferenceUID(ByVal imageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet) As String
+        Dim frameOfReferenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim frameOfReferenceTag As String = Tags.FrameofReferenceUID
+
+        frameOfReferenceAttribute = imageDataSet(frameOfReferenceTag)
+
+        Return frameOfReferenceAttribute.Values(0)
+    End Function
+End Class
