@@ -108,16 +108,26 @@ Class ContourDataRule
 
                                                                         Dim dotIndex As Integer
                                                                         Try
-                                                                            dotIndex = zcorContourData.IndexOf(".")
-                                                                            zcorContourData = zcorContourData.Substring(0, dotIndex + 3)
+                                                                            If (zcorContourData.Contains(".")) Then
+                                                                                dotIndex = zcorContourData.IndexOf(".")
+                                                                                zcorContourData = zcorContourData.Substring(0, dotIndex + 3)
+                                                                            Else
+                                                                                zcorContourData = zcorContourData + ".00"
+                                                                            End If
+
                                                                         Catch ex As System.Exception
                                                                             'No decimal point in the value, add 1/100 precision
                                                                             zcorContourData = zcorContourData + ".00"
                                                                         End Try
                                                                         Dim zcorImagePatienPosition As String = ctImageDataSet(Tags.ImagePositionPatient).Values(2).ToString()
                                                                         Try
-                                                                            dotIndex = zcorContourData.IndexOf(".")
-                                                                            zcorImagePatienPosition = zcorImagePatienPosition.Substring(0, dotIndex + 3)
+                                                                            If (zcorImagePatienPosition.Contains(".")) Then
+                                                                                dotIndex = zcorImagePatienPosition.IndexOf(".")
+                                                                                zcorImagePatienPosition = zcorImagePatienPosition.Substring(0, dotIndex + 3)
+                                                                            Else
+                                                                                zcorImagePatienPosition = zcorImagePatienPosition + ".00"
+                                                                            End If
+
                                                                         Catch ex As System.Exception
                                                                             'No decimal point in the value, add 1/100 precision
                                                                             zcorImagePatienPosition = zcorImagePatienPosition + ".00"

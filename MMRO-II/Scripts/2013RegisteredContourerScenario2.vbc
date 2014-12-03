@@ -50,6 +50,16 @@ Class RegisteredContourerScenario2
             '-------------- Critical attribute mapping ------------------------------------------
 
             'C.7.1.1 Patient Module
+
+            'Patient's Name	(0010,0010), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientName, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Patient ID	(0010,0020), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientID, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Patient's Birthdate (0010,0030), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientsBirthDate, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Patient's Sex (0010,0040), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.PatientSex, False, False, ErrorSeverity.RuleError, IODType.Generic))
+
             'Patient() 's Name	(0010,0010), same as in reference data
             validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientName, IODType.RTStructureSet, ErrorSeverity.RuleError, False))
             'Patient ID	(0010,0020), same as in reference data
@@ -60,6 +70,22 @@ Class RegisteredContourerScenario2
             validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.RTStructureSet, ErrorSeverity.RuleError, False))
 
             'C.7.2.1 General Study Module		
+            'Study Instance UID (0020,000D), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyInstanceUID, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Study Date (0008,0020), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyDate, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Study Time (0008,0030), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyTime, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Referring Physician's Name (0008,0090), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.ReferringPhysiciansName, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Study ID (0020,0010), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.StudyID, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Accession Number (0008,0050), same as in other received objects
+            validate.AddRule(New CriticalAttributeInterRelationRule(Tags.AccessionNumber, False, False, ErrorSeverity.RuleError, IODType.Generic))
+            'Study Description (0008,1030), same as in other received objects
+            validate.AddRule(New StudyDescriptionInterrelationRule(False, False, ErrorSeverity.RuleError, IODType.Generic))
+
+
             'Study Instance UID	(0020,000D), New value, but maybe the same as in reference data
             validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.RTStructureSet, ErrorSeverity.RuleError, True))
             'Study Date	(0008,0020), New value, but maybe the same as in reference data
@@ -97,7 +123,7 @@ Class RegisteredContourerScenario2
             validate.AddRule(New NrIntOfSequenceItemRule(Tags.ReferencedFrameofReferenceSequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
 
             'Frame of Reference UID	(0020,0052), same as in reference data
-            validate.AddRule(New CriticalAttributeMappingRule(Tags.ReferencedFrameofReferenceUID, IODType.RTStructureSet, ErrorSeverity.RuleError, False))
+            validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.ReferencedFrameofReferenceUID, IODType.RTStructureSet, ErrorSeverity.RuleError, True))
 
             'RT Referenced Study Sequence (0x30060012), may only contain one item
             validate.AddRule(New NrIntOfSequenceItemRule(Tags.RTReferencedStudySequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))

@@ -15,7 +15,7 @@
 <DoCleanUp>Yes</DoCleanUp>
 <BreakOnMissingInput>No</BreakOnMissingInput>
 <TransformationMatrixTolerancePrecentage>5</TransformationMatrixTolerancePrecentage>
-<TransformationMatrixMinimalToleranceValue>0.05</TransformationMatrixMinimalToleranceValue>
+<TransformationMatrixMinimalToleranceValue>0,05</TransformationMatrixMinimalToleranceValue>
 </TestToolConfiguration>
 
 
