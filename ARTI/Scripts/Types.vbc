@@ -29,7 +29,7 @@ Public Enum IODType
     NEventReport
     NGet
     BasicTextSR
-
+    EnhancedSR
 
     ' Unknown  ' can be used when the SOP Class UID of a received message can not be identified
 
@@ -78,7 +78,9 @@ Public Enum ARTO_Scenario
     SlidingWindowBeam
     StaticElectronBeam
     StereotacticBeam
+    PhotonApplicatorBeam
     StereotacticArcBeam
+    PhotonApplicatorArcBeam
     BasicStaticMLCBeam
     MLCArcBeam
     'Insert New enum values BEFORE HERE!

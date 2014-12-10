@@ -26,6 +26,8 @@ Public Class Tags
     Public Shared ReadOnly ReferencedToleranceTableNumber As String = String.Format("{0}[1]/{1}", BeamSequence, "0x300A00A0")
 
     Public Shared ReadOnly PrimaryFluenceModeSequence As String = String.Format("{0}[1]/{1}", BeamSequence, "0x30020050")
+    Public Shared ReadOnly FluenceMode As String = String.Format("{0}[1]/{1}", PrimaryFluenceModeSequence, "0x30020051")
+    Public Shared ReadOnly FluenceModeID As String = String.Format("{0}[1]/{1}", PrimaryFluenceModeSequence, "0x30020052")
 
     Public Shared ReadOnly HighDoseTechniqueTypeTag As String = "0x300A00C7"
 
@@ -141,18 +143,35 @@ Public Class Tags
     Public Shared ReadOnly IsocenterPositionTagSequence As String = "0x300A012C"
     Public Shared ReadOnly SurfaceEntryPointTagSequence As String = "0x300A012E"
     Public Shared ReadOnly SourcetoSurfaceDistanceTagSequence As String = "0x300A0130"
-
+    Public Shared ReadOnly TableTopPitchAngleTagSequence As String = "0x300A0140"
+    Public Shared ReadOnly TableTopRollAngleTagSequence As String = "0x300A0144"
+    Public Shared ReadOnly TableTopRollRotationDirectionTagSequence As String = "0x300A0146"
+    Public Shared ReadOnly TableTopPitchRotationDirectionTagSequence As String = "0x300A0142"
+    Public Shared ReadOnly LeafJawPositionsTagSequence As String = "0x300A011C"
+    Public Shared ReadOnly CumulativeDoseReferenceCoefficientTagSequence As String = "0x300A010C"
+    Public Shared ReadOnly BeamLimitingDevicePositionSequenceTagSequenceLeafJawPosition As String = BeamLimitingDevicePositionSequenceTagSequence + "[1]/" + LeafJawPositionsTagSequence
+    Public Shared ReadOnly ReferencedDoseReferenceSequenceTagSequenceCumulativeDoseReferenceCoefficient As String = ReferencedDoseReferenceSequenceTagSequence + "[1]/" + CumulativeDoseReferenceCoefficientTagSequence
 
     'wedge position in control points 'number of items the same as the number of wedges
     Public Shared ReadOnly WedgePositionSequence As String = String.Format("{0}[1]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence2 As String = String.Format("{0}[2]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence3 As String = String.Format("{0}[3]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence4 As String = String.Format("{0}[4]/{1}", ControlPointSequence, "0x300A0116")
     Public Shared ReadOnly OnlyWedgePositionSequence As String = "0x300A0116"
     Public Shared ReadOnly WedgePosition As String = String.Format("{0}[1]/{1}", WedgePositionSequence, "0x300A0118")
+    Public Shared ReadOnly WedgePosition2 As String = String.Format("{0}[1]/{1}", WedgePositionSequence2, "0x300A0118")
+    Public Shared ReadOnly WedgePosition3 As String = String.Format("{0}[1]/{1}", WedgePositionSequence3, "0x300A0118")
+    Public Shared ReadOnly WedgePosition4 As String = String.Format("{0}[1]/{1}", WedgePositionSequence4, "0x300A0118")
 
     Public Shared ReadOnly Test As String = String.Format("{0}[1]/{1}", ControlPointSequence, "0x300A0112")
 
     'Applicator
     Public Shared ReadOnly ApplicatorID As String = String.Format("{0}[1]/{1}", ApplicatorSequence, "0x300A0108")
     Public Shared ReadOnly ApplicatorType As String = String.Format("{0}[1]/{1}", ApplicatorSequence, "0x300A0109")
+
+    Public Shared ReadOnly ApplicatorGeometrySequence As String = String.Format("{0}[1]/{1}", ApplicatorSequence, "0x300A0431")
+    Public Shared ReadOnly ApplicatorApertureShape As String = String.Format("{0}[1]/{1}", ApplicatorGeometrySequence, "0x300A0432")
+    Public Shared ReadOnly ApplicatorOpening As String = String.Format("{0}[1]/{1}", ApplicatorGeometrySequence, "0x300A0433")
 
     'PATIENT MODULE
     Public Shared ReadOnly PatientSetupSequence As String = "0x300A0180"

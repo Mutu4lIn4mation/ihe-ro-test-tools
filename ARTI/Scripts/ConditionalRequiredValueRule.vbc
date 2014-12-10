@@ -71,7 +71,7 @@ Class ConditionalRequiredValueRule
                     End If
                 Else
 
-                    message = "The conditional tag '" + Tags.GetTagName(m_conditionTagSequence) + "' (" + m_conditionTagSequence + ") is not present in the dataset."
+                    message = "The conditional tag '" + Tags.GetTagName(m_conditionTagSequence) + "' (" + m_conditionTagSequence + ") doesn't has the condition value " + m_conditionTagValue + "."
                     Me.SetValid(message)
                 End If
             End If

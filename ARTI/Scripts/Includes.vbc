@@ -86,5 +86,9 @@
 #include "RadiationDeliveryDialog.Designer.vbc"
 #include "IodTypeHelper.vbc"
 #include "ConditionalRequiredValueRule.vbc"
-
+#include "ConditionalRequiredValueRuleTPPC.vbc"
+#include "OptionalConstantValueRule.vbc"
+#include "ControlPointConstantValueRule.vbc"
+#include "ControlPointValueRule.vbc"
+#include "ControlPointOptionalValueRule.vbc"
 #End If
