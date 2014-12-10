@@ -567,7 +567,7 @@ Class RulesFactory
 
     Private Shared Function CreateMLCArcBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
         Dim m_rules As List(Of Rule) = New List(Of Rule)
-        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.BeamType, "DYNAMIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
         m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
         m_rules.Add(New ValueRule(Tags.HighDoseTechniqueType, "NORMAL", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
 

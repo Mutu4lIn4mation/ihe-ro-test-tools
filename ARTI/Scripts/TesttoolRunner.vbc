@@ -5,6 +5,7 @@ Class TesttoolRunner
     Public Shared ReadOnly TestSessionFileName_DCOMP As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\DCOMP\Sessionfiles\TestTool 2013 - DCOMP - Test.ses"
     Public Shared ReadOnly TestSessionFileName_QAPV As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\QAPV\Sessionfiles\TestTool 2014 - QAPV - Test.ses"
     Public Shared ReadOnly TestSessionFileName_TDW As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\TDW-II\Sessionfiles\TestTool 2013 (TEST).ses"
+    Public Shared ReadOnly TestSessionFileName_IPDW As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\IPDW\Sessionfiles\TestTool 2009 - IPDW (TEST).ses"
 
     Public Shared Sub RunTool(ByVal theTestTool As TestToolBase, ByVal sessionFileName As String)
 

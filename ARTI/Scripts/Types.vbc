@@ -98,6 +98,13 @@ Public Enum DataDirSelector
     Unknown
 End Enum
 
+Public Enum ProcedureStep
+    Acquire = 1
+    Registration = 2
+    Adjust = 3
+    Deliver = 4
+End Enum
+
 
 
 
