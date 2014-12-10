@@ -1,0 +1,45 @@
+Class BeamScenarioProducer
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New(ByVal scenario As ARTO_Scenario)
+
+        Dim archiveActor As ArchiveActor = New ArchiveActor()
+
+        'scenario is the beam scenario
+        Dim receiveStep As ReceiveScenarioStep = New ReceiveScenarioStep(archiveActor, New BeamProducerActor, DvtkData.Dimse.DimseCommand.CSTORERQ)
+
+        Dim dialog As SendOptionalDataDialog = New SendOptionalDataDialog()
+        Dim result As DialogResult = dialog.ShowDialog()
+
+        Dim sendStructureSet As Boolean = dialog.OptionResult
+        If sendStructureSet Then
+            'send step creeren die CT en SS verstuurt
+
+            'todo: abort scenario if sending data failed
+            m_scenarioDatasetXmlFileName = DataSetHandler.RTAdvancedXMLFileName
+            Dim sendStep As SendScenarioStep = New SendScenarioStep(archiveActor, New BeamProducerActor())
+            sendStep.AddTransaction(New BeamTransaction(scenario))
+            sendStep.AddTransaction(New ComputedTomographyTransaction())
+            sendStep.AddTransaction(New StructureSetTransaction())
+            m_scenarioSteps.Add(sendStep)
+        End If
+
+        Dim cleanUp As CleanUpScenarioStep = Nothing
+        cleanUp = New CleanUpScenarioStep(TestToolConfiguration.GetInstance.GetSession.ResultsRootDirectory)
+
+        receiveStep.AddTransaction(New BeamTransaction(scenario))
+
+        'Configurate the validate step
+        Dim validate As ValidateScenarioStep = New ValidateScenarioStep(receiveStep)
+        validate.AddRules(RulesFactory.CreateRules(scenario, sendStructureSet))
+
+        m_scenarioSteps.Add(receiveStep)
+        m_scenarioSteps.Add(validate)
+
+        If TestToolConfiguration.GetInstance.DoCleanUp = True Then
+            m_scenarioSteps.Add(cleanUp)
+        End If
+
+    End Sub
+End Class

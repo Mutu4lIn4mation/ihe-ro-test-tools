@@ -1,0 +1,597 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+
+
+Class RulesFactory
+
+    Public Shared Function CreateRules(ByVal scenario As ARTO_Scenario, ByVal sendStructureSet As Boolean) As System.Collections.Generic.IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+        'rules that are the same for every beam scenario
+        rules.AddRange(CreateBaseBeamRules(scenario, sendStructureSet))
+        Select Case scenario
+            Case ARTO_Scenario.BasicStaticBeam
+                rules.AddRange(CreateBasicStaticBeamRules(scenario))
+            Case ARTO_Scenario.MotorizedWedgeBeam
+                rules.AddRange(CreateMotorizedWedgeBeamRules(scenario))
+            Case ARTO_Scenario.HardWedgeBeam
+                rules.AddRange(CreateHardWedgeBeamRules(scenario))
+            Case ARTO_Scenario.VirtualWedgeBeam
+                rules.AddRange(CreateVirtualWedgeBeamRules(scenario))
+            Case ARTO_Scenario.ArcBeam
+                rules.AddRange(CreateArcBeamRules(scenario))
+            Case ARTO_Scenario.ConformalArcBeam
+                rules.AddRange(CreateConformalArcBeamRules(scenario))
+            Case ARTO_Scenario.StepAndShootBeam
+                rules.AddRange(CreateStepAndShootBeamRules(scenario))
+            Case ARTO_Scenario.SlidingWindowBeam
+                rules.AddRange(CreateSlidingWindowBeamRules(scenario))
+            Case ARTO_Scenario.StaticElectronBeam
+                rules.AddRange(CreateStaticElectronBeamRules(scenario))
+            Case ARTO_Scenario.StereotacticBeam
+                rules.AddRange(CreateStereotacticBeamRules(scenario))
+            Case ARTO_Scenario.IMATVMATBeam
+                rules.AddRange(CreateIMATVMATBeamRules(scenario))
+            Case ARTO_Scenario.StereotacticArcBeam
+                rules.AddRange(CreateStereotacticArcBeamRules(scenario))
+            Case ARTO_Scenario.BasicStaticMLCBeam
+                rules.AddRange(CreateBasicStaticMLCBeamRules(scenario))
+            Case ARTO_Scenario.MLCArcBeam
+                rules.AddRange(CreateMLCArcBeamRules(scenario))
+            Case Else
+                Throw New Exception(String.Format("Cannot create set of rules for unknown scenario '{0}'.", scenario))
+        End Select
+
+        Return rules
+
+    End Function
+
+    Private Shared Function CreateBaseBeamRules(ByVal scenario As ARTO_Scenario, ByVal sendStructureSet As Boolean) As System.Collections.Generic.IEnumerable(Of Rule)
+        'this are a set of module rules which account for every scenario
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        'General Study Module
+        'load structure set file
+        If sendStructureSet = True Then
+            Dim RefdataObject As DvtkHighLevelInterface.Dicom.Other.DataSet = DataSetHandler.LoadDatasetFromFile(DataSetHandler.RTAdvancedXMLFileName, "StructureSet")
+            m_rules.Add(New ValueRule(Tags.StudyInstanceUID, RefdataObject(Tags.StudyInstanceUID).Values.Item(0), IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        End If
+        'm_rules.Add(New ValueRule(Tags.ReferencedSOPClassUID, structureSet(Tags.SOPClassUID).Values.Item(0), IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'm_rules.Add(New ValueRule(Tags.ReferencedSOPInstanceUID, structureSet(Tags.SOPInstanceUID).Values.Item(0), IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'General Equipment Module
+        m_rules.Add(New IsRequiredRule(Tags.Manufacturer, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.ManufacturersModelName, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.SoftwareVersions, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'RT General Plan Module
+        m_rules.Add(New IsRequiredRule(Tags.RTPLanLabel, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.RTPlanDate, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.RTPlanTime, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.PlanIntent, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.RTPlanGeometry, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RTPlanGeometry, "PATIENT", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'RT Fraction Scheme Module				
+        m_rules.Add(New IsRequiredRule(Tags.FractionGroupSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceRangeRule(Tags.FractionGroupSequence, 1, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.NumberOfFractionsPlanned, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.ReferencedBeamSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.BeamDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.BeamDoseSpecificationPoint, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.BeamMeterset, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'RT Prescription Module
+        m_rules.Add(New IsRequiredRule(Tags.DoseReferenceSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.DoseReferenceUID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.DoseReferenceDescription, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'Control Point Fixed Attribute List
+        m_rules.Add(New ConstantValueRule(Tags.PatientSupportAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.PatientSupportRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.TableTopEccentricAxisDistance, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.TableTopEccentricAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.TableTopEccentricRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.TableTopPitchAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.TableTopPitchRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.TableTopRollAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.TableTopRollRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.TableTopVerticalPosition, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.TableTopLongitudinalPosition, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.TableTopLateralPosition, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+
+        'Base beam rules
+        m_rules.Add(New IsRequiredRule(Tags.BeamSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueEqualOrHigherRule(Tags.BeamNumber, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.BeamName, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.BeamType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.RadiationType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New OptionalRule(Tags.HighDoseTechniqueType, IODType.RTPlanDosimetric, ErrorSeverity.RuleInfo))
+        m_rules.Add(New IsRequiredRule(Tags.TreatmentMachineName, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.PrimaryDosimeterUnit, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.PrimaryDosimeterUnit, "MU", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.SourceAxisDistance, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.BeamLimitingDeviceSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.BeamLimitingDeviceSequence, New IsRequiredRule(Tags.RTBeamLimitingDeviceType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New BeamLimitingDeviceTypeRule(scenario, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.BeamLimitingDeviceSequence, New RequiredConditionalRule(Tags.LeafPositionBoundaries, Tags.RTBeamLimitingDeviceType, "MLC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New IsRequiredRule(Tags.ReferencedPatientSetupNumber, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueEqualOrHigherRule(Tags.ReferencedPatientSetupNumber, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.TreatmentDeliveryType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+
+        'Beam Modifiers
+        m_rules.Add(New IsRequiredRule(Tags.NumberOfWedges, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.NumberOfCompensators, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.NumberOfBoli, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.NumberOfBlocks, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.FinalCumulativeMetersetWeight, IODType.RTPlanDosimetric, ErrorSeverity.RuleInfo))
+
+        'Control points
+        m_rules.Add(New IsRequiredRule(Tags.NumberOfControlPoints, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'Control point sequence
+        m_rules.Add(New NrOfSequenceItemRule(Tags.ControlPointSequence, Tags.NumberOfControlPoints, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New IsRequiredRule(Tags.CumulativeMetersetWeight, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New IsRequiredRule(Tags.ReferencedDoseReferenceSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ReferencedDoseReferenceSequence, New IsRequiredRule(Tags.CumulativeDoseReferenceCoefficient, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.NominalBeamEnergy, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New IsRequiredRule(Tags.DoseRateSet, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.DoseRateSet, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New IsRequiredRule(Tags.BeamLimitingDevicePositionSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.BeamLimitingDevicePositionSequence, New IsRequiredRule(Tags.LeafJawPositions, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New OptionalRule(Tags.GantryPitchAngle, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ValueRule(Tags.GantryPitchRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.BeamLimitingDeviceAngle, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.IsocenterPosition, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        Return m_rules 'CreateBaseBeamRules
+
+    End Function
+    Private Shared Function CreateBasicStaticBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfCompensators, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'controlpoints
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New RequiredConditionalRule(Tags.SourceToSurfaceDistance, Tags.SetupTechnique, "FIXED_SSD", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateCompensatorRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateHardWedgeRules())
+
+        Return m_rules 'CreateBasicStaticBeamRules
+
+    End Function
+
+    Private Shared Function CreateMotorizedWedgeBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfWedges, 1, 2, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfCompensators, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "4", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIERS
+        Dim values(1) As String
+        values(0) = "MOTORIZED"
+        values(1) = "STANDARD"
+
+        m_rules.Add(New SequenceLoopRule(Tags.WedgeSequence, New ValueListRule(Tags.WedgeType, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateCompensatorRules())
+
+        Return m_rules 'CreateMotorizedWedgeBeamRules
+
+    End Function
+
+    Private Shared Function CreateHardWedgeBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "1", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfCompensators, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIERS
+        m_rules.Add(New SequenceLoopRule(Tags.WedgeSequence, New ValueRule(Tags.WedgeType, "STANDARD", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateCompensatorRules())
+
+        Return m_rules 'CreateHardWedgeBeamRules
+
+    End Function
+
+    Private Shared Function CreateVirtualWedgeBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfWedges, 1, 2, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfCompensators, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIERS
+        Dim values(1) As String
+        values(0) = "DYNAMIC"
+        values(1) = "STANDARD"
+        m_rules.Add(New SequenceLoopRule(Tags.WedgeSequence, New ValueListRule(Tags.WedgeType, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateCompensatorRules())
+        Return m_rules 'CreateVirtualWedgeBeamRules
+
+    End Function
+
+    Private Shared Function CreateArcBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "DYNAMIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.HighDoseTechniqueType, "NORMAL", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'controlpoints
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        Dim values(2) As String
+        values(0) = "CW"
+        values(1) = "CC"
+        values(2) = "NONE"
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueListRule(Tags.GantryRotationDirection, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+
+        Return m_rules 'CreateArcBeamRules
+
+    End Function
+
+    Private Shared Function CreateConformalArcBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "DYNAMIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'controlpoints
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfControlPoints, 0, Integer.MaxValue, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        Dim values(2) As String
+        values(0) = "CW"
+        values(1) = "CC"
+        values(2) = "NONE"
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueListRule(Tags.GantryRotationDirection, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        Return m_rules 'CreateConformalArcBeamRules
+    End Function
+
+    Private Shared Function CreateStepAndShootBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.HighDoseTechniqueType, "NORMAL", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfWedges, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'controlpoints
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfControlPoints, 0, Integer.MaxValue, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+
+
+        'BEAM MODIFIER RULES
+
+        m_rules.Add(New SequenceLoopRule(Tags.WedgeSequence, New ValueRule(Tags.WedgeType, "STANDARD", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.AddRange(ModifierRulesFactory.CreateHardWedgeRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        Return m_rules 'CreateStepAndShootBeamRules
+    End Function
+
+    Private Shared Function CreateSlidingWindowBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "DYNAMIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.HighDoseTechniqueType, "NORMAL", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfWedges, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'controlpoints
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfControlPoints, 2, Integer.MaxValue, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+
+        m_rules.Add(New SequenceLoopRule(Tags.WedgeSequence, New ValueRule(Tags.WedgeType, "STANDARD", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.AddRange(ModifierRulesFactory.CreateHardWedgeRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        Return m_rules 'CreateSlidingWindowBeamRules
+
+    End Function
+
+    Private Shared Function CreateStaticElectronBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "ELECTRON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfCompensators, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceRangeRule(Tags.ApplicatorSequence, 1, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New IsRequiredRule(Tags.ApplicatorID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New IsRequiredRule(Tags.ApplicatorType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+
+        'controlpoints
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateCompensatorRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        Return m_rules 'CreateStaticElectronBeamRules
+
+    End Function
+
+    Private Shared Function CreateStereotacticBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfBlocks, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceRangeRule(Tags.ApplicatorSequence, 1, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New IsRequiredRule(Tags.ApplicatorID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New IsRequiredRule(Tags.ApplicatorType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New ValueRule(Tags.ApplicatorType, "STEREOTACTIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+
+        'controlpoints
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        Return m_rules 'CreateStereotacticBeamRules
+    End Function
+
+    Private Shared Function CreateIMATVMATBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "DYNAMIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        Dim values(1) As String
+        values(0) = "NORMAL"
+        values(1) = "HDR"
+        m_rules.Add(New ValueListRule(Tags.HighDoseTechniqueType, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleInfo))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfBlocks, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'controlpoints
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfControlPoints, 2, Integer.MaxValue, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        Dim gantryValues(2) As String
+        gantryValues(0) = "CW"
+        gantryValues(1) = "CC"
+        gantryValues(2) = "NONE"
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueListRule(Tags.GantryRotationDirection, gantryValues, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        Return m_rules 'CreateIMATVMATBeamRules
+
+    End Function
+
+    Private Shared Function CreateStereotacticArcBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "DYNAMIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfBlocks, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceRangeRule(Tags.ApplicatorSequence, 1, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New IsRequiredRule(Tags.ApplicatorID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New IsRequiredRule(Tags.ApplicatorType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ApplicatorSequence, New ValueRule(Tags.ApplicatorType, "STEREOTACTIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+
+        'controlpoints
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        Dim gantryValues(2) As String
+        gantryValues(0) = "CW"
+        gantryValues(1) = "CC"
+        gantryValues(2) = "NONE"
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueListRule(Tags.GantryRotationDirection, gantryValues, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        Return m_rules 'CreateStereotacticArcBeamRules
+    End Function
+
+    Private Shared Function CreateBasicStaticMLCBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfCompensators, 0, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueInRangeRule(Tags.NumberOfBlocks, 0, 8, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        
+
+        'controlpoints
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConstantValueRule(Tags.GantryAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.GantryRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New RequiredConditionalRule(Tags.SourceToSurfaceDistance, Tags.SetupTechnique, "FIXED_SSD", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateCompensatorRules())
+        m_rules.AddRange(ModifierRulesFactory.CreateBlockRules())
+        Return m_rules 'CreateBasicStaticMLCBeamRules
+    End Function
+
+    Private Shared Function CreateMLCArcBeamRules(ByVal scenario As ARTO_Scenario) As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        m_rules.Add(New ValueRule(Tags.BeamType, "STATIC", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.HighDoseTechniqueType, "NORMAL", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'beam modifiers values
+        m_rules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.NumberOfBlocks, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New NotPresentRule(Tags.ApplicatorSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'controlpoints
+        m_rules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        Dim gantryValues(2) As String
+        gantryValues(0) = "CW"
+        gantryValues(1) = "CC"
+        gantryValues(2) = "NONE"
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueListRule(Tags.GantryRotationDirection, gantryValues, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConstantValueRule(Tags.BeamLimitingDeviceAngle, Tags.ControlPointSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New ValueRule(Tags.BeamLimitingDeviceRotationDirection, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.ControlPointSequence, New RequiredConditionalRule(Tags.SourceToSurfaceDistance, Tags.SetupTechnique, "FIXED_SSD", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        'BEAM MODIFIER RULES
+        m_rules.AddRange(ModifierRulesFactory.CreateBolusRules())
+        Return m_rules 'CreateMLCArcBeamRules
+    End Function
+
+End Class

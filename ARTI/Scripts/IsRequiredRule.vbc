@@ -1,0 +1,34 @@
+Class IsRequiredRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' The attribute should be present in the dataset
+    ''' </summary>
+    ''' <param name="valueTag">the attribute to be checked</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal valueTag As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Is Required Rule", valueTag, iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        If iodType = IODTypeRule Then
+            Dim message As String
+
+
+            If Not dicomMessage.Exists(m_TagSequence) Then
+                message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present."
+                Me.SetError(message)
+            Else
+                message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is present."
+                Me.SetValid(message)
+            End If
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+
+End Class

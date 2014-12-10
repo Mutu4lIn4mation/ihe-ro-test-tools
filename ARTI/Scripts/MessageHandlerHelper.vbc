@@ -1,0 +1,15 @@
+Class MessageHandlerHelper
+
+    Public Shared Function CreateResponseMessage(ByVal command As DvtkData.Dimse.DimseCommand, ByVal receivedMessage As DicomMessage) As DicomMessage
+
+        Dim dicomMessageToSend As DicomMessage = New DicomMessage(command)
+
+        dicomMessageToSend.Set(Tags.AffectedSOPClassUID, UI, receivedMessage.CommandSet.Item(Tags.RequestedSOPClassUID).Values(0))
+        dicomMessageToSend.Set(Tags.AffectedSOPInstanceUID, UI, receivedMessage.CommandSet.Item(Tags.RequestedSOPInstanceUID).Values(0))
+        dicomMessageToSend.Set(Tags.MessageIDBeingRespondedTo, US, receivedMessage.CommandSet.Item(Tags.MessageID).Values(0))
+
+        Return dicomMessageToSend
+
+    End Function
+
+End Class

@@ -1,0 +1,70 @@
+
+Class TesttoolRunner
+
+    Public Shared ReadOnly TestSessionFileName_RTA As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\ARTI\Sessionfiles\TestTool 2013 RT Advanced Objects (TEST).ses"
+    Public Shared ReadOnly TestSessionFileName_DCOMP As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\DCOMP\Sessionfiles\TestTool 2013 - DCOMP - Test.ses"
+    Public Shared ReadOnly TestSessionFileName_QAPV As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\QAPV\Sessionfiles\TestTool 2014 - QAPV - Test.ses"
+    Public Shared ReadOnly TestSessionFileName_TDW As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\TDW-II\Sessionfiles\TestTool 2013 (TEST).ses"
+
+    Public Shared Sub RunTool(ByVal theTestTool As TestToolBase, ByVal sessionFileName As String)
+
+        Dim theExecutablePath As String = System.Windows.Forms.Application.ExecutablePath
+        Dim theExecutableName As String = Path.GetFileName(theExecutablePath).ToLower()
+
+#If Not DVT_INTERPRETS_SCRIPT Then
+        Dvtk.Setup.Initialize()
+#End If
+
+        ' Create threadmanager.
+        Dim theDvtThreadManager As DvtkHighLevelInterface.Common.Threads.ThreadManager = New DvtkHighLevelInterface.Common.Threads.ThreadManager
+
+        ' Test tool configuration initialisation.
+        Dim testtoolconfig As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        ' Determine the session path.
+#If DVT_INTERPRETS_SCRIPT Then
+        sessionFilename = Session.SessionFileName
+#End If
+        ' Initialise test tool configuration.
+        testtoolconfig.Initialise(Path.GetDirectoryName(sessionFileName))
+
+        ' Creation test tool object.
+        theTestTool.Initialize(theDvtThreadManager)
+        theTestTool.Options.LogWaitingForCompletionChildThreads = False
+
+        ' Reset the hli activity form window.
+        HliForm.ResetSingleton()
+
+        ' Set the test tool properties.
+#If DVT_INTERPRETS_SCRIPT Then
+        theTestTool.Options.DvtkScriptSession = Session
+        theTestTool.Options.StartAndStopResultsGatheringEnabled = False
+        theTestTool.ResultsGatheringStarted = True
+        theTestTool.Options.Identifier = Path.GetFileName(DvtkScriptHostScriptFullFileName).Replace(".", "_")
+#Else
+        theTestTool.Options.StartAndStopResultsGatheringEnabled = True
+        theTestTool.ResultsGatheringStarted = False
+        theTestTool.Options.LoadFromFile(sessionFileName)
+        'theTestTool.Options.ShowResults = True
+        HliForm.GetSingleton().AutoExit = True
+        theTestTool.Options.Identifier = "TestTool_vbs"
+#End If
+        testtoolconfig.SetMainThread(theTestTool)
+        testtoolconfig.SetSession(theTestTool.Options.DvtkScriptSession)
+        testtoolconfig.SetThreadManager(theDvtThreadManager)
+        testtoolconfig.LoadDefinitionFiles(theTestTool)
+
+        ' Start the test tool thread.
+        theTestTool.Start()
+
+        ' Wait for the test tool object to finish.
+        theDvtThreadManager.WaitForCompletionThreads()
+
+#If Not DVT_INTERPRETS_SCRIPT Then
+        Dvtk.Setup.Terminate()
+#End If
+
+    End Sub
+
+
+End Class

@@ -1,0 +1,35 @@
+Class BeamModifierDetectionRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' This rule determines if a modifier is in the dataset based on the attribute that contains the 
+    ''' number of (wedges, blocks,compensators or boli)
+    ''' </summary>
+    ''' <param name="valueTag">tag sequence of the attribute that indicates how many modifiers are in this dataset</param>
+    ''' <param name="modifier">which modifier is being checked</param>
+    ''' <param name="iodType"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal valueTag As String, ByVal modifier As Modifier, ByVal iodType As IODType)
+
+        MyBase.New("Beam Modifier Detection Rule", valueTag, iodType, ErrorSeverity.RuleInfo)
+
+        m_Modifier = modifier
+
+    End Sub
+    Private m_Modifier As Modifier
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim count As Integer = 0
+
+        If dicomMessage.Exists(m_TagSequence) Then
+            Dim values As DvtkHighLevelInterface.Dicom.Other.Values = dicomMessage.DataSet.GetValues(m_TagSequence)
+            If Not (values.Count() = 0 Or values.Item(0) = "0") Then
+                count = Integer.Parse(values.Item(0))
+            End If
+        End If
+
+        SetValid(String.Format("Detected: {0} beams of type '{1}'.", count, m_Modifier))
+        Report()
+
+    End Sub
+
+End Class

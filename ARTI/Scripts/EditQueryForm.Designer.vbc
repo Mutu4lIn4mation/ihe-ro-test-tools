@@ -1,0 +1,353 @@
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class EditQueryForm
+    Inherits System.Windows.Forms.Form
+
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()> _
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing AndAlso components IsNot Nothing Then
+            components.Dispose()
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
+
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(EditQueryForm))
+        Me.m_DateTimePickerStart = New System.Windows.Forms.DateTimePicker
+        Me.m_DateTimePickerStop = New System.Windows.Forms.DateTimePicker
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.m_CodeValueText = New System.Windows.Forms.TextBox
+        Me.m_CodeSchemeText = New System.Windows.Forms.TextBox
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.Label7 = New System.Windows.Forms.Label
+        Me.m_PatientIDText = New System.Windows.Forms.TextBox
+        Me.m_PatientsNameText = New System.Windows.Forms.TextBox
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.warningLabel = New System.Windows.Forms.Label
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.Label10 = New System.Windows.Forms.Label
+        Me.m_CodeMeaningText = New System.Windows.Forms.TextBox
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.m_SendButton = New System.Windows.Forms.Button
+        Me.Label8 = New System.Windows.Forms.Label
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.labelCodeValue = New System.Windows.Forms.Label
+        Me.InfoCheckBox = New System.Windows.Forms.CheckBox
+        Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'm_DateTimePickerStart
+        '
+        Me.m_DateTimePickerStart.CustomFormat = "yyyy-MM-dd, HH:mm:ss"
+        Me.m_DateTimePickerStart.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.m_DateTimePickerStart.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.m_DateTimePickerStart.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.m_DateTimePickerStart.Location = New System.Drawing.Point(84, 67)
+        Me.m_DateTimePickerStart.Name = "m_DateTimePickerStart"
+        Me.m_DateTimePickerStart.Size = New System.Drawing.Size(130, 20)
+        Me.m_DateTimePickerStart.TabIndex = 0
+        Me.m_DateTimePickerStart.Value = New Date(Now.Year, Now.Month, Now.Day, 0, 0, 0, 0)
+        '
+        'm_DateTimePickerStop
+        '
+        Me.m_DateTimePickerStop.CustomFormat = "yyyy-MM-dd, HH:mm:ss"
+        Me.m_DateTimePickerStop.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.m_DateTimePickerStop.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.m_DateTimePickerStop.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.m_DateTimePickerStop.Location = New System.Drawing.Point(237, 67)
+        Me.m_DateTimePickerStop.Name = "m_DateTimePickerStop"
+        Me.m_DateTimePickerStop.Size = New System.Drawing.Size(130, 20)
+        Me.m_DateTimePickerStop.TabIndex = 1
+        Me.m_DateTimePickerStop.Value = New Date(Now.Year, Now.Month, Now.Day, 0, 0, 0, 0)
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(81, 39)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(279, 13)
+        Me.Label1.TabIndex = 2
+        Me.Label1.Text = "ScheduledProcedureStepStartDateAndTime (0040,4005) "
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.Location = New System.Drawing.Point(220, 71)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(11, 13)
+        Me.Label2.TabIndex = 3
+        Me.Label2.Text = "-"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label3.Location = New System.Drawing.Point(155, 25)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(256, 13)
+        Me.Label3.TabIndex = 4
+        Me.Label3.Text = "ScheduledStationNameCodeSequence (0040,4025) "
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(81, 54)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(119, 13)
+        Me.Label4.TabIndex = 5
+        Me.Label4.Text = "CodeValue (0008,0100)"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label5.Location = New System.Drawing.Point(10, 76)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(190, 13)
+        Me.Label5.TabIndex = 6
+        Me.Label5.Text = "CodingSchemeDesignator (0008,0102)"
+        '
+        'm_CodeValueText
+        '
+        Me.m_CodeValueText.Cursor = System.Windows.Forms.Cursors.IBeam
+        Me.m_CodeValueText.Location = New System.Drawing.Point(211, 51)
+        Me.m_CodeValueText.Name = "m_CodeValueText"
+        Me.m_CodeValueText.Size = New System.Drawing.Size(200, 20)
+        Me.m_CodeValueText.TabIndex = 2
+        '
+        'm_CodeSchemeText
+        '
+        Me.m_CodeSchemeText.Location = New System.Drawing.Point(211, 73)
+        Me.m_CodeSchemeText.Name = "m_CodeSchemeText"
+        Me.m_CodeSchemeText.Size = New System.Drawing.Size(200, 20)
+        Me.m_CodeSchemeText.TabIndex = 3
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label6.Location = New System.Drawing.Point(67, 29)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(133, 13)
+        Me.Label6.TabIndex = 9
+        Me.Label6.Text = "PatientsName (0010,0010)"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label7.Location = New System.Drawing.Point(89, 51)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(111, 13)
+        Me.Label7.TabIndex = 10
+        Me.Label7.Text = "PatientID (0010,0020)"
+        '
+        'm_PatientIDText
+        '
+        Me.m_PatientIDText.Location = New System.Drawing.Point(211, 48)
+        Me.m_PatientIDText.Name = "m_PatientIDText"
+        Me.m_PatientIDText.Size = New System.Drawing.Size(200, 20)
+        Me.m_PatientIDText.TabIndex = 5
+        '
+        'm_PatientsNameText
+        '
+        Me.m_PatientsNameText.Location = New System.Drawing.Point(211, 26)
+        Me.m_PatientsNameText.Name = "m_PatientsNameText"
+        Me.m_PatientsNameText.Size = New System.Drawing.Size(200, 20)
+        Me.m_PatientsNameText.TabIndex = 4
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.warningLabel)
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.m_DateTimePickerStart)
+        Me.GroupBox1.Controls.Add(Me.m_DateTimePickerStop)
+        Me.GroupBox1.Controls.Add(Me.Label2)
+        Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(426, 121)
+        Me.GroupBox1.TabIndex = 13
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Date/Time Range"
+        '
+        'warningLabel
+        '
+        Me.warningLabel.AutoSize = True
+        Me.warningLabel.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.warningLabel.ForeColor = System.Drawing.Color.Tomato
+        Me.warningLabel.Location = New System.Drawing.Point(139, 90)
+        Me.warningLabel.Name = "warningLabel"
+        Me.warningLabel.Size = New System.Drawing.Size(179, 15)
+        Me.warningLabel.TabIndex = 4
+        Me.warningLabel.Text = "Date/Time range is invalid!"
+        Me.warningLabel.Visible = False
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.Label10)
+        Me.GroupBox2.Controls.Add(Me.m_CodeMeaningText)
+        Me.GroupBox2.Controls.Add(Me.Label3)
+        Me.GroupBox2.Controls.Add(Me.Label4)
+        Me.GroupBox2.Controls.Add(Me.Label5)
+        Me.GroupBox2.Controls.Add(Me.m_CodeValueText)
+        Me.GroupBox2.Controls.Add(Me.m_CodeSchemeText)
+        Me.GroupBox2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox2.Location = New System.Drawing.Point(12, 139)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(426, 121)
+        Me.GroupBox2.TabIndex = 14
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Station Info"
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label10.Location = New System.Drawing.Point(67, 98)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(133, 13)
+        Me.Label10.TabIndex = 8
+        Me.Label10.Text = "CodeMeaning (0008,0104)"
+        '
+        'm_CodeMeaningText
+        '
+        Me.m_CodeMeaningText.Location = New System.Drawing.Point(211, 95)
+        Me.m_CodeMeaningText.Name = "m_CodeMeaningText"
+        Me.m_CodeMeaningText.Size = New System.Drawing.Size(200, 20)
+        Me.m_CodeMeaningText.TabIndex = 7
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.Label6)
+        Me.GroupBox3.Controls.Add(Me.Label7)
+        Me.GroupBox3.Controls.Add(Me.m_PatientsNameText)
+        Me.GroupBox3.Controls.Add(Me.m_PatientIDText)
+        Me.GroupBox3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox3.Location = New System.Drawing.Point(12, 266)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(426, 92)
+        Me.GroupBox3.TabIndex = 15
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Patient Info"
+        '
+        'm_SendButton
+        '
+        Me.m_SendButton.Location = New System.Drawing.Point(308, 362)
+        Me.m_SendButton.Name = "m_SendButton"
+        Me.m_SendButton.Size = New System.Drawing.Size(129, 33)
+        Me.m_SendButton.TabIndex = 6
+        Me.m_SendButton.Text = "Send"
+        Me.m_SendButton.UseVisualStyleBackColor = True
+        '
+        'Label8
+        '
+        Me.Label8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label8.Location = New System.Drawing.Point(12, 429)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(432, 93)
+        Me.Label8.TabIndex = 0
+        Me.Label8.Text = "The testtool is specifically made to listen to exactly 4 C-FIND responses containing a workitem (with status = pending) and a last C-FIND response without a workitem (with status =  success). Therefore it is necessary that the query that is created will match exactly 4 workitems (and not any more). The scheduled date and time is initially set to this day. It is possible to set your own datetime range. The other fields can be used (optionally) to narrow the query, if not used, the query will use them as empty values."
+        '
+        'Label9
+        '
+        Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label9.Location = New System.Drawing.Point(12, 526)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(432, 75)
+        Me.Label9.TabIndex = 16
+        Me.Label9.Text = "When not all 4 C-FIND responses are received, it is not possible to continue with any other scenario. The remainder of the scenarios are implemented dynamically and make use of the values from the different C-FIND responses. If there are still errors during the validation of these messages, the other scenarios could result in unexpected errors. To validate the whole flow, all errors should be solved."
+        '
+        'labelCodeValue
+        '
+        Me.labelCodeValue.AutoSize = True
+        Me.labelCodeValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.labelCodeValue.ForeColor = System.Drawing.Color.Tomato
+        Me.labelCodeValue.Location = New System.Drawing.Point(28, 403)
+        Me.labelCodeValue.Name = "labelCodeValue"
+        Me.labelCodeValue.Size = New System.Drawing.Size(400, 13)
+        Me.labelCodeValue.TabIndex = 17
+        Me.labelCodeValue.Text = "Station name attributes must either be all empty or all contain a value"
+        Me.labelCodeValue.Visible = False
+        '
+        'InfoCheckBox
+        '
+        Me.InfoCheckBox.AutoSize = True
+        Me.InfoCheckBox.Location = New System.Drawing.Point(12, 378)
+        Me.InfoCheckBox.Name = "InfoCheckBox"
+        Me.InfoCheckBox.Size = New System.Drawing.Size(108, 17)
+        Me.InfoCheckBox.TabIndex = 18
+        Me.InfoCheckBox.Text = "Show help"
+        Me.InfoCheckBox.UseVisualStyleBackColor = True
+        Me.InfoCheckBox.Visible = False
+        '
+        'EditQueryForm
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(456, 400)
+        Me.ControlBox = False
+        Me.Controls.Add(Me.InfoCheckBox)
+        Me.Controls.Add(Me.labelCodeValue)
+        Me.Controls.Add(Me.Label9)
+        Me.Controls.Add(Me.Label8)
+        Me.Controls.Add(Me.m_SendButton)
+        Me.Controls.Add(Me.GroupBox3)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Name = "EditQueryForm"
+        Me.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.Text = "Worklist Query for Positioning and Delivery "
+        Me.TopMost = True
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
+
+    End Sub
+    Friend WithEvents m_DateTimePickerStart As System.Windows.Forms.DateTimePicker
+    Friend WithEvents m_DateTimePickerStop As System.Windows.Forms.DateTimePicker
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents m_CodeValueText As System.Windows.Forms.TextBox
+    Friend WithEvents m_CodeSchemeText As System.Windows.Forms.TextBox
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents m_PatientIDText As System.Windows.Forms.TextBox
+    Friend WithEvents m_PatientsNameText As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents m_SendButton As System.Windows.Forms.Button
+    Friend WithEvents warningLabel As System.Windows.Forms.Label
+    Friend WithEvents Label8 As System.Windows.Forms.Label
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents Label10 As System.Windows.Forms.Label
+    Friend WithEvents m_CodeMeaningText As System.Windows.Forms.TextBox
+    Friend WithEvents labelCodeValue As System.Windows.Forms.Label
+    Friend WithEvents InfoCheckBox As System.Windows.Forms.CheckBox
+
+End Class

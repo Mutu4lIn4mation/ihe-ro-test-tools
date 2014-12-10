@@ -1,0 +1,105 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Windows.Forms
+#End If
+
+Public Class RadiationDeliveryDialog
+    Private m_percentageEnabled As Boolean = False
+    Private m_percentage As Integer = 0
+    Private m_delivered As Boolean = False
+
+    Public Sub New()
+        Me.New(False)
+    End Sub
+
+    Public Sub New(ByVal percentageEnabled As Boolean)
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        m_percentageEnabled = percentageEnabled
+
+        'If Not m_percentageEnabled Then
+        '    GroupBox2.Visible = False
+        'End If
+    End Sub
+
+    Public ReadOnly Property Percentage() As Integer
+        Get
+            Return m_percentage
+        End Get
+    End Property
+
+    Public ReadOnly Property Delivered() As Boolean
+        Get
+            Return m_delivered
+        End Get
+    End Property
+
+
+    Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
+        If RadioButton2.Checked Then
+            m_delivered = True
+        Else
+            m_delivered = False
+            m_percentage = 0
+        End If
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.Close()
+    End Sub
+
+    Private Sub Cancel_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Me.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.Close()
+    End Sub
+
+    Private Sub RadioButton1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButton1.CheckedChanged
+        If RadioButton1.Checked Then
+            RadioButton2.Checked = False
+
+            GroupBox2.Enabled = False
+            Label1.Enabled = False
+            TextBox1.Enabled = False
+
+            OK_Button.Enabled = True
+        End If
+    End Sub
+
+    Private Sub RadioButton2_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButton2.CheckedChanged
+        If RadioButton2.Checked Then
+            RadioButton1.Checked = False
+
+            If m_percentageEnabled Then
+                GroupBox2.Enabled = True
+                Label1.Enabled = True
+                TextBox1.Enabled = True
+            End If
+
+            OK_Button_Handle()
+        End If
+    End Sub
+
+    Private Sub TextBox1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextBox1.TextChanged
+        OK_Button_Handle()
+    End Sub
+
+    Private Sub OK_Button_Handle()
+        Dim value As Integer = 0
+
+        If m_percentageEnabled Then
+            Try
+                value = Integer.Parse(TextBox1.Text)
+            Catch ex As Exception
+                'do nothing
+            End Try
+            If value > 0 And value < 100 Then
+                m_percentage = value
+                OK_Button.Enabled = True
+            Else
+                m_percentage = 0
+                OK_Button.Enabled = True
+            End If
+        Else
+            OK_Button.Enabled = True
+        End If
+    End Sub
+End Class

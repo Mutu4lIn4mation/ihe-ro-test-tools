@@ -1,0 +1,55 @@
+SESSION
+
+SESSION-TYPE media
+SESSION-FILE-VERSION 2
+
+# Product Test Session Properties
+SESSION-TITLE ""
+SESSION-ID 000
+MANUFACTURER "DVT"
+MODEL-NAME "DVT"
+SOFTWARE-VERSIONS "2.6.2"
+APPLICATION-ENTITY-NAME "DICOM"
+APPLICATION-ENTITY-VERSION "3.0"
+TESTED-BY "doosjej"
+DATE "20100706"
+
+# Test Session Properties
+LOG-ERROR true
+LOG-WARNING true
+LOG-INFO true
+LOG-RELATION false
+LOG-DEBUG false
+PDU-DUMP false
+STORAGE-MODE as-media
+DETAILED-VALIDATION-RESULTS true
+SUMMARY-VALIDATION-RESULTS true
+INCLUDE-TYPE-3-NOTPRESENT-INRESULTS false
+DUMP-ATTRIBUTES-REF-FILES false
+ENSURE-EVEN-ATTRIBUTE-VALUE-LENGTH true
+
+# Definitions
+DEFINITION-DIRECTORY "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\UnifiedProcedureStep-Push.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\CTImageStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\DeformableSpatialRegistrationStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\FileMeta.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\RTBeamsDeliveryInstructionStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\RTBeamsTreatmentRecordStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\RTDoseStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\RTImageStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\RTPlanStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\RTStructureSetStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\RTTreatmentSummaryRecordStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\SpatialRegistrationStorage.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\StudyRootQueryRetrieve-MOVE.def"
+DEFINITION "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\Definition files\DICOM definition files\UnifiedProcedureStep-Pull.def"
+
+# Results
+RESULTS-ROOT "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\DVtkProject\Sessionfiles\Media\Results\"
+APPEND-TO-RESULTS-FILE false
+
+# Data Directory
+DATA-DIRECTORY "D:\ASTRO\ihe_ro2010_svn\trunk\ihe_ro2010\03-Code\DVtkProject\Sessionfiles\Media\Results\"
+
+ENDSESSION

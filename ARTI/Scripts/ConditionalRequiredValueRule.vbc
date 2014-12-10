@@ -1,0 +1,81 @@
+Class ConditionalRequiredValueRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' this attribute has a certain required value if another attribute has a certain value
+    ''' </summary>
+    ''' <param name="valueTag">the attribute to be checked</param>
+    ''' <param name="value">the value it should have</param>
+    ''' <param name="conditionTag">the attribute that should have a certain value for this attribute to be required</param>
+    ''' <param name="conditionValue">the value the conditionTag should have</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+
+    Public Sub New(ByVal valueTag As String, ByVal value As String, ByVal conditionTag As String, ByVal conditionValue As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+        MyClass.New(valueTag, value, "", 1, conditionTag, conditionValue, iodType, severity)
+    End Sub
+
+    Public Sub New(ByVal valueTag As String, ByVal value As String, ByVal sequenceItemTag As String, ByVal itemIndex As Integer, ByVal conditionTag As String, ByVal conditionValue As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+        MyBase.New("Conditional Required Value Rule", valueTag, iodType, severity)
+        m_conditionTagSequence = conditionTag
+        m_conditionTagValue = conditionValue
+        m_requiredTagSequence = valueTag
+        m_requiredTagValue = value
+        m_SequenceItemTag = sequenceItemTag
+        m_ItemIndex = itemIndex
+    End Sub
+
+    Private m_conditionTagValue As String
+    Private m_conditionTagSequence As String
+    Private m_requiredTagSequence As String
+    Private m_requiredTagValue As String
+    Private m_requiredSequenceNr As Integer
+    Private m_SequenceItemTag As String
+    Private m_ItemIndex As Integer
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim message As String = ""
+        Dim tagSequence As String = ""
+
+        If iodType = IODTypeRule Then
+            If Not dicomMessage.Exists(m_conditionTagSequence) Then
+                'Tag doesn't exist in dataset
+                message = "The conditional tag '" + Tags.GetTagName(m_conditionTagSequence) + "' (" + m_conditionTagSequence + ") is not present in the dataset."
+                Me.SetValid(message)
+            ElseIf dicomMessage.Exists(m_conditionTagSequence) Then
+
+                If dicomMessage(m_conditionTagSequence).Values.Item(0) = m_conditionTagValue Then
+                    'Tag does exists in dataset, and has the value 
+                    'Tag exists in dataset and has the right value, condition is true
+                    If (m_SequenceItemTag <> "") Then
+                        tagSequence = getItemInSQTag(m_ItemIndex, m_SequenceItemTag)
+                    Else
+                        tagSequence = m_TagSequence
+                    End If
+
+                    If dicomMessage.Exists(tagSequence) Then
+                        If dicomMessage(tagSequence).Values.Item(0) = m_requiredTagValue Then
+                            'Required value in attribute
+                            message = "'" + Tags.GetTagName(m_conditionTagSequence) + "' (" + m_conditionTagSequence + ") contains the value: " + dicomMessage(m_conditionTagSequence).Values.Item(0).ToString() + " and '" + Tags.GetTagName(m_requiredTagSequence) + "' (" + m_requiredTagSequence + ")  for item: '" + m_requiredSequenceNr.ToString() + "' has value: " + dicomMessage(tagSequence).Values.Item(0)
+                            Me.SetValid(message)
+                        Else
+                            'Required value not in attribute
+                            message = "'" + Tags.GetTagName(m_conditionTagSequence) + "' (" + m_conditionTagSequence + ") contains the value: " + dicomMessage(m_conditionTagSequence).Values.Item(0).ToString() + " and '" + Tags.GetTagName(m_requiredTagSequence) + "' (" + m_requiredTagSequence + ")  for item: '" + m_requiredSequenceNr.ToString() + "' has value: " + dicomMessage(tagSequence).Values.Item(0) + " instead of: " + m_requiredTagValue
+                            Me.SetError(message)
+                        End If
+                    Else
+                        'Required item not in dataset
+                        message = "'" + Tags.GetTagName(m_conditionTagSequence) + "' (" + m_conditionTagSequence + ") contains the value: " + dicomMessage(m_conditionTagSequence).Values.Item(0).ToString() + " and '" + Tags.GetTagName(m_requiredTagSequence) + "' (" + m_requiredTagSequence + ") is not present in the dataset for item: '" + m_requiredSequenceNr.ToString() + "'."
+                        Me.SetError(message)
+
+                    End If
+                Else
+
+                    message = "The conditional tag '" + Tags.GetTagName(m_conditionTagSequence) + "' (" + m_conditionTagSequence + ") is not present in the dataset."
+                    Me.SetValid(message)
+                End If
+            End If
+            Me.Report()
+        End If
+    End Sub
+End Class
