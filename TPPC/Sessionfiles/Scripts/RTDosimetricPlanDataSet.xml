@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSet>
+    <DataSetPath>\..\Datasets\TPPC</DataSetPath>
+    <BasicStaticBeam>BasicStaticBeam\RTPlanBasicStaticBeam.dcm</BasicStaticBeam>
+    <HardWedgeBeam>HardWedgeBeam\RTPlanHardWedgeBeam.dcm</HardWedgeBeam>
+    <MotorizedWedgeBeam>MotorizedWedgeBeam\RTPlanMotorizedWedgeBeam.dcm</MotorizedWedgeBeam>
+    <VirtualWedgeBeam>VirtualWedgeBeam\RTPlanVirtualWedgeBeam.dcm</VirtualWedgeBeam>
+    <ArcBeam>ArcBeam\RTPlanArcBeam.dcm</ArcBeam>
+    <ConformalArcBeam>ConformalArcBeam\RTPlanConformalArcBeam.dcm</ConformalArcBeam>
+    <StepAndShootBeam>StepAndShootBeam\RTPlanStepShootBeam.dcm</StepAndShootBeam>
+    <SlidingWindowBeam>SlidingWindowBeam\RTPlanSlidingWindowBeam.dcm</SlidingWindowBeam>
+    <StaticElectronBeam>StaticElectronBeam\RTPlanElectronBeamStaticElectronBeam.dcm</StaticElectronBeam>
+    <PhotonApplicatorBeam>PhotonApplicatorBeam\RTPlanPhotonApplicatorBeam.dcm</PhotonApplicatorBeam>
+	<PhotonApplicatorArcBeam>PhotonApplicatorArcBeam\RTPlanPhotonApplicatorArcBeam.dcm</PhotonApplicatorArcBeam>
+	<BasicStaticMLCBeam>BasicStaticMLCBeam\RTPlanBasicStaticMLCBeam.dcm</BasicStaticMLCBeam>
+	<MLCArcBeam>MLCArcBeam\RTPlanMLCArcBeam.dcm</MLCArcBeam>
+    <IMATVMATBeam>IMATVMATBeam\RTPlanIMATVMATBeam.dcm</IMATVMATBeam>
+    <StructureSet>StructureSet\RTSTRUCT.dcm</StructureSet>
+    <CTImage>CT\CT_2.25.601473306079309293828095543923666337950.</CTImage>
+</DataSet>

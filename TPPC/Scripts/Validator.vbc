@@ -1,0 +1,307 @@
+Class Validator
+
+    Protected m_logger As Logger = Logger.GetInstance()
+    'the scenariorules it will apply
+    Protected m_rules As ArrayList
+    Protected m_isDifferenceCheck As Boolean
+
+    Private m_validationMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal isDifferenceCheck As Boolean)
+        m_isDifferenceCheck = isDifferenceCheck
+    End Sub
+
+    'This method validates all received messages. It applies DICOM validation and checks for the specified IHE-RO scenario rules
+    Public Sub ValidateMessages(ByRef receivedMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection, ByRef scenarioRules As ArrayList)
+
+        m_rules = scenarioRules
+
+        applyRules(receivedMessages)
+        receivedMessages.Clear()
+
+    End Sub
+    'apply all the rules for the selected messages
+    Private Sub applyRules(ByRef validationMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+        'Validate and apply message level rules
+        For Each message As DicomMessage In validationMessages
+            If KnownMessageType(message) Then
+                ' Apply the definition file rules
+                Validate(message)
+                'Apply Attribute level rules
+                ApplyAttributeRules(message)
+                'Apply Module level rules
+                ApplyModuleRules(message)
+                'Apply Mapping rules
+                ApplyMappingRules(message)
+            Else
+                Reporter.GetInstance.ReportWarningMessage("Unexpected SOP Class skipped.")
+            End If
+        Next
+        'Apply Message Collection rules on received messages
+        ApplyMessageCollectionRuleRules(validationMessages)
+    End Sub
+    
+    'This method loads the Appropriate defintion files for dicom validation of received messages
+    Protected Sub LoadAppropriateDefinitionFiles()
+        'Dim RtPlanDefinitionFiletoLoad As String
+        'Dim RtPlanDefinitionFiletoUnload As String
+        'RtPlanDefinitionFiletoLoad = config.GetDefinitionFileName(m_usedRtPlanType)
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        config.LoadDefinitionFiles(config.GetMainThread)
+
+        LogLoadedDefinitionFiles(config.GetMainThread.Options.LoadedDefinitionFileNames)
+    End Sub
+
+    'Logs the loaded definition files
+    Protected Sub LogLoadedDefinitionFiles(ByVal defFiles As String())
+        Logger.GetInstance.LogMessage("Loaded Definition files : ")
+        For Each deffilename As String In defFiles
+            Logger.GetInstance.LogMessage("	Definition file: " + deffilename)
+        Next
+    End Sub
+
+    'This method validates the message agains the definition files
+    Protected Sub Validate(ByRef receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+        Dim messageIOD As IODType
+
+        'looks in the message for the private attribute and removes it and sets the boolean
+        config.GetMainThread.Options.DvtkScriptSession.IsDataTransferExplicit = SetTransferSyntax(receivedMessage)
+
+        messageIOD = DetermineIodType(receivedMessage)
+        'perform definition file rules on the receivedMessage
+        If Not receivedMessage.CommandSet.DimseCommand = CFINDRSP Then
+            'when a PUSH is received, the defintion file of PULL should be used for the validation
+            Dim affectedSOPClassUIdChanged As Boolean = convertSOPClassUIDforUPS(Tags.AffectedSOPClassUID, receivedMessage)
+            Dim requestedSOPClassUIdChanged As Boolean = convertSOPClassUIDforUPS(Tags.RequestedSOPClassUID, receivedMessage)
+
+            config.GetMainThread.Validate(receivedMessage)
+
+            'change back the sop class UID to received sop class UID
+            convertBackSOPClassUIDforUPS(receivedMessage, requestedSOPClassUIdChanged, affectedSOPClassUIdChanged)
+            'STATUS "0" means succeeded, no extra definition file validation
+        ElseIf Not receivedMessage(Tags.StatusCommandElement).Values(0) = "0" Then
+
+            'convert response to another dicom message
+            Dim cFindResponse As DvtkData.Dimse.DicomMessage = New DvtkData.Dimse.DicomMessage()
+            'cFindResponse.CommandSet = New DvtkData.Dimse.CommandSet(CFINDRSP)
+
+            'convert the commandset of the repsonse
+            For item As Integer = 0 To receivedMessage.CommandSet.Count - 1
+                cFindResponse.CommandSet.AddAttribute(receivedMessage.CommandSet.Item(item).GroupNumber, receivedMessage.CommandSet.Item(item).ElementNumber, receivedMessage.CommandSet.Item(item).VR, receivedMessage.CommandSet.Item(item).Values(0))
+            Next
+            cFindResponse.DataSet = receivedMessage.DataSet.DvtkDataDataSet
+
+            cFindResponse.CommandSet.MakeAscending()
+
+            'convert original request to another dicom message
+            Dim sendMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage _
+                            = ReferenceDataSet.GetInstance().GetUnifiedProcedureStepPull_CFIND_REQ()
+
+            Dim cFindRequest As DvtkData.Dimse.DicomMessage = New DvtkData.Dimse.DicomMessage()
+            cFindRequest.CommandSet = New DvtkData.Dimse.CommandSet(CFINDRQ)
+            'convert the commandset of the request
+            For item As Integer = 0 To sendMessage.CommandSet.Count - 1
+                If sendMessage.CommandSet.Item(item).VR = UL Then
+                    cFindRequest.CommandSet.AddAttribute(sendMessage.CommandSet.Item(item).GroupNumber, sendMessage.CommandSet.Item(item).ElementNumber, sendMessage.CommandSet.Item(item).VR, sendMessage.CommandSet.Item(item).Values(0))
+                End If
+            Next
+            cFindRequest.DataSet = sendMessage.DataSet.DvtkDataDataSet
+            config.GetMainThread.Options.DvtkScriptSession.Validate(cFindResponse, Nothing, cFindRequest, Dvtk.Sessions.ValidationControlFlags.UseValueRepresentations Or Dvtk.Sessions.ValidationControlFlags.UseDefinitions)
+
+            'config.GetMainThread.Options.DvtkScriptSession.WriteHtml("<br>", True, True)
+            'config.GetMainThread.Options.DvtkScriptSession.WriteHtml("IHE will validate the C-FIND reponse for both their DICOM as IHE compliancy.", True, True)
+            'config.GetMainThread.Options.DvtkScriptSession.WriteHtml("<br>", True, True)
+
+        End If
+
+
+    End Sub
+
+    'This method applies the attribute rules
+    Protected Sub ApplyAttributeRules(ByRef receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        'Determine message iodType
+        Dim attRule As AttributeRule
+        Dim msgIodType As IODType = DetermineIodType(receivedMessage)
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In m_rules
+            If ((TypeOf scenariorule Is AttributeRule) And IodTypeHelper.IsMessageOfIodType(receivedMessage, scenariorule.IODTypeRule)) Then
+                attRule = DirectCast(scenariorule, AttributeRule)
+                attRule.ApplyRule(receivedMessage, scenariorule.IODTypeRule)
+            ElseIf ((TypeOf scenariorule Is AttributeRule) And (receivedMessage.CommandSet.DimseCommand = CSTORERQ) And (scenariorule.IODTypeRule = IODType.CStoreRequest)) Then
+                attRule = DirectCast(scenariorule, AttributeRule)
+                attRule.ApplyRule(receivedMessage, scenariorule.IODTypeRule)
+            ElseIf ((TypeOf scenariorule Is AttributeRule) And (receivedMessage.CommandSet.DimseCommand = CMOVERQ) And (scenariorule.IODTypeRule = IODType.StudyRootQueryRetrieveMOVE)) Then
+                attRule = DirectCast(scenariorule, AttributeRule)
+                attRule.ApplyRule(receivedMessage, scenariorule.IODTypeRule)
+            End If
+        Next
+    End Sub
+
+    'This method applies the module rules
+    Protected Sub ApplyModuleRules(ByRef receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        'Determine message iodType
+        Dim modRule As ModuleRule
+        Dim msgIodType As IODType = DetermineIodType(receivedMessage)
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In m_rules
+            If ((TypeOf scenariorule Is ModuleRule) And IodTypeHelper.IsMessageOfIodType(receivedMessage, scenariorule.IODTypeRule)) Then
+                modRule = DirectCast(scenariorule, ModuleRule)
+                modRule.ApplyRule(receivedMessage, scenariorule.IODTypeRule)
+            End If
+        Next
+    End Sub
+
+    'This method applies the mapping rules
+    Protected Sub ApplyMappingRules(ByRef receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        'Determine message iodType
+        Dim mapRule As MappingRule
+        Dim msgIodType As IODType = DetermineIodType(receivedMessage)
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In m_rules
+            If ((TypeOf scenariorule Is MappingRule) And IodTypeHelper.IsMessageOfIodType(receivedMessage, scenariorule.IODTypeRule)) Then
+                mapRule = DirectCast(scenariorule, MappingRule)
+                mapRule.ApplyRule(receivedMessage, scenariorule.IODTypeRule)
+            End If
+        Next
+    End Sub
+
+
+    'This method applies the interrelation rules
+    Protected Sub ApplyMessageCollectionRuleRules(ByRef receivedMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+        Dim messageCollectionRule As MessageCollectionRule
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In m_rules
+            If TypeOf scenariorule Is MessageCollectionRule Then
+                messageCollectionRule = DirectCast(scenariorule, MessageCollectionRule)
+                messageCollectionRule.ApplyRule(receivedMessages)
+            End If
+        Next
+    End Sub
+
+
+    'This method determines the IOD type of a message
+    Protected Function DetermineIodType(ByRef receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As IODType
+        'What kind of message did we receive
+        'Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+        'attribute = receivedMessage.DataSet(Tags.SOPClassUID)
+
+        Dim iod As IODType
+        'If Not (SOPclass.TryGetIODType(Attribute.Values(0).ToString(), iod)) Then
+        If receivedMessage.CommandSet.DimseCommand = NACTIONRQ Then
+            iod = IODType.NAction
+            Return iod
+        End If
+
+        If Not (SOPclass.TryGetIODType(receivedMessage.CommandSet.GetSopClassUid(), iod)) Then
+            m_logger.LogMessage("Could not determine IOD type of received message..")
+        End If
+
+        Return iod
+
+    End Function
+
+    'This method determines if a message is of a type known to the Test tool (definitions). returns true in case the message is of type CT Image, RT Structureset, RT Plan, or RT Dose
+    Protected Function KnownMessageType(ByRef receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As Boolean
+        Dim messageSOPClassUID As String
+        'Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+
+        'Retrieve the message sop class uid
+        'attribute = receivedMessage.DataSet(Tags.SOPClassUID)
+        'messageSOPClassUID = attribute.Values(0)
+        messageSOPClassUID = receivedMessage.CommandSet.GetSopClassUid()
+        If messageSOPClassUID = "" Then
+            Dim log As String = "(Requested or Affected) SOP Class UID could not be found in received message " + receivedMessage.CommandSet.DimseCommand.ToString()
+            m_logger.LogErrorMessage(log)
+        End If
+
+        'remove any spaces in the sop class uid
+        Dim space As Char = " "c
+        messageSOPClassUID = messageSOPClassUID.TrimStart(space)
+        messageSOPClassUID = messageSOPClassUID.TrimEnd(space)
+
+        'is the sop class uid a known uid?
+        Dim iod As IODType
+        If Not (SOPclass.TryGetIODType(messageSOPClassUID, iod)) Then
+            m_logger.LogMessage("An unexpected SOP Class received with sop class uid '" + messageSOPClassUID + "').")
+            Return False
+        End If
+
+        Return True
+
+    End Function
+
+    'This method determines if a message is of a type known to the Test tool (definitions). returns true in case the message is of type CT Image, RT Structureset, RT Plan, or RT Dose
+    Protected Function getMessageType(ByRef receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As IODType
+        Dim messageSOPClassUID As String
+        'Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+
+        'Retrieve the message sop class uid
+        'attribute = receivedMessage.DataSet(Tags.SOPClassUID)
+        'messageSOPClassUID = attribute.Values(0)
+        messageSOPClassUID = receivedMessage.CommandSet.GetSopClassUid()
+        If messageSOPClassUID = "" Then
+            Dim log As String = "(Requested or Affected) SOP Class UID could not be found in received message " + receivedMessage.CommandSet.DimseCommand.ToString()
+            m_logger.LogErrorMessage(log)
+        End If
+
+        'remove any spaces in the sop class uid
+        Dim space As Char = " "c
+        messageSOPClassUID = messageSOPClassUID.TrimStart(space)
+        messageSOPClassUID = messageSOPClassUID.TrimEnd(space)
+
+        'is the sop class uid a known uid?
+        Dim iod As IODType
+        If Not (SOPclass.TryGetIODType(messageSOPClassUID, iod)) Then
+            m_logger.LogMessage("An unexpected SOP Class received with sop class uid '" + messageSOPClassUID + "').")
+            Return Nothing
+        End If
+
+        Return iod
+
+    End Function
+    Protected Function convertSOPClassUIDforUPS(ByVal tag As String, ByVal message As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As Boolean
+        If message.Exists(tag) Then
+            If message.Item(tag).Values(0) = SOPclass.UnifiedProcedureStepPushSOPClassUID Then
+                message.Set(tag, UI, SOPclass.UnifiedProcedureStepPullSOPClassUID)
+                Logger.GetInstance().LogMessage("Command Set SOP class UID temporary changed from PUSH to PULL for validation purposes")
+                Return True
+            End If
+        End If
+        Return False
+    End Function
+
+    Protected Sub convertBackSOPClassUIDforUPS(ByVal message As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal requested As Boolean, ByVal affected As Boolean)
+        If requested Then
+            message.Set(Tags.RequestedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+            Logger.GetInstance().LogMessage("Command Set requested SOP class UID converted back from PULL to PUSH")
+        End If
+        If affected Then
+            message.Set(Tags.AffectedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+            Logger.GetInstance().LogMessage("Command Set affected SOP class UID converted back from PULL to PUSH")
+        End If
+    End Sub
+    Private Function SetTransferSyntax(ByVal dicomMessage As DicomMessage) As Boolean
+        Dim isDataTransferExplicit As Boolean = False
+        If dicomMessage.Exists(Tags.privateTransferSyntaxAttribute) Then
+            Dim transferSyntax As String = dicomMessage(Tags.privateTransferSyntaxAttribute).Values(0)
+            If transferSyntax = "1.2.840.10008.1.2" Then
+                isDataTransferExplicit = False
+            Else
+                isDataTransferExplicit = True
+            End If
+            dicomMessage.DataSet.Delete(Tags.privateTransferSyntaxAttribute)
+        End If
+
+        Return isDataTransferExplicit
+    End Function
+
+End Class

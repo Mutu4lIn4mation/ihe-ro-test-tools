@@ -1,0 +1,23 @@
+' Structure Set transaction
+Class StructureSetTransaction
+    Inherits Transaction
+    'Constructor
+    Public Sub New()
+
+        MyBase.New("RO-0", "Structure Set Storage", IODType.RTStructureSet, True)
+
+    End Sub
+
+    'method which returns the related reference data messages belonging to this transaction
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        'add the structure set message to the arraylist
+        datasetMessages.Add(referenceData.GetStructureSet())
+
+        'return the array with dataset(s)
+        Return datasetMessages
+    End Function
+
+End Class

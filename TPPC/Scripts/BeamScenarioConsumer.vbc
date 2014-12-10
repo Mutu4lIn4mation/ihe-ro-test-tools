@@ -1,0 +1,52 @@
+Class BeamScenarioConsumer
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New(ByVal scenario As ARTO_Scenario)
+        'scenario is the beam scenario
+
+        m_scenarioDatasetXmlFileName = DataSetHandler.RTAdvancedXMLFileName
+
+        'Configurate the receive step
+        Dim sendStep As SendScenarioStep = New SendScenarioStep(New BeamConsumerActor(), New ArchiveActor())
+
+        ' The following is solved by ticket 12 and 15 of the IHE-RO trac database of 2010    
+        'Select Case scenario
+
+        '    Case ARTO_Scenario.ArcBeam, ARTO_Scenario.ConformalArcBeam, ARTO_Scenario.IMATVMATBeam, ARTO_Scenario.SlidingWindowBeam, ARTO_Scenario.StaticElectronBeam, ARTO_Scenario.StepAndShootBeam, ARTO_Scenario.StereotacticBeam
+        '        Dim warningText As String = "Warning: Please note that this test scenario currently uses dummy test data. The test data for this scenario: " + scenario.ToString + " has not yet been provided by IHE-RO."
+        '        Dim headerText As String = "Dummy RT Plan"
+        '        MessageBox.Show(warningText, headerText, MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
+
+        'End Select
+
+        Dim dialog As SendOptionalDataDialog = New SendOptionalDataDialog()
+        Dim result As DialogResult = dialog.ShowDialog()
+        If dialog.OptionResult Then
+            'send step creeren die CT en SS verstuurt
+            'todo: cancel sending if sending failed            
+            sendStep.AddTransaction(New ComputedTomographyTransaction())
+            sendStep.AddTransaction(New StructureSetTransaction())
+
+        End If
+
+        Dim cleanUp As CleanUpScenarioStep = Nothing
+        cleanUp = New CleanUpScenarioStep(TestToolConfiguration.GetInstance.GetSession.ResultsRootDirectory)
+
+        Dim beamTransaction As BeamTransaction = New BeamTransaction(scenario)
+
+        'Show modifier selection dialog and use it's results
+        Dim modifierSelectionDialog As ModifierSelectionDialog = New ModifierSelectionDialog(scenario)
+        modifierSelectionDialog.ShowDialog()
+
+        beamTransaction.RemoveModifiers(modifierSelectionDialog.GetDeselectedOptionalModifiers(), modifierSelectionDialog.OptionalModifiers)
+
+        sendStep.AddTransaction(beamTransaction)
+        m_scenarioSteps.Add(sendStep)
+
+        If TestToolConfiguration.GetInstance.DoCleanUp = True Then
+            m_scenarioSteps.Add(cleanUp)
+        End If
+
+    End Sub
+End Class
