@@ -1,0 +1,174 @@
+Class GeometricPlannerScenario2
+    Inherits Scenario
+    'Constructor
+    Public Sub New()
+        'actor(s) under test
+        m_scenarioActors.Add(New GeometricPlannerActor)
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = "ReferenceDataSet.xml"
+        'transactions to send
+        m_transactionsToSend.Add(New RO_1_Transaction)
+        m_transactionsToSend.Add(New RO_7_Transaction)
+        'transactions to receive
+        m_transactionsToReceive.Add(New RO_3_Transaction)
+
+        '============== RT-Plan (geometric) ================================================-
+
+        '-------------- Critical attribute mapping ------------------------------------------
+
+        'C.7.1.1 Patient Module
+        'Patient() 's Name	(0010,0010), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientName, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Patient ID	(0010,0020), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientID, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Patient() 's Birthdate	(0010,0030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientsBirthDate, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Patient() 's Sex	(0010,0040), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+
+
+        'C.7.2.1 General Study Module		
+        'Study Instance UID	(0020,000D), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Study Date	(0008,0020), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyDate, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Study Time	(0008,0030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyTime, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Referring(Physician)(0008,0090), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.ReferringPhysiciansName, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Study ID	(0020,0010), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyID, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Accession Number	(0008,0050), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.AccessionNumber, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Study Description	(0008,1030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyDescription, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+
+        'C.7.4.1 Frame Of Reference Module		
+        'Frame of Reference UID	(0020,0052), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.FrameofReferenceUID, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+        'Position Reference Indicator (0020,1040), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PositionReferenceIndicator, IODType.RTPlanGeometric, ErrorSeverity.RuleError, False))
+
+        '--------------  End critical attribute mapping rules -------------------------------
+
+        'C.8.8.13 RT Fraction Scheme		
+        'Fraction Group Sequence	(300A,0070)	Only 1 item shall be present
+        m_scenarioRules.Add(New NrIntOfSequenceItemRule(Tags.FractionGroupSequence, 1, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '>Number of Brachy Application Setups 300A,00A0	value shall be 0
+        m_scenarioRules.Add(New IsRequiredRule(Tags.NumberofBrachyApplicationSetups, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.NumberofBrachyApplicationSetups, "0", IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        'C.8.8.14 RT Beams Module		
+        'Beam Sequence	(300A,00B0)	"Up to 100 beams should be supported, this rule is not tested
+
+        'Beam Name	(300A,00C2)	
+        '1. The Beam Name is unique within the Beam Sequence"
+        m_scenarioRules.Add(New BeamNameIsUniqueRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        '2. Once a Beam Name is created, it will never change.
+        m_scenarioRules.Add(New BeamNameNotChangedRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '>Beam Type 300A,00C4 Value shall be STATIC or Dynamic
+        m_scenarioRules.Add(New IsRequiredRule(Tags.BeamType, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        Dim values(1) As String
+        values(0) = "STATIC"
+        values(1) = "DYNAMIC"
+        m_scenarioRules.Add(New ValueListRule(Tags.BeamType, values, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '>Radiation Type 300A,00C6 value: PHOTON
+        m_scenarioRules.Add(New IsRequiredRule(Tags.RadiationType, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '>High-Dose Technique Type 300A,00C7 Geometric Plans shall not specify this attribute.
+        m_scenarioRules.Add(New NotPresentRule(Tags.HighDoseTechniqueType, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '>Source-Axis Distance 300A,00B4 Shall be present
+        m_scenarioRules.Add(New IsRequiredRule(Tags.SourceAxisDistance, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        'Beam Limiting Device Sequence	(300A,00B6)	
+        'If >>RT Beam Limiting Device Type(300A,00B8) = X, Y, ASYMX or ASYMY then the sequence should contain 
+        'descriptions of two sets of jaws, so 2 items should be present
+        'else if  >>RT Beam Limiting Device Type(300A,00B8) = MLCX  or MLCY then the sequence shall report at 
+        'least one set of MLC descriptions, so at least 1 item should be present"
+        m_scenarioRules.Add(New BeamLimitingDeviceSequenceRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Number of Blocks (300A,00F0) 1. Up to 8 block items shall be suported (test this with script and dataset)
+        'Block Sequence(300A,00FA) 2. Only one block with >>Block Type(300A,00F8) = APERTURE may be present in the 
+        'all blocks"
+
+        '>Referenced Patient Setup Number (300C,006A) Shall be present
+        m_scenarioRules.Add(New IsRequiredRule(Tags.ReferencedPatientSetupNumber, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        '>Number of Wedges (300A,00D0) Shall be present
+        m_scenarioRules.Add(New ValueRule(Tags.NumberOfWedges, "0", IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        '>Number of Compensators (300A,00E0) Shall be present
+        m_scenarioRules.Add(New ValueRule(Tags.NumberOfCompensators, "0", IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        '>Number of Boli (300A,00ED) Shall be present
+        m_scenarioRules.Add(New ValueRule(Tags.NumberOfBoli, "0", IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        m_scenarioRules.Add(New BlockRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Block Number of Points	(300A,0104)	Value >= 3
+        m_scenarioRules.Add(New BlockNumberofPointsRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '>>Block Divergence 300A,00FA Value should be PRESENT
+        m_scenarioRules.Add(New IsRequiredRule(Tags.BlockDivergence, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        'Block Data	(300A,0106)	"1. Shall not be 0 points. One or more points should be present.
+        '2.No boundary check done. See decision D.6"
+        m_scenarioRules.Add(New BlockDataRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '>Final Cumulative Meterset Weight 300A,010E Shall not be present in a Geometric Plan.
+        m_scenarioRules.Add(New NotPresentRule(Tags.FinalCumulativeMetersetWeight, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        '>>Referenced Dose Reference Sequence 300C,0050 Shall not be present for Geometric Plans.
+        m_scenarioRules.Add(New NotPresentRule(Tags.ReferencedDoseReferenceSequence, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+
+        '>Number of Control Points 300A,0110 Shall have a value of 2 for Geometric Plans.  
+        m_scenarioRules.Add(New IsRequiredRule(Tags.NumberOfControlPoints, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.NumberOfControlPoints, "2", IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        'Control Point Sequence	(300A,0111)	"For a Geometric Plans When Beam Type(300A,00C4) is STATIC then
+        'second control point (sequence item) shall contain(only) 
+        ' Control Point Index (300A,0112) with a value of 1 
+        ' Cumulative Meterset Weight (300A,0134) set NULL"
+        m_scenarioRules.Add(New ControlPointSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Cumulative Meterset Weight (300A,0134)	For a Geometric Plans 
+        '1. First control point Shall be NULL 
+        '2. Second control point Shall be NULL "
+        m_scenarioRules.Add(New CumulativeMetersetWeightRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Referenced Dose Reference Sequence (300C,0050) For a Geometric Plans Shall not be present
+        m_scenarioRules.Add(New ReferencedDoseReferenceSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Wedge Position Sequence (300A,0116) For a Geometric Plans Shall not be present"
+        m_scenarioRules.Add(New WedgePositionSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Beam Limiting Device Position Sequence	(300A,011A)	For a Geometric Plans 
+        '1. shall be presented Control Point index 0 only.
+        '2. correspond to the devices defined in the Beam Limiting Device Sequence, TODO: Find all relations"
+        m_scenarioRules.Add(New BeamLimitingDevicePositionSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Gantry Rotation Direction (300A,011F) For a Geometric Plans - For Control Point Index 0 only, 
+        'this value must have the value of NONE"
+        m_scenarioRules.Add(New GantryRotationDirectionRule(IODType.Generic, ErrorSeverity.RuleError))
+
+        'C.12.1 SOP Common		
+
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+        m_scenarioRules.Add(New SOPInstanceUIDRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        'Specific Character Set	0008,0005 should be one of these values ISO_IR 100 or ""
+        Dim values2(1) As String
+        values2(0) = "ISO_IR 100"
+        values2(1) = ""
+        m_scenarioRules.Add(New ValueListRule(Tags.SpecificCharacterSet, values2, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        'Instance Creation Date	0008,0012 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreationDate, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Instance Creation Time	0008,0013 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreationTime, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Instance Creator UID 0008,0014 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreatorUID, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Instance Number 0020,0013 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceNumber, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+
+        '============== End RT-Plan (geometric) rules =======================================
+
+    End Sub
+
+
+End Class

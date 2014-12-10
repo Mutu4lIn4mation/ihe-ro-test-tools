@@ -1,0 +1,63 @@
+Class Reporter
+
+    'the actual instance of the Reporter class
+    Private Shared m_instance As Reporter
+    Private m_testTool As TestTool
+
+    'we hide the constructor from the outside
+    Private Sub New()
+    End Sub
+
+    'Static method for creating one single instance
+    Public Shared Function GetInstance() As Reporter
+        ' initialize if not already done
+        If m_instance Is Nothing Then
+            m_instance = New Reporter
+        End If
+        ' return the initialized instance of the Reporter Class
+        Return m_instance
+    End Function 'Instance
+
+
+    Public Sub SetTestTool(ByRef testTool As TestTool)
+        m_testTool = testTool
+    End Sub
+
+    Public Sub Report(ByVal errorText As String, ByVal severity As ErrorSeverity)
+        If m_testTool Is Nothing Then
+            Throw New System.Exception("The testToolobject is not set")
+        End If
+
+        If severity = ErrorSeverity.RuleError Then
+            'm.testtool.WriteInformation("[Error]")
+            m_testTool.WriteErrorNow(vbCrLf + "IHE-RO Error : " + errorText)
+            'm.testtool.WriteInformation("[/Error]" + vbCrLf)
+
+        ElseIf severity = ErrorSeverity.RuleInfo Then
+            m_testTool.WriteInformationNow(vbCrLf + "IHE-RO Info : " + errorText)
+        ElseIf severity = ErrorSeverity.RuleWarning Then
+            m_testTool.WriteWarningNow(vbCrLf + "IHE-RO Warning : " + errorText)
+        End If
+    End Sub
+
+    Public Sub ReportDebugMessage(ByVal errorText As String)
+        If m_testTool Is Nothing Then
+            Throw New System.Exception("The testToolobject is not set")
+        End If
+        m_testTool.WriteInformationNow(vbCrLf + errorText)
+    End Sub
+
+    Public Sub ReportWarningMessage(ByVal errorText As String)
+        If m_testTool Is Nothing Then
+            Throw New System.Exception("The testToolobject is not set")
+        End If
+        m_testTool.WriteWarningNow(vbCrLf + errorText)
+    End Sub
+
+    Public Sub ReportErrorMessage(ByVal errorText As String)
+        If m_testTool Is Nothing Then
+            Throw New System.Exception("The testToolobject is not set")
+        End If
+        m_testTool.WriteErrorNow(vbCrLf + errorText)
+    End Sub
+End Class 'Reporter Class

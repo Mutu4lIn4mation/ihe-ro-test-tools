@@ -1,0 +1,150 @@
+
+
+
+'Receiver
+
+'Receives transactions from the actor under test
+'This class : 
+' - Listens for incoming associations
+' - Handles incoming associations correctly
+' - Stops when one or more stopcriteria are met.
+' Stopcriteria for the receiver are: 
+' * AllExpectedObjectsReceived
+' * UserPressedStop
+'( * ReceiveTimeout occurred)
+
+Class Receiver
+
+    'Constructor
+    Public Sub New()
+    End Sub
+
+    'constants
+    Protected Const SOPClassUIDTagSequence As String = "0x00080016"
+    Protected Const RTDose As String = "1.2.840.10008.5.1.4.1.1.481.2"
+    Protected Const RTStructerSet As String = "1.2.840.10008.5.1.4.1.1.481.3"
+    Protected Const RTPlan As String = "1.2.840.10008.5.1.4.1.1.481.5"
+    Protected Const CTImage As String = "1.2.840.10008.5.1.4.1.1.2"
+
+    'has transactions to receive
+    Protected m_transactions As ArrayList = Nothing
+    'has a m_receiverThread
+    Public m_receiverThread As ReceiverThread = New ReceiverThread
+    'has a logging mechanisme
+    Protected m_logger As Logger = Logger.GetInstance()
+
+
+    'has received messages
+    Public ReadOnly Property ReceivedMessages() As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+        Get
+            Try
+                Return m_receiverThread.Messages.DicomMessages.CStoreRequests
+            Catch ex As System.NullReferenceException
+                Return New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+            End Try
+        End Get
+    End Property
+
+
+    'Receive Transactionsfrom the actor under test
+    ' - Listens for incoming associations
+    ' - Handles incoming associations correctly
+    ' - Stops when one or more stopcriteria are met.
+    Public Function ReceiveTransactions(ByRef transactions As ArrayList) As Boolean
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        m_receiverThread.Initialize(config.GetMainThread())
+        m_receiverThread.Options.CopyFrom(config.GetMainThread().Options)
+        m_receiverThread.Options.Identifier = "IHE-RO Tool Receiver"
+        m_receiverThread.Options.LogThreadStartingAndStoppingInParent = False
+        m_receiverThread.Options.StartAndStopResultsGatheringEnabled = True
+        m_receiverThread.Options.AutoValidate = False
+        m_receiverThread.ResultsGatheringStarted = False
+        '     Add the different MessageHandlers.
+        m_receiverThread.AddToBack(New MessageHandlerCStore)
+
+#If DVT_INTERPRETS_SCRIPT Then
+		Dim theHliForm As New HliForm
+        theHliForm.Attach(m_receiverThread)
+#Else
+        DvtkHighLevelInterface.Common.UserInterfaces.HliForm.GetSingleton().Attach(m_receiverThread)
+        DvtkHighLevelInterface.Common.UserInterfaces.HliForm.GetSingleton().AutoExit = True
+#End If
+
+        ' Log all allowed transfersyntaxes
+        LogUsedTransferSyntaxes()
+        ' Start the SCP listener
+        m_receiverThread.Start()
+
+        'show the listening dialog
+        Dim TheForm As Form = New ListeningDlg
+        Dim theDialogResult As Integer = TheForm.ShowDialog()
+
+        ' Stop Listening
+        m_receiverThread.Stop()
+        m_receiverThread.WaitForCompletion()
+        If m_receiverThread.HasExceptionOccured Then
+            Throw New System.Exception("An error occured while receiving transactions from the actor under test")
+        End If
+
+        If m_receiverThread.m_inAssociation Then
+            Throw New System.Exception("An abort occured while receiving transactions from the actor under test")
+            'MessageBox.Show("Receiver in association.")
+        End If
+
+        m_logger.LogMessage("Number of dicom (cstore-rq) messages received: " + ReceivedMessages.Count.ToString())
+
+    End Function
+
+    'Check if all transactions are received.
+    Public Function AllTransactionsReceived(ByRef expectedTransactions As ArrayList) As Boolean
+        For Each transaction As Transaction In expectedTransactions
+            If Not TransactionReceived(transaction.TransactionIodType) Then
+                Return False
+            End If
+        Next
+        Return True
+
+    End Function
+
+    'Check if the received message has the transaction IOD type.
+    Protected Function TransactionReceived(ByRef searchIodType As IODType) As Boolean
+        Dim expectedSOPClassUID As String
+        Dim messageSOPClassUID As String
+        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+
+        Select Case searchIodType
+            Case IODType.CTImage
+                expectedSOPClassUID = CTImage
+            Case IODType.RTDose
+                expectedSOPClassUID = RTDose
+            Case IODType.RTPlanDosimetric
+                expectedSOPClassUID = RTPlan
+            Case IODType.RTPlanGeometric
+                expectedSOPClassUID = RTPlan
+            Case IODType.RTStructureSet
+                expectedSOPClassUID = RTStructerSet
+        End Select
+
+        For Each message As DvtkHighLevelInterface.Dicom.Messages.DicomMessage In ReceivedMessages
+            attribute = message.DataSet(SOPClassUIDTagSequence)
+            messageSOPClassUID = attribute.Values(0)
+            If expectedSOPClassUID = messageSOPClassUID Then
+                Return True
+            End If
+        Next
+        Return False
+
+    End Function
+
+    Protected Sub LogUsedTransferSyntaxes()
+        Dim message As String
+        message = "Supported Transfer Syntaxes for receiver:"
+
+        For Each stringvalue As String In TestToolConfiguration.GetInstance().SupportedTransferSyntaxesReceiver
+            message += vbCrLf + vbTab + stringvalue
+        Next
+        Logger.GetInstance().LogMessage(message)
+    End Sub
+
+End Class

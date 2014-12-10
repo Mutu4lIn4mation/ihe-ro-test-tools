@@ -1,0 +1,9 @@
+
+
+Class SenderThread
+Inherits DvtkHighLevelInterface.Dicom.Threads.DicomThread
+
+    Protected Overrides Sub Execute()
+    End Sub
+
+End Class

@@ -1,0 +1,26 @@
+
+' Transaction RO-7 (Structure Set Retrieval) class
+Class RO_7_Transaction
+Inherits Transaction
+
+    'Constructor
+    Public Sub New()
+		m_Id = "RO-7"
+		m_Description = "Structure Set Retrieval"
+		m_iodtype = IodType.RTStructureSet
+    End Sub
+
+   	'method which returns the related reference data messages belonging to this transaction
+	Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+		Dim datasetMessages as ArrayList = new ArrayList()
+		Dim referenceData as ReferenceDataSet = ReferenceDataSet.GetInstance()
+		
+		'add the structure set message to the arraylist
+		datasetMessages.Add( referenceData.GetRTStructureSet() )
+		
+		'return the array with dataset(s)
+		return datasetMessages
+	End Function
+
+
+End Class

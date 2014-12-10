@@ -1,0 +1,239 @@
+
+
+Class Sender
+    Inherits DvtkHighLevelInterface.Dicom.Threads.DicomThread
+
+    Dim m_config As TestToolConfiguration
+    Dim m_logger As Logger = Logger.GetInstance()
+    Dim m_reporter As Reporter = Reporter.GetInstance()
+    Dim m_transactions As ArrayList = Nothing
+
+    '!!!!!!!
+    Public m_isStoppedCalled As Boolean = False
+    Dim m_finishedWithoutException As Boolean = True
+    Dim m_exceptionText As String = ""
+
+    'Constructor
+    Public Sub New()
+        m_config = TestToolConfiguration.GetInstance()
+    End Sub
+
+    'TODO: Determine whether the Sender class needs to inherit from dicomthread or not, since the running thread is alreay a dicomthread. 
+    'protected m_senderThread as SenderThread = new SenderThread()
+
+    Public ReadOnly Property FinishedWithoutException() As Boolean
+        Get
+            Return (m_finishedWithoutException)
+        End Get
+    End Property
+
+    Public ReadOnly Property ExceptionText() As String
+        Get
+            Return (m_exceptionText)
+        End Get
+    End Property
+
+    ' Send the transactions to the actor under test
+    Public Sub SendTransactions(ByRef transactions As ArrayList)
+        Initialize(TestToolConfiguration.GetInstance.GetMainThread)
+        Options.CopyFrom(TestToolConfiguration.GetInstance.GetMainThread.Options)
+        Options.Identifier = "Sender"
+        Options.LogThreadStartingAndStoppingInParent = False
+        Options.AutoValidate = False
+
+#If DVT_INTERPRETS_SCRIPT Then
+	Dim theHliForm As New HliForm
+        theHliForm.Attach(Me)
+#Else
+        DvtkHighLevelInterface.Common.UserInterfaces.HliForm.GetSingleton().Attach(Me)
+        DvtkHighLevelInterface.Common.UserInterfaces.HliForm.GetSingleton().AutoExit = False
+#End If
+        m_transactions = transactions
+
+        Options.ShowResults = False
+
+        Options.StartAndStopResultsGatheringEnabled = True
+        ResultsGatheringStarted = False
+
+        ' Log all allowed transfersyntaxes
+        LogUsedTransferSyntaxes()
+        Reporter.GetInstance().ReportDebugMessage("Starting to send transactions to the actor..")
+
+        Start()
+        WaitForCompletion()
+        If (Not Me.FinishedWithoutException) Then
+            Throw New System.Exception(Me.ExceptionText)
+        End If
+
+        If (Me.m_isStoppedCalled) Then
+            m_logger.LogMessage("Stop is called on Sender stopped.")
+        End If
+
+    End Sub
+
+    'Determine presentation contexts
+    Protected Function DeterminePresentationContexts(ByRef transactions As ArrayList) As DvtkHighLevelInterface.Dicom.Other.PresentationContext()
+        Dim UIDs As System.Collections.Specialized.StringCollection = New System.Collections.Specialized.StringCollection
+
+        Dim iTransactions As Integer
+
+        'loop through all transactions
+        For iTransactions = 0 To transactions.Count - 1
+            Dim iDataSet As Integer
+            'get the DataSet list of the transaction
+            Dim currenttransaction As Transaction = DirectCast(transactions.Item(iTransactions), Transaction)
+
+            'loop through all the datasets of 1 transaction
+            For iDataSet = 0 To currenttransaction.TransactionReferenceDataMessages.Count - 1
+                Dim message As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = CType(currenttransaction.TransactionReferenceDataMessages.Item(iDataSet), DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+                Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = message.DataSet
+
+                'if the UID is not listed yet we add it 
+                If Not UIDs.Contains(dataSet("0x00080016").Values().Item(0).ToString) Then
+                    UIDs.Add(dataSet("0x00080016").Values().Item(0).ToString)
+                End If
+            Next
+        Next
+
+
+        'get the supported transfersyntaxes
+        Dim transferSyntaxes As System.Collections.Specialized.StringCollection = m_config.SupportedTransferSyntaxesSender
+
+        'an array we can use as an paramArray for the presentationcontexts
+        Dim presentationContextArray As DvtkHighLevelInterface.Dicom.Other.PresentationContext()
+        presentationContextArray = Array.CreateInstance(GetType(DvtkHighLevelInterface.Dicom.Other.PresentationContext), UIDs.Count * transferSyntaxes.Count)
+
+
+        Dim indexUIDs As Integer
+        Dim numberOfPresentationContexts As Integer = 0
+        'combine every UID with all the supported transfersyntaxes and create a presentationcontext of them together
+        For indexUIDs = 0 To UIDs.Count - 1
+            Dim indexSyntaxes As Integer
+            For indexSyntaxes = 0 To transferSyntaxes.Count - 1
+                presentationContextArray(numberOfPresentationContexts) = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(UIDs(indexUIDs), transferSyntaxes(indexSyntaxes))
+                numberOfPresentationContexts = numberOfPresentationContexts + 1
+            Next
+        Next
+
+        Return presentationContextArray
+    End Function
+
+    'Creates an association
+    Protected Sub CreateAssociation(ByRef presentationContextArray As DvtkHighLevelInterface.Dicom.Other.PresentationContext())
+
+        'Handle some required global configuration variables when working with Dicomthreads
+        'Me.Initialize(m_config.GetMainThread)
+        'Me.Options.DvtkScriptSession = m_config.GetSession
+
+        'Send the associationrequest
+        Me.SendAssociateRq(presentationContextArray)
+
+        Dim receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomProtocolMessage = Nothing
+        'Receive the associate Ackknowledge
+        receivedMessage = ReceiveMessage()
+
+        'Check wether the received response is expected else throw an exception
+        If receivedMessage.IsAssociateAc Then
+            m_logger.LogMessage("The association was accepted.")
+        ElseIf receivedMessage.IsAssociateRj Then
+            m_logger.LogMessage("The SCP Rejected the association.")
+            Throw New System.Exception("The SCP Rejected the association.")
+        ElseIf receivedMessage.IsAbort Then
+            m_logger.LogMessage("The SCP sent an Abort.")
+            Throw New System.Exception("The SCP sent an Abort.")
+        Else
+            'Unexpected message or error
+            m_logger.LogMessage("The message was unexpected. Expected was an AssociateAccept. Received: " + receivedMessage.ToString())
+            Throw New System.Exception("The message was unexpected. Expected was an AssociateAccept. Received: " + receivedMessage.ToString())
+        End If
+
+    End Sub
+
+    'Sends the dicom) data objects (transactions to the actor
+    Protected Sub SendDataObjects(ByRef transactions As ArrayList)
+        Dim iTransactions As Integer
+
+        'loop through all transactions
+        For iTransactions = 0 To transactions.Count - 1
+            Dim iMessages As Integer
+            'get the DataSet list of the transaction
+            Dim currenttransaction As Transaction = DirectCast(transactions.Item(iTransactions), Transaction)
+
+            'loop through all the messages of 1 transaction
+            For iMessages = 0 To currenttransaction.TransactionReferenceDataMessages.Count - 1
+                Dim sndMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = CType(currenttransaction.TransactionReferenceDataMessages.Item(iMessages), DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+                Dim rspMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+                Try
+                    Send(sndMessage)
+                    Options.AutoValidate = False
+                    rspMessage = ReceiveDicomMessage()
+                    'Validate(rspMessage, "")
+                    'Options.AutoValidate = True
+
+                    If Not rspMessage.CommandSet.DimseCommand = DvtkData.Dimse.DimseCommand.CSTORERSP Then
+                        Throw New System.Exception("After a CSTORE Request the SCP returned an unexpected message: " + DvtkData.Dimse.DimseCommand.CSTORERSP.ToString())
+                    End If
+                Catch ex As System.Exception
+
+                    If (TypeOf ex Is System.Threading.ThreadAbortException) Then
+                        m_isStoppedCalled = True
+                    End If
+
+                    m_logger.LogMessage("Error sending the messages: " + ex.Message.ToString)
+                    Throw New System.Exception("Error sending the messages: " + ex.Message.ToString)
+                End Try
+            Next
+        Next
+    End Sub
+
+    'Closes the association
+    Protected Function CloseAssociation() As Boolean
+        Try
+            SendReleaseRq()
+            ReceiveReleaseRp()
+        Catch ex As System.Exception
+            If (TypeOf ex Is System.Threading.ThreadAbortException) Then
+                m_isStoppedCalled = True
+            End If
+
+            m_logger.LogMessage("Failed on releasing the Association, however the Messages have been sent to the SCP correctly.")
+            m_reporter.ReportWarningMessage("Failed on releasing the Association, however the Messages have been sent to the SCP correctly.")
+        End Try
+    End Function
+
+    Protected Sub LogUsedTransferSyntaxes()
+        Dim message As String
+        message = "Supported Transfer Syntaxes for sender:"
+
+        For Each stringvalue As String In TestToolConfiguration.GetInstance().SupportedTransferSyntaxesSender
+            message += vbCrLf + vbTab + stringvalue
+        Next
+        Logger.GetInstance().LogMessage(message)
+    End Sub
+
+    Protected Overrides Sub Execute()
+        Dim presentationContexts As DvtkHighLevelInterface.Dicom.Other.PresentationContext() = DeterminePresentationContexts(m_transactions)
+
+        Try
+            CreateAssociation(presentationContexts)
+            SendDataObjects(m_transactions)
+            CloseAssociation()
+        Catch ex As System.Exception
+
+            If (TypeOf ex Is System.Threading.ThreadAbortException) Then
+                m_isStoppedCalled = True
+
+            End If
+
+            Dim errorText As String = "Sending of the transactions failed."
+
+            m_logger.LogMessage(errorText)
+
+            m_finishedWithoutException = False
+            m_exceptionText = errorText
+
+        End Try
+    End Sub
+
+
+End Class 'Sender

@@ -1,0 +1,18 @@
+Option Strict Off
+
+Imports System
+Imports System.Collections
+Imports System.Collections.Specialized
+Imports System.IO
+Imports System.Windows.Forms
+Imports System.Drawing
+
+Imports DvtkData.Dimse.VR
+Imports DvtkData.Dimse.DimseCommand
+Imports DvtkHighLevelInterface
+Imports DvtkHighLevelInterface.Dicom.Messages
+Imports DvtkHighLevelInterface.Common.UserInterfaces
+Imports DvtkHighLevelInterface.Common.Other
+
+' Indicates if this Visual Basic Script will be executed under DVT.
+#Const DVT_INTERPRETS_SCRIPT = True

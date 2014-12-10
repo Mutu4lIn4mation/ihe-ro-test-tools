@@ -1,0 +1,99 @@
+Class ReferencedFrameNumberRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Referenced Frame Number Rule", "", iodType, severity)
+
+    End Sub
+    Private m_iodType As IODType
+    Private m_message As String
+    Private m_valid As Boolean = False
+
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim done As Boolean = False
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+        'Dim roiContourSequenceTag As String = "0x30060039"
+        Dim roiContourSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        'Dim contourSequenceTag As String = "0x30060040"
+        Dim contourSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        'Dim contourImageSequenceTag As String = "0x30060016"
+        Dim contourImageSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        'Dim referencedFrameNumberTag As String = "0x00081160"
+        Dim referencedFrameNumberAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        If iodType = IODTypeRule Then
+            'Check if Roi Contour Sequence is present
+            If dicomMessage.DataSet.Exists(Tags.ROIContourSequence) = False Then
+                m_valid = False
+                m_message = "The attribute: '" + Tags.GetTagName(Tags.ROIContourSequence) + "' (" + Tags.ROIContourSequence + ") is not present."
+            Else
+                roiContourSequenceAttribute = dicomMessage.DataSet(Tags.ROIContourSequence)
+                Dim i As Integer
+
+                If done = False Then
+                    For i = 1 To roiContourSequenceAttribute.ItemCount()
+                        If done = False Then
+                            seqItem = roiContourSequenceAttribute.GetItem(i)
+                            'Check if Contour Sequence is present
+                            If seqItem.Exists(Tags.ContourSequenceTag) = False Then
+                                m_valid = False
+                                done = True
+                                m_message = "The attribute: '" + Tags.GetTagName(Tags.ContourSequenceTag) + "' (" + Tags.ContourSequenceTag + ") is not present."
+                            Else
+                                'Contour Sequence 3006,0040
+                                contourSequenceAttribute = seqItem(Tags.ContourSequenceTag)
+                                Dim j As Integer
+                                If done = False Then
+                                    For j = 1 To contourSequenceAttribute.ItemCount()
+                                        If done = False Then
+                                            seqItem = contourSequenceAttribute.GetItem(j)
+                                            'Contour Image Sequence 3006,0016 check if exists
+                                            If seqItem.Exists(Tags.ContourImageSequenceTag) = False Then
+                                                m_valid = False
+                                                done = True
+                                                m_message = "The attribute: '" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") is not present."
+                                            Else
+                                                'Contour Image Sequence 3006,0016
+                                                contourImageSequenceAttribute = seqItem(Tags.ContourImageSequenceTag)
+                                                'Get the number of contour image sequence items, should be 1 according to IHE-RO
+                                                If contourImageSequenceAttribute.ItemCount() = 1 Then
+                                                    'Referenced Frame Number shall not be present
+                                                    If seqItem.Exists(Tags.ReferencedFrameNumberTag) = False Then
+                                                        m_valid = True
+                                                        m_message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedFrameNumberTag) + "' (" + Tags.ReferencedFrameNumberTag + ") is not Present"
+                                                    Else
+                                                        m_valid = False
+                                                        done = True
+                                                        m_message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedFrameNumberTag) + "' (" + Tags.ReferencedFrameNumberTag + ") Present"
+                                                    End If
+                                                Else
+                                                    m_valid = False
+                                                    done = True
+                                                    m_message = "The attribute: '" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") items is not equal to one"
+                                                End If
+                                            End If
+                                        End If
+                                    Next
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
+            End If
+        End If
+
+        If m_valid = True Then
+            Me.SetValid(m_message)
+        Else
+            Me.SetError(m_message)
+        End If
+        Me.Report()
+    End Sub
+End Class

@@ -1,0 +1,278 @@
+Class DosimetricPlannerScenario1
+    Inherits Scenario
+    'Constructor
+    Public Sub New()
+        'actor(s) under test
+        m_scenarioActors.Add(New DosimetricPlannerActor)
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = "ReferenceDataSet.xml"
+        'transactions to send
+        m_transactionsToSend.Add(New RO_1_Transaction)
+        m_transactionsToSend.Add(New RO_7_Transaction)
+        m_transactionsToSend.Add(New RO_8_Transaction)
+        'transactions to receive
+        m_transactionsToReceive.Add(New RO_4_Transaction)
+        m_transactionsToReceive.Add(New RO_5_Transaction)
+
+        '============== RT-Plan (dosimetric) ================================================
+
+        '-------------- Critical attribute mapping ------------------------------------------
+
+        'C.7.1.1 Patient Module
+        'Patient() 's Name	(0010,0010), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientName, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Patient ID	(0010,0020), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Patient() 's Birthdate	(0010,0030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientsBirthDate, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Patient() 's Sex	(0010,0040), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+
+
+        'C.7.2.1 General Study Module		
+        'Study Instance UID	(0020,000D), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Study Date	(0008,0020), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyDate, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Study Time	(0008,0030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyTime, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Referring(Physician)(0008,0090), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.ReferringPhysiciansName, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Study ID	(0020,0010), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Accession Number	(0008,0050), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.AccessionNumber, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Study Description	(0008,1030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyDescription, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+
+        'C.7.4.1 Frame Of Reference Module		
+        'Frame of Reference UID	(0020,0052), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.FrameofReferenceUID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+        'Position Reference Indicator (0020,1040), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PositionReferenceIndicator, IODType.RTPlanDosimetric, ErrorSeverity.RuleError, False))
+
+        '--------------  End critical attribute mapping rules -------------------------------
+
+        'C.8.8.13 RT Fraction Scheme		
+        'Fraction Group Sequence	(300A,0070)	Only 1 item shall be present
+        m_scenarioRules.Add(New NrIntOfSequenceItemRule(Tags.FractionGroupSequence, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '>Number of Brachy Application Setups 300A,00A0	value shall be 0
+        m_scenarioRules.Add(New IsRequiredRule(Tags.NumberofBrachyApplicationSetups, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.NumberofBrachyApplicationSetups, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'C.8.8.14 RT Beams Module		
+        'Beam Sequence	(300A,00B0)	"Up to 100 beams should be supported, this rule is not tested
+
+        'Beam Name	(300A,00C2)	
+        '1. The Beam Name is unique within the Beam Sequence"
+        m_scenarioRules.Add(New BeamNameIsUniqueRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        '2. Once a Beam Name is created, it will never change.
+        m_scenarioRules.Add(New BeamNameNotChangedRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '>Beam Type 300A,00C4 Value shall be STATIC or Dynamic
+        m_scenarioRules.Add(New IsRequiredRule(Tags.BeamType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        Dim values(1) As String
+        values(0) = "STATIC"
+        values(1) = "DYNAMIC"
+        m_scenarioRules.Add(New ValueListRule(Tags.BeamType, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '>Radiation Type 300A,00C6 value: PHOTON
+        m_scenarioRules.Add(New IsRequiredRule(Tags.RadiationType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '>High-Dose Technique Type (300A,00C7) is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.HighDoseTechniqueType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        '>Treatment Machine Name (300A,00B2) is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.TreatmentMachineName, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '>Source-Axis Distance 300A,00B4 Shall be present
+        m_scenarioRules.Add(New IsRequiredRule(Tags.SourceAxisDistance, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'Beam Limiting Device Sequence	(300A,00B6)	
+        'If >>RT Beam Limiting Device Type(300A,00B8) = X, Y, ASYMX or ASYMY then the sequence should contain 
+        'descriptions of two sets of jaws, so 2 items should be present
+        'else if  >>RT Beam Limiting Device Type(300A,00B8) = MLCX  or MLCY then the sequence shall report at 
+        'least one set of MLC descriptions, so at least 1 item should be present"
+        m_scenarioRules.Add(New BeamLimitingDeviceSequenceRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Number of Blocks (300A,00F0) 1. Up to 8 block items shall be suported (test this with script and dataset)
+        'Block Sequence(300A,00FA) 2. Only one block with >>Block Type(300A,00F8) = APERTURE may be present in the 
+        'all blocks"
+
+        '>Referenced Patient Setup Number (300C,006A) Shall be present
+        m_scenarioRules.Add(New IsRequiredRule(Tags.ReferencedPatientSetupNumber, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        '>Number of Wedges (300A,00D0) Shall be present
+        m_scenarioRules.Add(New IsRequiredRule(Tags.NumberOfWedges, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        '>Number of Compensators (300A,00E0) Shall be present
+        m_scenarioRules.Add(New IsRequiredRule(Tags.NumberOfCompensators, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        '>Number of Boli (300A,00ED) Shall be present
+        m_scenarioRules.Add(New IsRequiredRule(Tags.NumberOfBoli, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_scenarioRules.Add(New BlockRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Block Number of Points	(300A,0104)	Value >= 3
+        m_scenarioRules.Add(New BlockNumberofPointsRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '>>Block Divergence 300A,00FA Value should be PRESENT
+        m_scenarioRules.Add(New IsRequiredRule(Tags.BlockDivergence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'Block Data	(300A,0106)	"1. Shall not be 0 points. One or more points should be present.
+        '2.No boundary check done. See decision D.6"
+        m_scenarioRules.Add(New BlockDataRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+
+        'C.12.1 SOP Common		
+
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+        m_scenarioRules.Add(New SOPInstanceUIDRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'Specific Character Set	0008,0005 should be one of these values ISO_IR 100 or ""
+        Dim values2(1) As String
+        values2(0) = "ISO_IR 100"
+        values2(1) = ""
+        m_scenarioRules.Add(New ValueListRule(Tags.SpecificCharacterSet, values2, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'Instance Creation Date	0008,0012 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreationDate, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Instance Creation Time	0008,0013 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreationTime, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Instance Creator UID 0008,0014 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreatorUID, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Instance Number 0020,0013 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceNumber, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '============== End RT-Plan (dosimetric)rules =======================================
+
+
+        '============== RT-Dose =============================================================
+
+        '-------------- Critical attribute mapping ------------------------------------------
+
+        'C.7.1.1 Patient Module
+        'Patient() 's Name	(0010,0010), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientName, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Patient ID	(0010,0020), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientID, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Patient() 's Birthdate	(0010,0030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientsBirthDate, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Patient() 's Sex	(0010,0040), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.RTDose, ErrorSeverity.RuleError, False))
+
+        'C.7.2.1 General Study Module		
+        'Study Instance UID	(0020,000D), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Study Date	(0008,0020), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyDate, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Study Time	(0008,0030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyTime, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Referring(Physician)(0008,0090), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.ReferringPhysiciansName, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Study ID	(0020,0010), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyID, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Accession Number	(0008,0050), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.AccessionNumber, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Study Description	(0008,1030), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.StudyDescription, IODType.RTDose, ErrorSeverity.RuleError, False))
+
+        'C.7.4.1 Frame Of Reference Module		
+        'Frame of Reference UID	(0020,0052), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.FrameofReferenceUID, IODType.RTDose, ErrorSeverity.RuleError, False))
+        'Position Reference Indicator (0020,1040), same as in reference data
+        m_scenarioRules.Add(New CriticalAttributeMappingRule(Tags.PositionReferenceIndicator, IODType.RTDose, ErrorSeverity.RuleError, False))
+
+        'C.7.6.2 Image Plane Module		
+        'Image Orientation(Patient) (0020,0037)	
+        '1. Shall be present in every RT Dose IOD.
+        '2. For an axial image (Image Type, (0008,0008) should be AXIAL), direction cosines shall be (+/-1, 0, 0, 0, +/1, 0) with an angle tolerance of 0.001 radians (0.057 degrees)"
+        m_scenarioRules.Add(New ImageOrientationPatientRule(IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Slice Thickness 0018,0050 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.SliceThickness, IODType.RTDose, ErrorSeverity.RuleError))
+        'Slice Location	0020,1041 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.SliceLocation, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Pixel Spacing	(0028,0030)	For RT Dose IOD, pixel spacing may be nonisotropic"
+        m_scenarioRules.Add(New PixelSpacingRule(IODType.RTDose, ErrorSeverity.RuleError))
+
+
+        'C.7.6.6 Multi-Frame Module		
+        'Frame Increment Pointer (0028,0009) Value should be the equal to the value of the Grid Offset Vector (3004,000C)
+        m_scenarioRules.Add(New FrameIncrementPointerRule(IODType.RTDose, ErrorSeverity.RuleError))
+
+        'C.8.8.3 RT Dose
+        'Samples per Pixel 0028,0002 Value shall be 1
+        m_scenarioRules.Add(New IsRequiredRule(Tags.SamplesperPixel, IODType.RTDose, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.SamplesperPixel, "1", IODType.RTDose, ErrorSeverity.RuleError))
+        'Photometric Interpretation	0028,0004 Value shall be MONOCHROME2
+        m_scenarioRules.Add(New IsRequiredRule(Tags.PhotometricInterpretation, IODType.RTDose, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.PhotometricInterpretation, "MONOCHROME2", IODType.RTDose, ErrorSeverity.RuleError))
+        'Bits Allocated	0028,0100 Value should be 16 or 32
+        m_scenarioRules.Add(New IsRequiredRule(Tags.BitsAllocated, IODType.RTDose, ErrorSeverity.RuleError))
+        Dim values3(1) As String
+        values3(0) = "16"
+        values3(1) = "32"
+        m_scenarioRules.Add(New ValueListRule(Tags.BitsAllocated, values3, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Bits Stored (0028,0101) Value equal to Bits Allocated (0028,0100)
+        m_scenarioRules.Add(New EqualToRule(Tags.BitsStored, IODType.RTDose, ErrorSeverity.RuleError, Tags.BitsAllocated))
+        'High Bit (0028,0102) Value = Bits Stored(0028,0101) - 1
+        m_scenarioRules.Add(New HighBitRule(IODType.RTDose, ErrorSeverity.RuleError))
+        'Dose Comment (3004,0006) Shall be present if Referenced RT Plan Sequence is NOT PRESENT
+        'If present it should have the same value as RT Plan Description and it should not be empty"
+
+        'Pixel Representation	0028,0103	R+*	Shall have the value 0 = unsigned integer. Negative dose values shall not be present."
+        m_scenarioRules.Add(New IsRequiredRule(Tags.PixelRepresentation, IODType.RTDose, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.PixelRepresentation, "0", IODType.RTDose, ErrorSeverity.RuleError))
+        'Dose Units	3004,0002	R+*	Shall be equal to the enumerated value GY
+        m_scenarioRules.Add(New IsRequiredRule(Tags.DoseUnits, IODType.RTDose, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.DoseUnits, "GY", IODType.RTDose, ErrorSeverity.RuleError))
+        'Dose Type	3004,0004	R+*	Shall be equal to the defined term PHYSICAL
+        m_scenarioRules.Add(New IsRequiredRule(Tags.DoseType, IODType.RTDose, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.DoseType, "PHYSICAL", IODType.RTDose, ErrorSeverity.RuleError))
+
+        m_scenarioRules.Add(New DoseCommentRule(IODType.Generic, ErrorSeverity.RuleError))
+
+        'Normalization Point 3004,0008 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.NormalizationPoint, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Dose Summation Type 3004,000A Shall have the value PLAN
+        m_scenarioRules.Add(New IsRequiredRule(Tags.DoseSummationType, IODType.RTDose, ErrorSeverity.RuleError))
+        m_scenarioRules.Add(New ValueRule(Tags.DoseSummationType, "PLAN", IODType.RTDose, ErrorSeverity.RuleError))
+        'Referenced RT Plan Sequence 300C,0002 Shall be present if Dose Summation Type (3004,000A) has the value PLAN
+        m_scenarioRules.Add(New IsRequiredRule(Tags.ReferencedRTPlanSequence, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Referenced Fraction(Group) Sequence (300C,0020) Shall be present if the parent sequence is present, and
+        'shall reference a single fraction group within the referenced RT Plan. Referenced Frame of Reference"
+        m_scenarioRules.Add(New ReferencedFractionGroupSequenceRule(ErrorSeverity.RuleError, IODType.RTDose))
+        'Grid Frame Offset Vector (3004,000C)
+        '1. First z coordinate shall be equal to zero. 
+        '2. The remaining z coordinates shall be relative to the starting z position in Image Position (Patient) (0020,0032).
+        m_scenarioRules.Add(New GridFrameOffsetVectorRule(Tags.GridFrameOffsetVector, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Tissue Heterogeneity Correction 3004,0014 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.TissueHeterogeneityCorrection, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'C.12.1 SOP Common		
+
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+        m_scenarioRules.Add(New SOPInstanceUIDRule(IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Specific Character Set	0008,0005 should be one of these values ISO_IR 100 or ""
+        Dim values4(1) As String
+        values4(0) = "ISO_IR 100"
+        values4(1) = ""
+        m_scenarioRules.Add(New ValueListRule(Tags.SpecificCharacterSet, values4, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'Instance Creation Date	0008,0012 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreationDate, IODType.RTDose, ErrorSeverity.RuleError))
+        'Instance Creation Time	0008,0013 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreationTime, IODType.RTDose, ErrorSeverity.RuleError))
+        'Instance Creator UID 0008,0014 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceCreatorUID, IODType.RTDose, ErrorSeverity.RuleError))
+        'Instance Number 0020,0013 is optional
+        m_scenarioRules.Add(New OptionalRule(Tags.InstanceNumber, IODType.RTDose, ErrorSeverity.RuleError))
+        '--------------  End critical attribute mapping rules -------------------------------
+
+        '============== End RT-Dos rules ====================================================
+
+    End Sub
+End Class

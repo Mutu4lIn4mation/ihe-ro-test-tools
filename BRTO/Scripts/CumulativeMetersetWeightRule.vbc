@@ -1,0 +1,97 @@
+Class CumulativeMetersetWeightRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Cumulative Meterset Weight Rule", "", iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        'Dim beamSequenceTagSequence As String = "0x300A00B0"
+        Dim beamSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        'Dim controlPointSequenceTagSequence As String = "0x300A0111"
+        Dim controlPointSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        'Dim controlPointIndexTagSequence As String = "0x300A0112"
+        Dim controlPointIndexAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        'Dim cumulativeMetersetWeightTagSequence As String = "0x300A0134"
+        Dim cumulativeMetersetWeightAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+        If iodType = IODTypeRule Then
+            Dim message As String = ""
+            Dim done As Boolean = False
+            Dim valid As Boolean = False
+
+            If dicomMessage.DataSet.Exists(Tags.BeamSequence) = False Then
+                message = "The attribute: '" + Tags.GetTagName(Tags.BeamSequence) + "' (" + Tags.BeamSequence + ") is not present."
+                valid = False
+                done = True
+            End If
+
+            If done = False Then
+                beamSequenceAttribute = dicomMessage.DataSet(Tags.BeamSequence)
+                Dim i As Integer
+                For i = 1 To beamSequenceAttribute.ItemCount()
+                    If done = False Then
+                        seqItem = beamSequenceAttribute.GetItem(i)
+                        If seqItem.Exists(Tags.ControlPointSequenceTagSequence) = False Then
+                            message = "The attribute: '" + Tags.GetTagName(Tags.ControlPointSequenceTagSequence) + "' (" + Tags.ControlPointSequenceTagSequence + ") is not present."
+                            valid = False
+                            done = True
+                        Else
+                            controlPointSequenceAttribute = seqItem(Tags.ControlPointSequenceTagSequence)
+                            If controlPointSequenceAttribute.ItemCount() = 2 Then
+                                Dim j As Integer
+                                For j = 1 To controlPointSequenceAttribute.ItemCount()
+                                    If done = False Then
+                                        'Cumulative Meterset Weight (300A,0134) set NULL for both control points
+
+                                        seqItem = controlPointSequenceAttribute.GetItem(j)
+
+                                        If seqItem.Exists(Tags.CumulativeMetersetWeightTagSequence) = False And done = False Then
+                                            message = "The attribute: '" + Tags.GetTagName(Tags.CumulativeMetersetWeightTagSequence) + "' (" + Tags.CumulativeMetersetWeightTagSequence + ") is not present."
+                                            valid = False
+                                            done = True
+                                        Else
+                                            cumulativeMetersetWeightAttribute = seqItem(Tags.CumulativeMetersetWeightTagSequence)
+
+                                            If Not cumulativeMetersetWeightAttribute.Values(0).ToString() = "" Then
+                                                message = "'" + Tags.GetTagName(Tags.CumulativeMetersetWeightTagSequence) + "' (" + Tags.CumulativeMetersetWeightTagSequence + ") is not NULL, should not have the value: " + cumulativeMetersetWeightAttribute.Values(0).ToString() + ", for every controlpoint the value of Cumulative Meterset Weight should be NULL(no value)"
+                                                valid = False
+                                                done = True
+                                            End If
+                                        End If
+
+                                        'Check pass, so the rule is valid at this point
+                                        If done = False Then
+                                            message = "'" + Tags.GetTagName(Tags.CumulativeMetersetWeightTagSequence) + "' (" + Tags.CumulativeMetersetWeightTagSequence + ") is NULL"
+                                            valid = True
+                                        End If
+                                    End If
+                                Next
+                            Else
+                                message = "'" + Tags.GetTagName(Tags.ControlPointSequenceTagSequence) + "' (" + Tags.ControlPointSequenceTagSequence + ") should contain 2 sequence items, instead of " + controlPointSequenceAttribute.ItemCount().ToString() + " sequence items"
+                                valid = False
+                                done = True
+                            End If
+                        End If
+                    End If
+                Next
+            End If
+
+            If valid Then
+                Me.SetValid(message)
+            Else
+                Me.SetError(message)
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

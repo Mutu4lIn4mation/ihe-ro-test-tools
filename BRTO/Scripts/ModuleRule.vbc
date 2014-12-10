@@ -1,0 +1,12 @@
+
+MustInherit Class ModuleRule
+    Inherits Rule
+
+    Public Sub New(ByVal name As String, ByVal iodTypeRule As IODType, ByVal errorSeverity As ErrorSeverity)
+        MyBase.New(name, iodTypeRule, errorSeverity)
+    End Sub
+
+
+    Public MustOverride Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+End Class

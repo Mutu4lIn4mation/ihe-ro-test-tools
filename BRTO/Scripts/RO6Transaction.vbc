@@ -1,0 +1,31 @@
+
+' Transaction RO-6 (Multi-Series Image Retrieve) class
+Class RO_6_Transaction
+Inherits Transaction
+
+    'Constructor
+    Public Sub New()
+		m_Id = "RO-6"
+		m_Description = "Multi-Series Image Retrieve"
+		m_iodtype = IodType.CTImage
+    End Sub
+
+   	'method which returns the related reference data messages belonging to this transaction
+	Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+		Dim datasetMessages as ArrayList = new ArrayList()
+		Dim referenceData as ReferenceDataSet = ReferenceDataSet.GetInstance()
+		Dim nrOfImages as Integer
+		dim ImageNr as Integer
+		
+		'iterate through the ct images and add the references to the ct image storage messages to the arraylist
+        nrOfImages = referenceData.GetImageCount(2, IODType.CTImage) ''determine the number of images of the second image set (multi series)		
+		For ImageNr = 1 To nrOfImages
+			'add the ct images to the arraylist
+			datasetMessages.Add( referenceData.GetCTImage( 2, ImageNr) )
+		Next ImageNr
+		
+		'return the array with ct images
+		return datasetMessages
+	End Function
+
+End Class

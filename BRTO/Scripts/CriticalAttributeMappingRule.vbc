@@ -1,0 +1,441 @@
+Class CriticalAttributeMappingRule
+    Inherits MappingRule
+
+    Public Sub New(ByVal valueTag As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal mayCopy As Boolean)
+
+        MyBase.New("Critical Attribute Mapping Rule", iodType, severity)
+        m_mayCopy = mayCopy
+        m_tagSequence = valueTag
+    End Sub
+
+    Public Sub New(ByVal valueTag As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal mayCopy As Boolean, ByVal dialogResult As DialogResult)
+
+        MyBase.New("Critical Attribute Mapping Rule", iodType, severity)
+        m_mayCopy = mayCopy
+        m_tagSequence = valueTag
+        Me.dialogResult = dialogResult
+    End Sub
+
+    Private m_mayCopy As Boolean
+    Private m_tagSequence As String
+    Private spatialRegistrationArray() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = Nothing
+    Private dialogResult As Integer = 0
+    Private count As Integer = 0
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim valid As Boolean = False
+
+        If iodType = Me.IODTypeRule Then
+
+            Dim message As String
+            Dim refDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet
+
+            If Not dialogResult = 0 Then
+                spatialRegistrationArray = ReferenceDataSet.GetInstance.GetSpatialRegistration()
+                If spatialRegistrationArray.Length > 1 Then
+                    If dialogResult = 1 Then
+                        refDataSet = spatialRegistrationArray(1).DataSet
+                    ElseIf dialogResult = 2 Then
+                        refDataSet = spatialRegistrationArray(0).DataSet
+                    ElseIf dialogResult = 3 Then
+                        If count = 0 Then
+                            refDataSet = spatialRegistrationArray(1).DataSet
+                            count = 1
+                        Else
+                            refDataSet = spatialRegistrationArray(0).DataSet
+                        End If
+                    ElseIf dialogResult = 4 Then
+                        If count = 0 Then
+                            refDataSet = spatialRegistrationArray(0).DataSet
+                            count = 1
+                        Else
+                            refDataSet = spatialRegistrationArray(1).DataSet
+                        End If
+
+                    ElseIf dialogResult = 5 Then
+                        refDataSet = spatialRegistrationArray(0).DataSet
+                    ElseIf dialogResult = 6 Then
+                        refDataSet = spatialRegistrationArray(1).DataSet
+                    End If
+                End If
+            End If
+
+            'Select the reference test data set tot use
+            If iodType = iodType.CTImage Then
+                refDataSet = ReferenceDataSet.GetInstance().GetCTImage(1, 1).DataSet
+            ElseIf iodType = iodType.MRImage Then
+                refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.MRImage).DataSet
+            ElseIf iodType = iodType.PETImage Then
+                refDataSet = ReferenceDataSet.GetInstance().GetSliceImage(1, 1, iodType.PETImage).DataSet
+            ElseIf iodType = iodType.RTDose Then
+                refDataSet = ReferenceDataSet.GetInstance().GetRTDose().DataSet
+            ElseIf iodType = iodType.RTPlanDosimetric Then
+                refDataSet = ReferenceDataSet.GetInstance().GetRTPlanDosimetric().DataSet
+            ElseIf iodType = iodType.RTPlanGeometric Then
+                refDataSet = ReferenceDataSet.GetInstance().GetRTPlanGeometric().DataSet
+            ElseIf (iodType = iodType.RTStructureSet) Then
+                refDataSet = ReferenceDataSet.GetInstance().GetRTStructureSet().DataSet
+            ElseIf (iodType = iodType.SpatialRegistration) Then
+                spatialRegistrationArray = ReferenceDataSet.GetInstance.GetSpatialRegistration()
+            End If
+
+            'Check for presence of the tag that needs to be checked
+            If Not dicomMessage.DataSet.Exists(m_tagSequence) Then
+                message = "The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") is not present."
+
+                'Check if the tag values are not the same
+            Else
+
+                If Not ValuesAreEqual(refDataSet(m_tagSequence), dicomMessage.DataSet(m_tagSequence)) Then
+                    '            ElseIf Not refDataSet(m_tagSequence).Values.Equals(dataSet(m_tagSequence).Values) Then
+                    If m_mayCopy = False Then
+                        message = "Critical attribute mapping: the attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has value " + dicomMessage.DataSet(m_tagSequence).Values(0).ToString() + ", expected value is " + refDataSet(m_tagSequence).Values(0).ToString()
+                    Else
+                        message = "Critical attribute mapping: the attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has new (New Source)value " + dicomMessage.DataSet(m_tagSequence).Values(0).ToString()
+                        valid = True
+                    End If
+                    'The values are the same; 
+                    'ElseIf refDataSet(m_tagSequence).Values.Equals(dataSet(m_tagSequence).Values) Then
+                Else
+                    If m_mayCopy = False Then
+                        message = "Crital attribute mapping: attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has correct value: " + dicomMessage.DataSet(m_tagSequence).Values(0).ToString()
+                    Else
+                        'Change the severity so that in the logging this is present, special case
+                        'Me.ErrSeverity = ErrorSeverity.RuleInfo
+                        message = "Crital attribute mapping: attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has same value: " + dicomMessage.DataSet(m_tagSequence).Values(0).ToString() + " this is a copy (May Copy) "
+                    End If
+                    valid = True
+                End If
+
+
+            End If
+
+            If valid Then
+                Me.SetValid(message)
+            Else
+                Me.SetError(message)
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+
+    'This method compares two attribute values and returns true if equal, false if not.
+    Protected Function ValuesAreEqual(ByRef attribute1 As DvtkHighLevelInterface.Dicom.Other.Attribute, ByRef attribute2 As DvtkHighLevelInterface.Dicom.Other.Attribute) As Boolean
+        Select Case attribute1.VR
+            Case DvtkData.Dimse.VR.PN
+                Return PersonNameEqual(attribute1.Values, attribute2.Values)
+            Case DvtkData.Dimse.VR.TM
+                Return TimeEqual(attribute1.Values, attribute2.Values)
+            Case DvtkData.Dimse.VR.DA
+                Return DateEqual(attribute1.Values, attribute2.Values)
+            Case Else
+                Return attribute1.Values.Equals(attribute2.Values)
+        End Select
+
+    End Function
+
+    'This method compares the segments of a person name
+    Protected Function PersonNameEqual(ByRef value1 As DvtkHighLevelInterface.Dicom.Other.Values, ByRef value2 As DvtkHighLevelInterface.Dicom.Other.Values) As Boolean
+        Dim name1 As String = value1.ToString()
+        Dim name2 As String = value2.ToString()
+
+        'remove 2nd and 3rd component groups if present
+        If name1.IndexOf("="c) > -1 Then
+            name1 = name1.Substring(0, name1.IndexOf("="c))
+        End If
+        If name2.IndexOf("="c) > -1 Then
+            name2 = name2.Substring(0, name2.IndexOf("="c))
+        End If
+
+        name1 = name1.Trim(""""c)
+        name2 = name2.Trim(""""c)
+
+        name1 = name1.TrimEnd("^")
+        name2 = name2.TrimEnd("^")
+
+        Dim delimStr As String = "^"
+        Dim delimiter As Char() = delimStr.ToCharArray()
+
+        'Split the person names based on the ^ delimiters
+        Dim name1Elements As ArrayList = SplitPNIntoElements(name1)
+        Dim name2Elements As ArrayList = SplitPNIntoElements(name2)
+
+        'compare the 5 PN elements of the first group
+        For i As Integer = 0 To 4
+            If Not name1Elements(i) = name2Elements(i) Then
+                Return False
+            End If
+        Next
+        Return True
+    End Function
+
+    'splits a person name component group into its 5 components
+    Private Function SplitPNIntoElements(ByVal value As String) As ArrayList
+        Dim elements As ArrayList = New ArrayList
+        Dim delimiterPosition As Integer
+
+        For i As Integer = 1 To 5
+            delimiterPosition = value.IndexOf("^")
+            If delimiterPosition > -1 Then
+                elements.Add(value.Substring(0, delimiterPosition).TrimEnd(" "c))
+                value = value.Remove(0, delimiterPosition + 1)
+            Else
+                If value.Length > 0 Then
+                    elements.Add(value)
+                    value = ""
+                Else
+                    elements.Add("")
+                End If
+            End If
+        Next
+        Return elements
+    End Function
+
+    Protected Function TimeEqual(ByRef value1 As DvtkHighLevelInterface.Dicom.Other.Values, ByRef value2 As DvtkHighLevelInterface.Dicom.Other.Values) As Boolean
+        Dim time1Str As String = value1.ToString()
+        Dim time2Str As String = value2.ToString()
+
+        Dim time1 As TimeTM = New TimeTM(time1Str)
+        Dim time2 As TimeTM = New TimeTM(time2Str)
+
+        If Not time1.Equals(time2) Then
+            Return False
+        Else
+            Return True
+        End If
+    End Function
+
+    Protected Function DateEqual(ByRef value1 As DvtkHighLevelInterface.Dicom.Other.Values, ByRef value2 As DvtkHighLevelInterface.Dicom.Other.Values) As Boolean
+        Dim date1Str As String = value1.ToString()
+        Dim date2Str As String = value2.ToString()
+
+        'the format should now be yyyymmdd
+        Dim date1 As DateDA = New DateDA(date1Str)
+        Dim date2 As DateDA = New DateDA(date2Str)
+
+        If Not date1.Equals(date2) Then
+            Return False
+        Else
+            Return True
+        End If
+    End Function
+
+
+End Class
+
+'TM Time conversion and comparisson class
+Public Class TimeTM
+
+    Private m_hours As Integer = 0
+    Private m_minutes As Integer = 0
+    Private m_seconds As Integer = 0
+    Private m_miliseconds As Integer = 0
+
+    Public Sub New(ByVal hours As Integer, ByVal minutes As Integer, ByVal seconds As Integer, ByVal miliseconds As Integer)
+        m_hours = hours
+        m_minutes = minutes
+        m_seconds = seconds
+        m_miliseconds = miliseconds
+    End Sub
+
+    Public Sub New(ByVal timeStr As String)
+        Dim theTime As TimeTM = ConvertStringToTime(timeStr)
+        Me.m_hours = theTime.m_hours
+        Me.m_minutes = theTime.m_minutes
+        Me.m_seconds = theTime.m_seconds
+        Me.m_miliseconds = theTime.m_miliseconds
+    End Sub
+
+    Public Property Hour()
+        Get
+            Return m_hours
+        End Get
+        Set(ByVal Value)
+            m_hours = Value
+        End Set
+    End Property
+
+    Public Property Minutes()
+        Get
+            Return m_minutes
+        End Get
+        Set(ByVal Value)
+            m_minutes = Value
+        End Set
+    End Property
+
+    Public Property Seconds()
+        Get
+            Return m_seconds
+        End Get
+        Set(ByVal Value)
+            m_seconds = Value
+        End Set
+    End Property
+
+    Public Property Miliseconds()
+        Get
+            Return m_miliseconds
+        End Get
+        Set(ByVal Value)
+            m_miliseconds = Value
+        End Set
+    End Property
+
+    Public Function ConvertStringToTime(ByVal timeStr As String) As TimeTM
+        Dim hours As Integer = 0
+        Dim minutes As Integer = 0
+        Dim seconds As Integer = 0
+        Dim miliseconds As Integer = 0
+        Const QUOTE As String = """"
+
+        'remove any spaces and quotes
+        timeStr = timeStr.Trim(" "c)
+        timeStr = timeStr.Trim(QUOTE.ToCharArray())
+
+        'backward compatibility older format hh:mm:ss.frac
+        timeStr = timeStr.Replace(":", "")
+
+        'the format should now be hhmmss.frac
+        Try
+            'hhmmss.frac
+            If timeStr.Length >= 2 Then
+                hours = Convert.ToInt32(timeStr.Substring(0, 2))
+            End If
+            If timeStr.Length >= 4 Then
+                minutes = Convert.ToInt32(timeStr.Substring(2, 2))
+            End If
+            If timeStr.Length >= 6 Then
+                seconds = Convert.ToInt32(timeStr.Substring(4, 2))
+            End If
+            If timeStr.IndexOf("."c) > -1 And (Not (timeStr.Length - 1) = timeStr.IndexOf("."c)) Then
+                Dim frac As String
+                frac = timeStr.Substring(timeStr.IndexOf("."c) + 1)
+                miliseconds = Convert.ToInt32(frac)
+            End If
+
+        Catch ex As System.Exception
+            Logger.GetInstance.LogMessage("Conversion of TM value representation with value '" + timeStr + " ' was not possible")
+        End Try
+
+        Return New TimeTM(hours, minutes, seconds, miliseconds)
+    End Function
+
+    Public Overridable Overloads Function Equals(ByVal value As TimeTM) As Boolean
+        If (Me.m_hours = value.m_hours) And (Me.m_minutes = value.m_minutes) And (Me.m_seconds = value.m_seconds) And (Me.m_miliseconds = value.m_miliseconds) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Public Overloads Shared Function Equals(ByVal value1 As TimeTM, ByVal value2 As TimeTM) As Boolean
+        If (value1.Equals(value2)) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+End Class
+
+'DA Date conversion and comparisson class
+Public Class DateDA
+    Private m_years As Integer = 0
+    Private m_months As Integer = 0
+    Private m_days As Integer = 0
+
+    Public Sub New(ByVal years As Integer, ByVal months As Integer, ByVal days As Integer)
+        m_years = years
+        m_months = months
+        m_days = days
+    End Sub
+
+    Public Sub New(ByVal datestring As String)
+        Dim theDate As DateDA = ConvertStringToDate(datestring)
+        Me.m_years = theDate.m_years
+        Me.m_months = theDate.m_months
+        Me.m_days = theDate.m_days
+    End Sub
+
+    Public Property Year()
+        Get
+            Return m_years
+        End Get
+        Set(ByVal Value)
+            m_years = Value
+        End Set
+    End Property
+
+    Public Property Months()
+        Get
+            Return m_months
+        End Get
+        Set(ByVal Value)
+            m_months = Value
+        End Set
+    End Property
+
+    Public Property Days()
+        Get
+            Return m_days
+        End Get
+        Set(ByVal Value)
+            m_days = Value
+        End Set
+    End Property
+
+    Public Overridable Overloads Function Equals(ByVal value As DateDA) As Boolean
+        If (Me.m_years = value.m_years) And (Me.m_months = value.m_months) And (Me.m_days = value.m_days) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Public Overloads Shared Function Equals(ByVal value1 As DateDA, ByVal value2 As DateDA) As Boolean
+        If (value1.Equals(value2)) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Public Function ConvertStringToDate(ByVal dateStr As String) As DateDA
+        Dim year As Integer = 0
+        Dim month As Integer = 0
+        Dim day As Integer = 0
+        Const QUOTE As String = """"
+
+        'remove any spaces and quotes
+        dateStr = dateStr.Trim(" "c)
+        dateStr = dateStr.Trim(QUOTE.ToCharArray())
+
+        'backward compatibility older format yyyy.mm.dd
+        dateStr = dateStr.Replace(".", "")
+
+        If dateStr.Length > 0 And dateStr.Length < 8 Then
+            Logger.GetInstance.LogMessage("DA attribute has illegal value: '" + dateStr + " '.")
+        End If
+
+        Try
+            'yyyymmdd
+            If dateStr.Length >= 4 Then
+                year = Convert.ToInt32(dateStr.Substring(0, 4))
+            End If
+            If dateStr.Length >= 6 Then
+                month = Convert.ToInt32(dateStr.Substring(4, 2))
+            End If
+            If dateStr.Length >= 8 Then
+                day = Convert.ToInt32(dateStr.Substring(6, 2))
+            End If
+        Catch ex As System.Exception
+            Logger.GetInstance.LogMessage("Conversion of DA value representation with value '" + dateStr + " ' was not possible")
+        End Try
+
+        Return New DateDA(year, month, day)
+    End Function
+
+End Class

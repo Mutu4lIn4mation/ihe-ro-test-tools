@@ -1,0 +1,55 @@
+
+' Scenario class.  A scenario represents a IHE-RO test scenario 
+MustInherit Class Scenario
+
+    'Constructor
+    Public Sub New()
+    End Sub
+
+    'has actor(s) under test
+    Protected m_scenarioActors As ArrayList = New ArrayList
+    'has scenario rules
+    Protected m_scenarioRules As ArrayList = New ArrayList
+    'has scenario dataset (xml filename)
+    Protected m_scenarioDatasetXmlFileName As String
+    'has transactions to send
+    Protected m_transactionsToSend As ArrayList = New ArrayList
+    'has transactions that are expected to be received
+    Protected m_transactionsToReceive As ArrayList = New ArrayList
+
+    'The Actor(s) to which this scenario applies
+    Public ReadOnly Property ScenarioActors() As ArrayList
+        Get
+            Return m_scenarioActors
+        End Get
+    End Property
+
+    'The rules specific for this scenario
+    Public ReadOnly Property ScenarioRules() As ArrayList
+        Get
+            Return m_scenarioRules
+        End Get
+    End Property
+
+    'The transactions that will be sent for this scenario
+    Public ReadOnly Property TransactionsToSend() As ArrayList
+        Get
+            Return m_transactionsToSend
+        End Get
+    End Property
+
+    'The transactions that will be received for this scenario
+    Public ReadOnly Property TransactionsToReceive() As ArrayList
+        Get
+            Return m_transactionsToReceive
+        End Get
+    End Property
+
+    'The xml file containing the file names and locations of the scenario test data
+    Public ReadOnly Property ScenarioDatasetFile() As String
+        Get
+            Return m_scenarioDatasetXmlFileName
+        End Get
+    End Property
+
+End Class

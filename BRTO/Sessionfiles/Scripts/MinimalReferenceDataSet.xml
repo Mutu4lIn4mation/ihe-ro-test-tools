@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This file contains the filepaths to a dataset of dicomfiles -->
+<!-- DataSetPath is required -->
+<!-- A minimal of 1 CTImageSet is required -->
+    <!-- A minimal of 1 CTImage is required for every CTImageSet -->
+<!-- StructureSet is required -->
+<!-- RTPlanDosimetric is required -->    
+<!-- RTPlanGeometric is required -->
+<!-- RTDose is required -->
+<DataSet>
+    <DataSetPath>..\Datasets\Referencedatasets\LimitedRefSet</DataSetPath>
+    <CTImageSet description="SingleSeries">
+        <CTImage>CT1_01.dcm</CTImage>
+        <CTImage>CT1_02.dcm</CTImage>
+        <CTImage>CT1_03.dcm</CTImage>
+        <CTImage>CT1_04.dcm</CTImage>
+        <CTImage>CT1_05.dcm</CTImage>
+        <CTImage>CT1_06.dcm</CTImage>
+        <CTImage>CT1_07.dcm</CTImage>
+        <CTImage>CT1_08.dcm</CTImage>
+        <CTImage>CT1_09.dcm</CTImage>
+        <CTImage>CT1_10.dcm</CTImage>
+        <CTImage>CT1_11.dcm</CTImage>
+        <CTImage>CT1_12.dcm</CTImage>
+        <CTImage>CT1_13.dcm</CTImage>
+        <CTImage>CT1_14.dcm</CTImage>
+        <CTImage>CT1_15.dcm</CTImage>
+        <CTImage>CT1_16.dcm</CTImage>
+        <CTImage>CT1_17.dcm</CTImage>
+        <CTImage>CT1_18.dcm</CTImage>
+        <CTImage>CT1_19.dcm</CTImage>
+        <CTImage>CT1_20.dcm</CTImage>
+        <CTImage>CT1_21.dcm</CTImage>
+        <CTImage>CT1_22.dcm</CTImage>
+        <CTImage>CT1_23.dcm</CTImage>
+        <CTImage>CT1_24.dcm</CTImage>
+        <CTImage>CT1_25.dcm</CTImage>
+        <CTImage>CT1_26.dcm</CTImage>
+        <CTImage>CT1_27.dcm</CTImage>
+        <CTImage>CT1_28.dcm</CTImage>
+        <CTImage>CT1_29.dcm</CTImage>
+        <CTImage>CT1_30.dcm</CTImage>
+        <CTImage>CT1_31.dcm</CTImage>
+        <CTImage>CT1_32.dcm</CTImage>
+        <CTImage>CT1_33.dcm</CTImage>
+        <CTImage>CT1_34.dcm</CTImage>
+        <CTImage>CT1_35.dcm</CTImage>
+        <CTImage>CT1_36.dcm</CTImage>
+        <CTImage>CT1_37.dcm</CTImage>
+        <CTImage>CT1_38.dcm</CTImage>
+        <CTImage>CT1_39.dcm</CTImage>
+    </CTImageSet>
+    <CTImageSet description="MultiSeries">
+        <CTImage>CT2_02_01.dcm</CTImage>
+        <CTImage>CT2_02_02.dcm</CTImage>
+        <CTImage>CT2_02_03.dcm</CTImage>
+        <CTImage>CT2_02_04.dcm</CTImage>
+        <CTImage>CT2_02_05.dcm</CTImage>
+        <CTImage>CT2_02_06.dcm</CTImage>
+        <CTImage>CT2_02_07.dcm</CTImage>
+        <CTImage>CT2_02_08.dcm</CTImage>
+        <CTImage>CT2_02_09.dcm</CTImage>
+        <CTImage>CT2_02_10.dcm</CTImage>
+        <CTImage>CT2_02_11.dcm</CTImage>
+        <CTImage>CT2_02_12.dcm</CTImage>
+        <CTImage>CT2_02_13.dcm</CTImage>
+        <CTImage>CT2_02_14.dcm</CTImage>
+        <CTImage>CT2_02_15.dcm</CTImage>
+        <CTImage>CT2_02_16.dcm</CTImage>
+        <CTImage>CT2_02_17.dcm</CTImage>
+        <CTImage>CT2_02_18.dcm</CTImage>
+        <CTImage>CT2_02_19.dcm</CTImage>
+        <CTImage>CT2_02_20.dcm</CTImage>
+        <CTImage>CT2_03_01.dcm</CTImage>
+        <CTImage>CT2_03_02.dcm</CTImage>
+        <CTImage>CT2_03_03.dcm</CTImage>
+        <CTImage>CT2_03_04.dcm</CTImage>
+        <CTImage>CT2_03_05.dcm</CTImage>
+        <CTImage>CT2_03_06.dcm</CTImage>
+        <CTImage>CT2_03_07.dcm</CTImage>
+        <CTImage>CT2_03_08.dcm</CTImage>
+        <CTImage>CT2_03_09.dcm</CTImage>
+        <CTImage>CT2_03_10.dcm</CTImage>
+        <CTImage>CT2_03_11.dcm</CTImage>
+        <CTImage>CT2_03_12.dcm</CTImage>
+        <CTImage>CT2_03_13.dcm</CTImage>
+        <CTImage>CT2_03_14.dcm</CTImage>
+        <CTImage>CT2_03_15.dcm</CTImage>
+        <CTImage>CT2_03_16.dcm</CTImage>
+        <CTImage>CT2_03_17.dcm</CTImage>
+        <CTImage>CT2_03_18.dcm</CTImage>
+        <CTImage>CT2_03_19.dcm</CTImage>
+        <CTImage>CT2_03_20.dcm</CTImage>
+        <CTImage>CT2_03_21.dcm</CTImage>
+        <CTImage>CT2_03_22.dcm</CTImage>
+    </CTImageSet>
+    <RTStructureSet>RTStructureSet.dcm</RTStructureSet>
+    <RTPlanDosimetric>RTPlanDosimetric.dcm</RTPlanDosimetric>
+    <RTPlanGeometric>RTPlanGeometric.dcm</RTPlanGeometric>
+    <RTDose>RT-Dose.dcm</RTDose>
+</DataSet>

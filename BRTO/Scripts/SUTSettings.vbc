@@ -1,0 +1,10 @@
+
+
+Class SUTSettings
+
+    'Constructor
+    Public Sub New()
+    End Sub
+
+
+End Class

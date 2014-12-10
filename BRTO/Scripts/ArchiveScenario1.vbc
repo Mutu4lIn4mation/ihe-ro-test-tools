@@ -1,0 +1,36 @@
+
+Class ArchiveScenario1
+    Inherits Scenario
+    'Constructor
+    Public Sub New()
+        'actor(s) under test
+        m_scenarioActors.Add(New ArchiveActor)
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = "ReferenceDataSet.xml"
+        'transactions to send
+        m_transactionsToSend.Add(New RO_2_Transaction)
+        m_transactionsToSend.Add(New RO_3_Transaction)
+        m_transactionsToSend.Add(New RO_4_Transaction)
+        m_transactionsToSend.Add(New RO_5_Transaction)
+        m_transactionsToSend.Add(New RO_11_Transaction)
+        'transactions to receive
+        m_transactionsToReceive.Add(New RO_1_Transaction)
+        m_transactionsToReceive.Add(New RO_7_Transaction)
+        m_transactionsToReceive.Add(New RO_8_Transaction)
+        m_transactionsToReceive.Add(New RO_9_Transaction)
+        m_transactionsToReceive.Add(New RO_10_Transaction)
+        'scenario rules
+		
+        m_scenarioRules.Add(New CompareRule(IODType.RTStructureSet, ErrorSeverity.RuleWarning))
+        m_scenarioRules.Add(New CompareRule(IODType.RTDose, ErrorSeverity.RuleWarning))
+        m_scenarioRules.Add(New CompareRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleWarning))
+        m_scenarioRules.Add(New CompareRule(IODType.CTImage, ErrorSeverity.RuleWarning))
+
+        'Referenced Frame of Reference Sequence (0x30060010), May only contain one item
+        m_scenarioRules.Add(New NrIntOfSequenceItemRule(Tags.ReferencedFrameofReferenceSequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+
+    End Sub
+
+
+End Class

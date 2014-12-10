@@ -1,0 +1,14 @@
+
+'Contourer actor object
+Class DoseDisplayerActor
+Inherits Actor
+
+   'Constructor
+   Public Sub New()
+		'Actor Id
+		m_id = "DoseDisplayer"
+		'Actor name
+        m_name = "DoseDisplayer actor"
+   End Sub
+
+End Class

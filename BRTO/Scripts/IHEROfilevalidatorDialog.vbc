@@ -1,0 +1,241 @@
+Public Class IHEROfilevalidatorDialog
+    Inherits System.Windows.Forms.Form
+
+
+#Region " Windows Form Designer generated code "
+
+    Public Sub New()
+        MyBase.New()
+
+        'This call is required by the Windows Form Designer.
+        InitializeComponent()
+
+        'Add any initialization after the InitializeComponent() call
+
+    End Sub
+
+    'Form overrides dispose to clean up the component list.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
+
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    Friend WithEvents ListBox1 As System.Windows.Forms.ListBox
+    Friend WithEvents startValidationButton As System.Windows.Forms.Button
+    Friend WithEvents cancelValidationButton As System.Windows.Forms.Button
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents geometricRTPlanRadioButton As System.Windows.Forms.RadioButton
+    Friend WithEvents dosimetricRTPlanRadioButton As System.Windows.Forms.RadioButton
+    Friend WithEvents addButton As System.Windows.Forms.Button
+    Friend WithEvents removeButton As System.Windows.Forms.Button
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
+        Me.ListBox1 = New System.Windows.Forms.ListBox
+        Me.startValidationButton = New System.Windows.Forms.Button
+        Me.cancelValidationButton = New System.Windows.Forms.Button
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.dosimetricRTPlanRadioButton = New System.Windows.Forms.RadioButton
+        Me.geometricRTPlanRadioButton = New System.Windows.Forms.RadioButton
+        Me.addButton = New System.Windows.Forms.Button
+        Me.removeButton = New System.Windows.Forms.Button
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'ListBox1
+        '
+        Me.ListBox1.Location = New System.Drawing.Point(8, 16)
+        Me.ListBox1.Name = "ListBox1"
+        Me.ListBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
+        Me.ListBox1.Size = New System.Drawing.Size(504, 147)
+        Me.ListBox1.TabIndex = 0
+        '
+        'startValidationButton
+        '
+        Me.startValidationButton.Location = New System.Drawing.Point(496, 224)
+        Me.startValidationButton.Name = "startValidationButton"
+        Me.startValidationButton.Size = New System.Drawing.Size(128, 24)
+        Me.startValidationButton.TabIndex = 1
+        Me.startValidationButton.Text = "&Start file validation"
+        '
+        'cancelValidationButton
+        '
+        Me.cancelValidationButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cancelValidationButton.Location = New System.Drawing.Point(536, 192)
+        Me.cancelValidationButton.Name = "cancelValidationButton"
+        Me.cancelValidationButton.Size = New System.Drawing.Size(88, 24)
+        Me.cancelValidationButton.TabIndex = 2
+        Me.cancelValidationButton.Text = "&Cancel"
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.dosimetricRTPlanRadioButton)
+        Me.GroupBox1.Controls.Add(Me.geometricRTPlanRadioButton)
+        Me.GroupBox1.Location = New System.Drawing.Point(8, 176)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(144, 72)
+        Me.GroupBox1.TabIndex = 3
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Select RT-Plan type"
+        '
+        'dosimetricRTPlanRadioButton
+        '
+        Me.dosimetricRTPlanRadioButton.Location = New System.Drawing.Point(8, 40)
+        Me.dosimetricRTPlanRadioButton.Name = "dosimetricRTPlanRadioButton"
+        Me.dosimetricRTPlanRadioButton.Size = New System.Drawing.Size(120, 24)
+        Me.dosimetricRTPlanRadioButton.TabIndex = 1
+        Me.dosimetricRTPlanRadioButton.Text = "RT-Plan Dosimetric"
+        '
+        'geometricRTPlanRadioButton
+        '
+        Me.geometricRTPlanRadioButton.Checked = True
+        Me.geometricRTPlanRadioButton.Location = New System.Drawing.Point(8, 16)
+        Me.geometricRTPlanRadioButton.Name = "geometricRTPlanRadioButton"
+        Me.geometricRTPlanRadioButton.Size = New System.Drawing.Size(120, 24)
+        Me.geometricRTPlanRadioButton.TabIndex = 0
+        Me.geometricRTPlanRadioButton.TabStop = True
+        Me.geometricRTPlanRadioButton.Text = "RT-Plan Geometric"
+        '
+        'addButton
+        '
+        Me.addButton.Location = New System.Drawing.Point(528, 16)
+        Me.addButton.Name = "addButton"
+        Me.addButton.Size = New System.Drawing.Size(80, 23)
+        Me.addButton.TabIndex = 4
+        Me.addButton.Text = "&Add files..."
+        '
+        'removeButton
+        '
+        Me.removeButton.Location = New System.Drawing.Point(528, 48)
+        Me.removeButton.Name = "removeButton"
+        Me.removeButton.Size = New System.Drawing.Size(80, 23)
+        Me.removeButton.TabIndex = 5
+        Me.removeButton.Text = "&Remove..."
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.ListBox1)
+        Me.GroupBox2.Controls.Add(Me.removeButton)
+        Me.GroupBox2.Controls.Add(Me.addButton)
+        Me.GroupBox2.Location = New System.Drawing.Point(8, 0)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(616, 168)
+        Me.GroupBox2.TabIndex = 6
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Selected files"
+        '
+        'IHEROfilevalidatorDialog
+        '
+        Me.AutoScale = False
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(634, 255)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.cancelValidationButton)
+        Me.Controls.Add(Me.startValidationButton)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
+        Me.Name = "IHEROfilevalidatorDialog"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.Text = "IHE-RO file validator"
+        Me.TopMost = True
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox2.ResumeLayout(False)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "Members"
+    Dim m_startValidation As Boolean = False
+    Dim m_isGeoMetricPlan As Boolean = True
+#End Region
+
+    Public Property StartValidation() As Boolean
+        Get
+            Return m_startValidation
+        End Get
+        Set(ByVal Value As Boolean)
+
+        End Set
+    End Property
+
+    Public Property GetList() As ArrayList
+        Get
+            Dim list As ArrayList = New ArrayList
+            Dim i As Integer
+            For i = 0 To Me.ListBox1.Items.Count() - 1
+                Dim str As String = Me.ListBox1.Items.Item(i).ToString()
+                list.Add(str)
+            Next
+            Return list
+        End Get
+        Set(ByVal Value As ArrayList)
+
+        End Set
+    End Property
+
+    Public Property IsGeometricPlan() As Boolean
+        Get
+            Return m_isGeoMetricPlan
+        End Get
+        Set(ByVal Value As Boolean)
+
+        End Set
+    End Property
+
+    Private Sub addButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles addButton.Click
+        Me.OpenFileDialog1.Multiselect = True
+        Me.OpenFileDialog1.ShowDialog()
+        Dim i As Integer
+        For i = 0 To Me.OpenFileDialog1.FileNames().Length() - 1
+            Dim str As String = Convert.ToString(Me.OpenFileDialog1.FileNames().GetValue(i))
+            Me.ListBox1.Items.Add(str)
+        Next
+    End Sub
+
+    Private Sub startValidationButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles startValidationButton.Click
+        m_startValidation = True
+        Me.Close()
+    End Sub
+
+    Private Sub cancelValidationButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cancelValidationButton.Click
+        m_startValidation = False
+        Me.Close()
+    End Sub
+
+    Private Sub removeButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles removeButton.Click
+
+        Dim i As Integer
+        Dim items As ArrayList = New ArrayList
+        For i = 0 To Me.ListBox1.SelectedItems.Count() - 1
+            items.Add(Me.ListBox1.SelectedItems.Item(i))
+        Next
+        For i = 0 To items.Count - 1
+            Me.ListBox1.Items.Remove(items(i))
+        Next
+    End Sub
+
+    Private Sub dosimetricRTPlanRadioButton_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dosimetricRTPlanRadioButton.CheckedChanged
+        m_isGeoMetricPlan = False
+    End Sub
+
+    Private Sub geometricRTPlanRadioButton_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles geometricRTPlanRadioButton.CheckedChanged
+        m_isGeoMetricPlan = True
+    End Sub
+End Class
