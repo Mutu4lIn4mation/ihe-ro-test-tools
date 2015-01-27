@@ -1,7 +1,0 @@
-Class MessageHandlerAssociateRQ
-    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
-    Public Overrides Function HandleReleaseRequest(ByVal releaseRq As DvtkHighLevelInterface.Dicom.Messages.ReleaseRq) As Boolean
-        MyBase.SendReleaseRp()
-        Return True
-    End Function
-End Class
