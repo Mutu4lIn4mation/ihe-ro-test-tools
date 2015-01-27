@@ -115,7 +115,7 @@ Class ArchiveScenario2
             validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.CTImage, ErrorSeverity.RuleError))
             validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.MRImage, ErrorSeverity.RuleError))
             validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.PETImage, ErrorSeverity.RuleError))
-            validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
 
             'C.7.4.1 Frame Of Reference Module
             'The Frame of Reference UID (0020,0052) of the Registration instance will have the same Frame of Reference UID

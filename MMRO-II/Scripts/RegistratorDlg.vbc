@@ -51,6 +51,9 @@ Public Class RegistratorDlg
     Friend WithEvents Button2 As System.Windows.Forms.Button
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents Button3 As System.Windows.Forms.Button
+    Friend WithEvents sendBackPETImages As System.Windows.Forms.CheckBox
+    Friend WithEvents sendBackMRImages As System.Windows.Forms.CheckBox
+
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.RadioButton1 = New System.Windows.Forms.RadioButton
         Me.RadioButton2 = New System.Windows.Forms.RadioButton
@@ -63,6 +66,8 @@ Public Class RegistratorDlg
         Me.Button2 = New System.Windows.Forms.Button
         Me.Label1 = New System.Windows.Forms.Label
         Me.Button3 = New System.Windows.Forms.Button
+        Me.sendBackPETImages = New System.Windows.Forms.CheckBox()
+        Me.sendBackMRImages = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'RadioButton1
@@ -124,7 +129,7 @@ Public Class RegistratorDlg
         'Button1
         '
         Me.Button1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button1.Location = New System.Drawing.Point(336, 264)
+        Me.Button1.Location = New System.Drawing.Point(460, 264)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(136, 24)
         Me.Button1.TabIndex = 5
@@ -133,7 +138,7 @@ Public Class RegistratorDlg
         'Button2
         '
         Me.Button2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Button2.Location = New System.Drawing.Point(336, 344)
+        Me.Button2.Location = New System.Drawing.Point(460, 344)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(136, 23)
         Me.Button2.TabIndex = 5
@@ -154,18 +159,42 @@ Public Class RegistratorDlg
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(336, 304)
+        Me.Button3.Location = New System.Drawing.Point(460, 304)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(136, 23)
         Me.Button3.TabIndex = 9
         Me.Button3.Text = "Skip sending the dataset"
+
+        '
+        'sendBackPETImages
+        '
+        Me.sendBackPETImages.AutoSize = True
+        Me.sendBackPETImages.Location = New System.Drawing.Point(300, 240)
+        Me.sendBackPETImages.Name = "sendBackPETImages"
+        Me.sendBackPETImages.Size = New System.Drawing.Size(177, 21)
+        Me.sendBackPETImages.TabIndex = 11
+        Me.sendBackPETImages.Text = "Send back PET images"
+        Me.sendBackPETImages.UseVisualStyleBackColor = True
+        '
+        'sendBackMRImages
+        '
+        Me.sendBackMRImages.AutoSize = True
+        Me.sendBackMRImages.Location = New System.Drawing.Point(300, 264)
+        Me.sendBackMRImages.Name = "sendBackMRImages"
+        Me.sendBackMRImages.Size = New System.Drawing.Size(171, 21)
+        Me.sendBackMRImages.TabIndex = 12
+        Me.sendBackMRImages.Text = "Send back MR images"
+        Me.sendBackMRImages.UseVisualStyleBackColor = True
+
         '
         'RegistratorDlg
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(488, 389)
+        Me.ClientSize = New System.Drawing.Size(650, 422)
         Me.ControlBox = False
+        Me.Controls.Add(Me.sendBackMRImages)
+        Me.Controls.Add(Me.sendBackPETImages)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.Button1)

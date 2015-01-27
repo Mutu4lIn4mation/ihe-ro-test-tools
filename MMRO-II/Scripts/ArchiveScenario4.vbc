@@ -125,7 +125,7 @@ Class ArchiveScenario4
             validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.CTImage, ErrorSeverity.RuleError))
             validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.MRImage, ErrorSeverity.RuleError))
             validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.PETImage, ErrorSeverity.RuleError))
-            validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
 
 
             'C.7.4.1 Frame Of Reference Module
@@ -250,7 +250,7 @@ Class ArchiveScenario4
             validate.AddRule(New NrIntOfSequenceItemRule(Tags.RTReferencedSeriesSequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
             'Series Instance UID (0020,000E), Shall contain the series to which the set of CT images upon which the structure set is based belong. 
             'Contains an item fo each CT image in the volume up which the structure set is based.
-            validate.AddRule(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+            validate.AddRule(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, IODType.CTImage))
 
             'Referenced SOP Class UID if present shall be the value 1.2.840.10008.5.1.4.1.1.2 or
             '1.2.840.10008.5.1.4.1.1.4 or 1.2.840.10008.5.1.4.1.1.128

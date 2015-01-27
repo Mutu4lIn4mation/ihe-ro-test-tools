@@ -152,7 +152,13 @@ Class RegisteredContourerScenario1
             validate.AddRule(New NrIntOfSequenceItemRule(Tags.RTReferencedSeriesSequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
             'Series Instance UID (0020,000E), Shall contain the series to which the set of CT images upon which the structure set is based belong. 
             'Contains an item fo each CT image in the volume up which the structure set is based.
-            validate.AddRule(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+                validate.AddRule(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, IODType.PETImage))
+            End If
+
+            If dialog.RegistratorDialogResult = DialogResult.CT_MR Then
+                validate.AddRule(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, IODType.MRImage))
+            End If
             'Contour Image Sequence(0x30060016), 
             '1.Must be present, item in the sequence 
             '2.Number of items equals the number of CT images
@@ -202,17 +208,40 @@ Class RegisteredContourerScenario1
             'Contour Image Sequence (0x30060016), Must be present with a single item. This item is the image upon which this 
             'contour should be placed. If the contour type is CLOSED_PLANAR, then the zcoordinates of the contour must match 
             'the z-coordinate of Image Position Patient in the image.
-            validate.AddRule(New ContourImageSequenceContourInterRelationRule(IODType.Generic, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+                validate.AddRule(New ContourImageSequenceContourInterRelationRule(IODType.Generic, ErrorSeverity.RuleError, IODType.PETImage))
+            End If
+
+            If dialog.RegistratorDialogResult = DialogResult.CT_MR Then
+                validate.AddRule(New ContourImageSequenceContourInterRelationRule(IODType.Generic, ErrorSeverity.RuleError, IODType.MRImage))
+            End If
 
             '>ROI Display Color 3006,002A is optional
             validate.AddRule(New OptionalRule(Tags.ROIDisplayColor, IODType.RTStructureSet, ErrorSeverity.RuleError))
 
             'ContourReferencedSOPClassUID 0008,1155	should have value = 1.2.840.10008.5.1.4.1.1.2
             validate.AddRule(New IsRequiredRule(Tags.ContourReferencedSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
-            validate.AddRule(New ValueRule(Tags.ContourReferencedSOPClassUID, SOPclass.CTImageSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+                validate.AddRule(New ValueRule(Tags.ContourReferencedSOPClassUID, SOPclass.PetImageSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            ElseIf dialog.RegistratorDialogResult = DialogResult.CT_MR Then
+                validate.AddRule(New ValueRule(Tags.ContourReferencedSOPClassUID, SOPclass.MRImageSOPClassUID, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            Else
+                Dim values5(1) As String
+                values5(0) = SOPclass.PetImageSOPClassUID
+                values5(1) = SOPclass.MRImageSOPClassUID
+                validate.AddRule(New ValueListRule(Tags.ContourReferencedSOPClassUID, values5, IODType.RTStructureSet, ErrorSeverity.RuleError))
+            End If
 
             'Referenced SOP Instance UID (0x00081155), Equals to the SOP Instance UID of the referenced CT image
-            validate.AddRule(New ReferencedSOPInstanceUIDContourModuleRule(IODType.Generic, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+            If dialog.RegistratorDialogResult = DialogResult.CT_MR Then
+                validate.AddRule(New ReferencedSOPInstanceUIDContourModuleRule(IODType.Generic, ErrorSeverity.RuleError, IODType.MRImage))
+            End If
+
+            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+                validate.AddRule(New ReferencedSOPInstanceUIDContourModuleRule(IODType.Generic, ErrorSeverity.RuleError, IODType.PETImage))
+            End If
+
             'Referenced Frame Number (0x00081160), This attribute shall not be present.
             validate.AddRule(New ReferencedFrameNumberRule(IODType.Generic, ErrorSeverity.RuleError))
 
@@ -238,7 +267,13 @@ Class RegisteredContourerScenario1
             '2.This z-coordinate must match the z-coordinate in the related CT image within 0.01 mm (contained in the Contour 
             'Image sequence in the same item of the ROI Contour sequence as this data). 
             '3. An implication of this is that the CLOSED_PLANAR contours are axial."  Implicitly tested by rule ImageOrientationPatientRule, not part of this rule
-            validate.AddRule(New ContourDataRule(ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+            If dialog.RegistratorDialogResult = DialogResult.CT_MR Then
+                validate.AddRule(New ContourDataRule(IODType.Generic, ErrorSeverity.RuleError, IODType.MRImage))
+            End If
+
+            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+                validate.AddRule(New ContourDataRule(IODType.Generic, ErrorSeverity.RuleError, IODType.PETImage))
+            End If
 
 
             'C.8.8.8 RT ROI Observations Module

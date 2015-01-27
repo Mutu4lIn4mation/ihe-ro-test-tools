@@ -1,12 +1,12 @@
 Class ContourImageSequenceContourInterRelationRule
     Inherits MessageCollectionRule
 
-    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal ctSet As CTSet)
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal expedtedReferencedIODType As IODType)
 
-        MyBase.New("Contour Image Sequence Contour Module Rule", iodType, severity)
-        m_ctSet = ctSet
+        MyBase.New("Contour Image Sequence Contour Interrelation Rule", iodType, severity)
+        m_expedtedReferencedIODType = expedtedReferencedIODType
     End Sub
-    Private m_ctSet As CTSet
+    Private m_expedtedReferencedIODType As IODType
     Private m_message As String
     Private m_valid As Boolean = False
     Private m_messageCollectionHelper As messageCollectionHelper
@@ -22,7 +22,7 @@ Class ContourImageSequenceContourInterRelationRule
         Dim roiContourSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
         Dim contourSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
         Dim contourImageSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
-        Dim ctImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim referencedImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
 
         If m_messageCollectionHelper.GetStructureSet() Is Nothing Then
             m_valid = False
@@ -74,9 +74,21 @@ Class ContourImageSequenceContourInterRelationRule
                                                         Dim numberOfImages As Integer
                                                         Dim refData As ReferenceDataSet = ReferenceDataSet.GetInstance
                                                         If Not refData.GetDataSetXML Is Nothing Then
-                                                            numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.CTImage)
+                                                            If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.MRImage)
+                                                            ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.PETImage)
+                                                            ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.CTImage)
+                                                            End If
                                                         Else
-                                                            numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage)
+                                                            If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.MRImage)
+                                                            ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.PETImage)
+                                                            ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage)
+                                                            End If
                                                         End If
 
                                                         If numberOfImages > 0 Then
@@ -90,19 +102,33 @@ Class ContourImageSequenceContourInterRelationRule
 
 
                                                                 If Not ReferenceDataSet.GetInstance.GetDataSetXML Is Nothing Then
-                                                                    ctImageDataSet = ReferenceDataSet.GetInstance().GetCTImage(1, imageCounter).DataSet
+                                                                    If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                        referencedImageDataSet = ReferenceDataSet.GetInstance.GetMRImage(1, imageCounter).DataSet
+                                                                    ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                        referencedImageDataSet = ReferenceDataSet.GetInstance.GetPETImage(1, imageCounter).DataSet
+                                                                    ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                        referencedImageDataSet = ReferenceDataSet.GetInstance.GetCTImage(1, imageCounter).DataSet
+                                                                    End If
+
                                                                 Else
-                                                                    ctImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, imageCounter)
-                                                                    If ctImageDataSet Is Nothing Then
+                                                                    If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                        referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.MRImage, imageCounter)
+                                                                    ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                        referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.PETImage, imageCounter)
+                                                                    ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                        referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, imageCounter)
+                                                                    End If
+
+                                                                    If referencedImageDataSet Is Nothing Then
                                                                         m_valid = False
                                                                         done = True
-                                                                        m_message = "No CT-Images received"
+                                                                        m_message = "No " + m_expedtedReferencedIODType.ToString() + "s received"
                                                                     End If
                                                                 End If
                                                                 If done = False Then
 
                                                                     'Compare SopInstanceUID with Referenced SOP InstanceUID of to find the correct image.
-                                                                    If ctImageDataSet(Tags.SOPInstanceUID).Values(0) = seqItem(Tags.ReferencedSOPInstanceUIDMOVE).Values(0) Then
+                                                                    If referencedImageDataSet(Tags.SOPInstanceUID).Values(0) = seqItem(Tags.ReferencedSOPInstanceUIDMOVE).Values(0) Then
                                                                         'Compare the z-image of the contour data with the z-coordinate of the patient position of the image.
                                                                         Dim contourSeqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = contourSequenceAttribute.GetItem(j)
                                                                         Dim zcorContourData As String = contourSeqItem(Tags.ContourDataTag).Values(2).ToString()
@@ -116,7 +142,7 @@ Class ContourImageSequenceContourInterRelationRule
                                                                             'No decimal point in the value, add 1/100 precision
                                                                             zcorContourData = zcorContourData + ".00"
                                                                         End Try
-                                                                        Dim zcorImagePatienPosition As String = ctImageDataSet(Tags.ImagePositionPatient).Values(2).ToString()
+                                                                        Dim zcorImagePatienPosition As String = referencedImageDataSet(Tags.ImagePositionPatient).Values(2).ToString()
                                                                         Try
                                                                             dotIndex = zcorContourData.IndexOf(".")
                                                                             'Get value with precision of 1/100
@@ -134,14 +160,17 @@ Class ContourImageSequenceContourInterRelationRule
                                                                             done = True
                                                                             m_message = "Number of Contour Image Sequence items is one, but z-coordinate does NOT match the Image Patient Position in the Image."
                                                                         End If
-
+                                                                    Else
+                                                                        m_valid = False
+                                                                        m_message = "the " + Tags.SOPInstanceUID + "with value:" + referencedImageDataSet(Tags.SOPInstanceUID).Values(0) + "does not match the " + Tags.ReferencedSOPInstanceUIDMOVE + "value:" + seqItem(Tags.ReferencedSOPInstanceUIDMOVE).Values(0)
                                                                     End If
+
                                                                 End If
                                                             Next
                                                         Else
                                                             done = True
                                                             m_valid = False
-                                                            m_message = "No CT-Image received"
+                                                            m_message = "No " + m_expedtedReferencedIODType.ToString() + "s received"
                                                         End If
                                                     Else
                                                         'True scenario when geometric type is not CLOSED_PLANER

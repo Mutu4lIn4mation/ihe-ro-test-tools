@@ -23,6 +23,17 @@ Class NrOfSequenceItemRule
         Dim message As String = ""
 
         If iodType = IODTypeRule Then
+
+            If (Left(m_TagSequence, 10) = Left(m_NrOfSeqItemTag, 10)) Then
+                If (Left(m_TagSequence, 13).EndsWith("]")) Then
+                    m_NrOfSeqItemTag = Left(m_TagSequence, 13) + Right(m_NrOfSeqItemTag, m_NrOfSeqItemTag.Length - 13)
+                Else
+                    m_NrOfSeqItemTag = Left(m_TagSequence, 14) + Right(m_NrOfSeqItemTag, m_NrOfSeqItemTag.Length - 13)
+                End If
+
+
+            End If
+
             Dim sequenceNr As Integer = 0
             Dim sequenceItems As Integer = 0
 

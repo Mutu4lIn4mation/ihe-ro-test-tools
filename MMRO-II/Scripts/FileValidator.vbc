@@ -1,0 +1,200 @@
+Class FileValidator
+
+    'has a Validator
+    Protected m_validator As Validator
+    'has a Reporter
+    Protected m_reporter As Reporter
+    'has rules
+    Private m_rules As System.Collections.ArrayList
+    'Has list of selected files
+    Private m_selectedFiles As System.Collections.ArrayList
+    'Depending on the selection of the user on the user interface
+    'Private m_isRTPlanGeometric = False
+    'The validator needs a DicomMessageCollection, so the dicom files are loaded into this collection 
+    Private m_dicomMessageCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+
+    'Constructor
+    Public Sub New()
+        m_validator = New Validator(True)
+        m_reporter = Reporter.GetInstance()
+        m_rules = New ArrayList
+        m_selectedFiles = New ArrayList
+        m_dicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+    End Sub
+
+    'Run a test scenario
+    Public Function RunFileValidator() As Boolean
+        Try
+            If ShowDialog() Then
+
+                'Load the selected dicom files into the dicommessagecollection
+                LoadFiles()
+                '- Add the rules to the list, all rules for all IODs will be added, 
+                '  the validator determines which rule is applied and which is not.
+                AddRules()
+                ' - validating the received transactions (Validator)
+                ValidateAndReport()
+            End If
+
+        Catch ex As System.Exception ' Catch the error.
+            m_reporter.ReportErrorMessage("IHE-RO test scenario : Scenario aborted, reason: " + ex.Message)
+        End Try
+
+    End Function
+
+    Protected Function ShowDialog() As Boolean
+        Dim dlg As IHEROfilevalidatorDialog = New IHEROfilevalidatorDialog
+        dlg.ShowDialog()
+
+        If dlg.StartValidation Then
+            'Add selected files of the dialog the the selected files list
+            m_selectedFiles = dlg.GetList()
+            'The user selected the type of RTPlan
+            'm_isRTPlanGeometric = dlg.IsGeometricPlan
+        End If
+
+        'dlg.Dispose()
+        Return dlg.StartValidation
+    End Function
+
+    Protected Sub LoadFiles()
+        Dim i As Integer
+        For i = 0 To m_selectedFiles.Count() - 1
+            Try
+                Dim dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+                'Read the file
+                Dim file As String = m_selectedFiles(i).ToString()
+                dicomMessage.DataSet.Read(file)
+                AddGroupElements(dicomMessage)
+                m_dicomMessageCollection.Add(dicomMessage)
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception("Error Reading the file : " + m_selectedFiles(i).ToString())
+            End Try
+        Next
+    End Sub
+
+    'Workaround for validating dicom files. Only group 0, dicommessages is supported at the moment.
+    Private Sub AddGroupElements(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        dicomMessage.CommandSet.Set("0x00000002", DvtkData.Dimse.VR.UI, dicomMessage.DataSet("0x00080016").Values(0))
+        dicomMessage.CommandSet.Set("0x00001000", DvtkData.Dimse.VR.UI, dicomMessage.DataSet("0x00080018").Values(0)) 'Command Field
+        dicomMessage.CommandSet.Set("0x00000000", DvtkData.Dimse.VR.UL, 20) ' Group length, not correct but just needs a number, not used
+        dicomMessage.CommandSet.Set("0x00000110", DvtkData.Dimse.VR.US, 1)  ' Message ID
+        dicomMessage.CommandSet.Set("0x00000700", DvtkData.Dimse.VR.US, 0)  ' Priority
+        dicomMessage.CommandSet.Set("0x00000800", DvtkData.Dimse.VR.US, 0)  ' Data Set Type
+    End Sub
+
+    Protected Sub AddRules()
+        AddSliceImageRules()
+        AddRTDoseRules()
+        AddRTStructureSetRules()
+        AddSpatialRegistrationRules()
+        'Not needed for IHE RO 2008
+        'If m_isRTPlanGeometric Then
+        '    AddRTPlanGeometricRules()
+        'Else
+        '    AdRTPlanDosimetricRules()
+        'End If
+    End Sub
+
+    Private Sub AddRTStructureSetRules()
+        'Only attribute rules are added, module, mapping and interrelation rules are out of the scope of the file validator
+
+        '============== RT-Structure Set attribute rules ====================================
+
+        'C.8.8.5 Structure Set Module
+        'Referenced Frame of Reference Sequence (0x30060010), may only contain one item
+        m_rules.Add(New NrOfSequenceItemRule(Tags.ReferencedFrameofReferenceSequence, "1", IODType.RTStructureSet, ErrorSeverity.RuleError))
+        'RT Referenced study sequence (3006,0012) may only contain one item
+        m_rules.Add(New NrOfSequenceItemRule(Tags.RTReferencedStudySequence, "1", IODType.RTStructureSet, ErrorSeverity.RuleError))
+        'RT Referenced Series Sequence, Only one item allowed in this sequence
+        m_rules.Add(New NrOfSequenceItemRule(Tags.RTReferencedSeriesSequence, "1", IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+        'C.12.1 SOP Common		
+
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+        'm_rules.Add(New SOPInstanceUIDRule(IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+        '============== End Structure set rules =============================================
+    End Sub
+
+    Private Sub AddSliceImageRules()
+        '============== CT-Image attribute rules  ===========================================
+
+        'C.7.1.1 Patient Module
+        'Series Instance UID (0020,000E) Used for resampeling of multiseries ct sets. 
+        'Should differ from the input ct images 
+        'm_rules.Add(New SeriesInstanceUIDMultiCTRule(ErrorSeverity.RuleError))
+
+        'C.7.6.2 Image Plane Module		
+        'Pixel Spacing	(0028,0030)	"1. For CTImage IOD, non-isotropic pixels are outside the scope of the profile.
+        '2. For IHE-RO 2008 (MR, PET): We do require the X and Y resolutions are equal, the z resolution may be different
+        m_rules.Add(New PixelSpacingRule(IODType.CTImage, ErrorSeverity.RuleError))
+        m_rules.Add(New PixelSpacingRule(IODType.MRImage, ErrorSeverity.RuleError))
+        m_rules.Add(New PixelSpacingRule(IODType.PETImage, ErrorSeverity.RuleError))
+
+        'C.12.1 SOP Common		
+
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+        'm_rules.Add(New SOPInstanceUIDRule(IODType.CTImage, ErrorSeverity.RuleError))
+        '==============  CT-Image attribute rules ============================================
+
+    End Sub
+
+    Private Sub AddRTDoseRules()
+        '============== RT-Dose attribute rules =============================================
+
+        'C.7.6.2 Image Plane Module		
+        'Pixel Spacing	(0028,0030)	For RT Dose IOD, pixel spacing may be nonisotropic"
+        m_rules.Add(New PixelSpacingRule(IODType.RTDose, ErrorSeverity.RuleError))
+
+        'C.8.8.3 RT Dose
+        'Grid Frame Offset Vector (3004,000C)
+        '1. First z coordinate shall be equal to zero. 
+        '2. The remaining z coordinates shall be relative to the starting z position in Image Position (Patient) (0020,0032).
+        m_rules.Add(New GridFrameOffsetVectorRule(Tags.GridFrameOffsetVector, IODType.RTDose, ErrorSeverity.RuleError))
+
+        'C.12.1 SOP Common		
+
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+        'm_rules.Add(New SOPInstanceUIDRule(IODType.RTDose, ErrorSeverity.RuleError))
+
+        '============== End RT-Dos attribute rules ==========================================
+    End Sub
+
+    Private Sub AddSpatialRegistrationRules()
+        'C.20.2 Spatial Registration
+
+        'Registration sequence (0070,0308) must contain exactly 2 items
+        m_rules.Add(New NrOfSequenceItemRule(Tags.RegistrationSequence, "2", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+        'each item in (0070,0308) must contain 1 item in (0070,0309)
+        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixRegistrationSequence, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixRegistrationSequence2, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+        'each item in (0070,0309) must contain 1 item in (0070,030A)
+        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixSequence, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixSequence2, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+        'each item in (0070,030A) must contain a 4x4 matrix in (3006,00C6) of which the last 4 positions are 0/0/0/1
+        m_rules.Add(New CorrectMatrixRule(Tags.FrameofReferenceTransformationMatrix, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        m_rules.Add(New CorrectMatrixRule("0x00700308[2]/0x00700309[1]/0x0070030A[1]/0x300600C6", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+        'the matrix in the first item in the registration sequence must have the values 1/0/0/0/0/1/0/0/0/0/1/0 in its first twelve positions
+        m_rules.Add(New CorrectIdentityMatrixRule(Tags.FrameofReferenceTransformationMatrix, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+
+        'the value of the frame of reference UID must be the same both in the base of the object and in the first registration object
+        m_rules.Add(New EqualToRule(Tags.FrameofReferenceUID, IODType.SpatialRegistration, ErrorSeverity.RuleError, Tags.RegistrationFrameofReferenceUID))
+
+        'the referenced image sequence (0008,1140) must not exist
+        m_rules.Add(New NotPresentRule(Tags.ReferencedImageSequence, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        m_rules.Add(New NotPresentRule(Tags.ReferencedImageSequence2, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+    End Sub
+    'validate the received transactions and report
+    Protected Sub ValidateAndReport()
+        If m_dicomMessageCollection.Count > 0 Then
+            'Not needed for IHE RO 2008
+            'm_validator.ValidateMessages(m_dicomMessageCollection, m_rules, m_isRTPlanGeometric)
+            m_validator.ValidateMessages(m_dicomMessageCollection, m_rules)
+        End If
+    End Sub
+End Class

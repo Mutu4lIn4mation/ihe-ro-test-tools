@@ -73,22 +73,44 @@ Class ContourImageSequenceStructureSetRule
                                                     'Contour Image Sequence Attribute 0x30060016
                                                     If seqItem.Exists(Tags.ContourImageSequenceTag) Then
                                                         contourImageSequenceAttribute = seqItem(Tags.ContourImageSequenceTag)
+
+                                                        Dim contourImageSequenceSeqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+                                                        contourImageSequenceSeqItem = contourImageSequenceAttribute.GetItem(1)
+                                                        Dim contourImageSequenceSOPClassUID As String = contourImageSequenceSeqItem(Tags.ReferencedSOPClassUID).Values(0).ToString()
+
+
                                                         'Must contain an item for every ct image according to IHE-RO
                                                         Dim numberOfImages As Integer
-If Not ReferenceDataSet.GetInstance.GetDataSetXML Is Nothing Then
-                                                            numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.CTImage)
+                                                        If Not ReferenceDataSet.GetInstance.GetDataSetXML Is Nothing Then
+
+                                                            If (contourImageSequenceSOPClassUID = SOPclass.CTImageSOPClassUID) Then
+                                                                numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.CTImage)
+                                                            ElseIf (contourImageSequenceSOPClassUID = SOPclass.MRImageSOPClassUID) Then
+                                                                numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.MRImage)
+
+                                                            ElseIf (contourImageSequenceSOPClassUID = SOPclass.PetImageSOPClassUID) Then
+                                                                numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.PETImage)
+                                                            End If
                                                         Else
-                                                            numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage)
+                                                            If (contourImageSequenceSOPClassUID = SOPclass.CTImageSOPClassUID) Then
+                                                                numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage)
+                                                            ElseIf (contourImageSequenceSOPClassUID = SOPclass.MRImageSOPClassUID) Then
+                                                                numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.MRImage)
+
+                                                            ElseIf (contourImageSequenceSOPClassUID = SOPclass.PetImageSOPClassUID) Then
+                                                                numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.PETImage)
+                                                            End If
+
                                                         End If
 
-                                                        If contourImageSequenceAttribute.ItemCount = numberOfImages Then
+                                                        If contourImageSequenceAttribute.ItemCount <= numberOfImages Then
                                                             m_valid = True
                                                             done = True
-                                                            m_message = "'" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") has a reference to every CT-Images"
+                                                            m_message = "'" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") has a correct number of referenced images"
                                                         Else
                                                             m_valid = False
                                                             done = True
-                                                            m_message = "'" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") does not have a reference to every CT-Images, reference to " + contourImageSequenceAttribute.ItemCount.ToString() + " CT-images, " + numberOfImages.ToString() + " CT-Images should be referenced"
+                                                            m_message = "'" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") has to many references, reference to " + contourImageSequenceAttribute.ItemCount.ToString() + " images, maxiumum " + numberOfImages.ToString() + " images can be referenced"
                                                         End If
                                                     End If
                                                 End If

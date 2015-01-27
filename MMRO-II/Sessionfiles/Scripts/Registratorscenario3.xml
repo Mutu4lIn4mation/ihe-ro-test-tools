@@ -243,6 +243,15 @@
         <CTImage>CT\CT239.dcm</CTImage>
         <CTImage>CT\CT240.dcm</CTImage>
         <CTImage>CT\CT241.dcm</CTImage>
+		<CTImage>CT\CT242.dcm</CTImage>
+		<CTImage>CT\CT243.dcm</CTImage>
+		<CTImage>CT\CT244.dcm</CTImage>
+		<CTImage>CT\CT245.dcm</CTImage>
+		<CTImage>CT\CT246.dcm</CTImage>
+		<CTImage>CT\CT247.dcm</CTImage>
+		<CTImage>CT\CT248.dcm</CTImage>
+		<CTImage>CT\CT249.dcm</CTImage>
+		<CTImage>CT\CT250.dcm</CTImage>
     </CTImageSet>
     <PETImageSet description="SingleSeries">
         <PETImage>PET\PT1.dcm</PETImage>

@@ -1,13 +1,13 @@
 Class ReferencedSOPInstanceUIDContourModuleRule
     Inherits MessageCollectionRule
 
-    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal ctSet As CTSet)
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal expedtedReferencedIODType As IODType)
 
         MyBase.New("Referenced SOP Instance UID Contour Module Rule", iodType, severity)
-        m_ctSet = ctSet
+        m_expedtedReferencedIODType = expedtedReferencedIODType
 
     End Sub
-    Private m_ctSet As CTSet
+    Private m_expedtedReferencedIODType As IODType
     Private m_message As String
     Private m_valid As Boolean = False
     Private m_messageCollectionHelper As messageCollectionHelper
@@ -27,7 +27,7 @@ Class ReferencedSOPInstanceUIDContourModuleRule
         Dim contourSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
         Dim contourImageSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
         Dim referencedSOPInstanceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
-        Dim ctImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim referencedImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
         Dim SOPInstanceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
 
         If m_messageCollectionHelper.GetStructureSet() Is Nothing Then
@@ -78,13 +78,37 @@ Class ReferencedSOPInstanceUIDContourModuleRule
                                                     Dim numberOfImages As Integer
                                                     Dim refData As ReferenceDataSet = ReferenceDataSet.GetInstance
                                                     If Not refData.GetDataSetXML Is Nothing Then
-                                                        numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.CTImage)
+
+                                                        If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                            numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.MRImage)
+                                                        ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                            numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.PETImage)
+                                                        ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                            numberOfImages = ReferenceDataSet.GetInstance.GetImageCount(1, IODType.CTImage)
+                                                        End If
+
                                                     Else
-                                                        numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage)
+
+                                                        If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                            numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.MRImage)
+                                                        ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                            numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.PETImage)
+                                                        ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                            numberOfImages = m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage)
+                                                        End If
+
                                                         If numberOfImages = 0 Then
                                                             m_valid = False
                                                             done = True
-                                                            m_message = "No CT-Images received"
+
+                                                            If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                m_message = "No MR-Images received"
+                                                            ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                m_message = "No PET-Images received"
+                                                            ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                m_message = "No CT-Images received"
+                                                            End If
+
                                                         End If
                                                     End If
                                                     'Itterate throug the ct-images to find the matching Sop Instance UID of the CT image
@@ -94,26 +118,47 @@ Class ReferencedSOPInstanceUIDContourModuleRule
                                                     For k = 1 To numberOfImages
                                                         If done = False Then
                                                             If Not ReferenceDataSet.GetInstance.GetDataSetXML Is Nothing Then
-                                                                ctImageDataSet = ReferenceDataSet.GetInstance.GetCTImage(1, k).DataSet
+                                                                If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                    referencedImageDataSet = ReferenceDataSet.GetInstance.GetMRImage(1, k).DataSet
+                                                                ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                    referencedImageDataSet = ReferenceDataSet.GetInstance.GetPETImage(1, k).DataSet
+                                                                ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                    referencedImageDataSet = ReferenceDataSet.GetInstance.GetCTImage(1, k).DataSet
+                                                                End If
+
                                                             Else
-                                                                ctImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, k)
+                                                                If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                    referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.MRImage, k)
+                                                                ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                    referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.PETImage, k)
+                                                                ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                    referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, k)
+                                                                End If
+
                                                             End If
 
-                                                            If ctImageDataSet Is Nothing Then
+                                                            If referencedImageDataSet Is Nothing Then
                                                                 m_valid = False
                                                                 done = True
-                                                                m_message = "No CT-Images received"
+                                                                If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                    m_message = "No MR-Images received"
+                                                                ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                    m_message = "No PET-Images received"
+                                                                ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                    m_message = "No CT-Images received"
+                                                                End If
+
                                                             Else
                                                                 'Check if the Sop InstanceUID exsists
-                                                                If ctImageDataSet.Exists(Tags.SOPInstanceUID) Then
-                                                                    SOPInstanceUIDAttribute = ctImageDataSet(Tags.SOPInstanceUID)
+                                                                If referencedImageDataSet.Exists(Tags.SOPInstanceUID) Then
+                                                                    SOPInstanceUIDAttribute = referencedImageDataSet(Tags.SOPInstanceUID)
                                                                     If referencedSOPInstanceUIDAttribute.Values.Equals(SOPInstanceUIDAttribute.Values) = True Then
                                                                         m_valid = True
                                                                         done = True
-                                                                        m_message = "'ReferencedSOPInstanceUID' (" + Tags.ReferencedSOPInstanceUIDMOVE + ") has a reference to'" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") of a CT-Images"
+                                                                        m_message = "'ReferencedSOPInstanceUID' (" + Tags.ReferencedSOPInstanceUIDMOVE + ") has a reference to'" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") of the " + m_expedtedReferencedIODType.ToString() + "'s"
                                                                     Else
                                                                         m_valid = False
-                                                                        m_message = "'ReferencedSOPInstanceUID' (" + Tags.ReferencedSOPInstanceUIDMOVE + ") has no reference to '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") of a CT-Images"
+                                                                        m_message = "'ReferencedSOPInstanceUID' (" + Tags.ReferencedSOPInstanceUIDMOVE + ") has no reference to '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") of the " + m_expedtedReferencedIODType.ToString() + "'s"
                                                                     End If
                                                                 End If
                                                             End If

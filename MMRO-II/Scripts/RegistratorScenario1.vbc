@@ -75,49 +75,31 @@ Class RegistratorScenario1
                     'receive.AddTransaction(New MMRO_1_Transaction(DialogResult.CTPET_MR))
                     'MMRO II
                     receive.AddTransaction(New MMRO_II_1_Transaction(DialogResult.CTPET_MR))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.CTImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.MRImage))
                 Case DialogResult.CT_PET
                     'MMRO I
                     'receive.AddTransaction(New MMRO_1_Transaction(DialogResult.CTMR_PET))
                     'MMRO II
                     receive.AddTransaction(New MMRO_II_1_Transaction(DialogResult.CTMR_PET))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.CTImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.PETImage))
                 Case DialogResult.CTPET_MR
                     'MMRO I
                     'receive.AddTransaction(New MMRO_1_Transaction(DialogResult.CTPET_MR))
                     'MMRO II
                     receive.AddTransaction(New MMRO_II_1_Transaction(DialogResult.CTPET_MR))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.CTImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.PETImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.MRImage))
-
                 Case DialogResult.CTMR_PET
                     'MMRO I
                     'receive.AddTransaction(New MMRO_1_Transaction(DialogResult.CTMR_PET))
                     'MMRO II
                     receive.AddTransaction(New MMRO_II_1_Transaction(DialogResult.CTMR_PET))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.CTImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.PETImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.MRImage))
-
                 Case DialogResult.CT_MR_PET
                     'MMRO I
                     'receive.AddTransaction(New MMRO_1_Transaction(DialogResult.CT_MR_PET))
                     'MMRO II
                     receive.AddTransaction(New MMRO_II_1_Transaction(DialogResult.CT_MR_PET))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.CTImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.MRImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.PETImage))
                 Case DialogResult.CT_PET_MR
                     'MMRO I
                     'receive.AddTransaction(New MMRO_1_Transaction(DialogResult.CT_PET_MR))
                     'MMRO II
                     receive.AddTransaction(New MMRO_II_1_Transaction(DialogResult.CT_PET_MR))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.CTImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.PETImage))
-                    receive.AddTransaction(New RAD_18_Transaction(IODType.MRImage))
 
                 Case Else
                     'MMRO I
@@ -126,10 +108,18 @@ Class RegistratorScenario1
                     receive.AddTransaction(New MMRO_II_1_Transaction)
             End Select
 
+            If (dialog.sendBackPETImages.Checked = True) Then
+                receive.AddTransaction(New RAD_18_Transaction(IODType.PETImage))
+            End If
+            If (dialog.sendBackMRImages.Checked = True) Then
+                receive.AddTransaction(New RAD_18_Transaction(IODType.MRImage))
+            End If
+
             'Configurate the validate step
             'rules 
             'C.7.1.1 Patient Module
-            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+
+            If dialog.sendBackPETImages.Checked = True Then
                 'Patient() 's Name	(0010,0010), same as in reference data
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientName, IODType.PETImage, ErrorSeverity.RuleError, False))
                 'Patient ID	(0010,0020), same as in reference data
@@ -138,24 +128,9 @@ Class RegistratorScenario1
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientsBirthDate, IODType.PETImage, ErrorSeverity.RuleError, False))
                 'Patient() 's Sex	(0010,0040), same as in reference data
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.PETImage, ErrorSeverity.RuleError, False))
-            ElseIf dialog.RegistratorDialogResult = DialogResult.CT_MR Then
-                'Patient() 's Name	(0010,0010), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientName, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Patient ID	(0010,0020), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientID, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Patient() 's Birthdate	(0010,0030), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientsBirthDate, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Patient() 's Sex	(0010,0040), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.MRImage, ErrorSeverity.RuleError, False))
-            Else
-                'Patient() 's Name	(0010,0010), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientName, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Patient ID	(0010,0020), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientID, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Patient() 's Birthdate	(0010,0030), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientsBirthDate, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Patient() 's Sex	(0010,0040), same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.PETImage, ErrorSeverity.RuleError, False))
+            End If
+
+            If dialog.sendBackMRImages.Checked = True Then
                 'Patient() 's Name	(0010,0010), same as in reference data
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientName, IODType.MRImage, ErrorSeverity.RuleError, False))
                 'Patient ID	(0010,0020), same as in reference data
@@ -176,7 +151,8 @@ Class RegistratorScenario1
             validate.AddRule(New CriticalAttributeMappingRule(Tags.PatientSex, IODType.SpatialRegistration, ErrorSeverity.RuleError, False, dialog.RegistratorDialogResult))
 
             'C.7.2.1 General Study Module	
-            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+
+            If dialog.sendBackPETImages.Checked = True Then
                 'Study Instance UID	(0020,000D), New value, but maybe the same as in reference data
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.PETImage, ErrorSeverity.RuleError, False))
                 'Study Date	(0008,0020), New value, but maybe the same as in reference data
@@ -191,36 +167,8 @@ Class RegistratorScenario1
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.AccessionNumber, IODType.PETImage, ErrorSeverity.RuleError, False))
                 'Study Description	(0008,1030), New value, but maybe the same as in reference data
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyDescription, IODType.PETImage, ErrorSeverity.RuleError, False))
-            ElseIf dialog.RegistratorDialogResult = DialogResult.CT_MR Then
-                'Study Instance UID	(0020,000D), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Study Date	(0008,0020), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyDate, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Study Time	(0008,0030), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyTime, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Referring(Physician)(0008,0090), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.ReferringPhysiciansName, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Study ID	(0020,0010), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyID, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Accession Number	(0008,0050), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.AccessionNumber, IODType.MRImage, ErrorSeverity.RuleError, False))
-                'Study Description	(0008,1030), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyDescription, IODType.MRImage, ErrorSeverity.RuleError, False))
-            Else
-                'Study Instance UID	(0020,000D), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Study Date	(0008,0020), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyDate, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Study Time	(0008,0030), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyTime, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Referring(Physician)(0008,0090), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.ReferringPhysiciansName, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Study ID	(0020,0010), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyID, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Accession Number	(0008,0050), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.AccessionNumber, IODType.PETImage, ErrorSeverity.RuleError, False))
-                'Study Description	(0008,1030), New value, but maybe the same as in reference data
-                validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyDescription, IODType.PETImage, ErrorSeverity.RuleError, False))
+            End If
+            If dialog.sendBackMRImages.Checked = True Then
                 'Study Instance UID	(0020,000D), New value, but maybe the same as in reference data
                 validate.AddRule(New CriticalAttributeMappingRule(Tags.StudyInstanceUID, IODType.MRImage, ErrorSeverity.RuleError, False))
                 'Study Date	(0008,0020), New value, but maybe the same as in reference data
@@ -254,60 +202,47 @@ Class RegistratorScenario1
 
             'C7.3.1 General Series Module
             'Series Instance UID (0020,000E), must be different form the series defined in the reference data
+
+            If dialog.sendBackPETImages.Checked = True Then
+                validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.PETImage, True, False, False, False, False, False))
+            End If
+
+            If dialog.sendBackMRImages.Checked = True Then
+                validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.MRImage, True, False, False, False, False, False))
+            End If
+
             If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
                 validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.SpatialRegistration, True, False, True, False, False, True))
-                validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.PETImage, True, False, False, False, False, False))
             ElseIf dialog.RegistratorDialogResult = DialogResult.CT_MR Then
                 validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.SpatialRegistration, True, True, False, False, False, True))
-                validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.MRImage, True, False, False, False, False, False))
             Else
                 validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.SpatialRegistration, True, True, True, False, False, True))
-                validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.MRImage, True, False, False, False, False, False))
-                validate.AddRule(New SeriesInstanceUIDMappingRule(ErrorSeverity.RuleError, IODType.PETImage, True, False, False, False, False, False))
             End If
-
-            'Patient Position should be one of these values HFS, FFS, HFP, FFP.
-            Dim values(3) As String
-            values(0) = "HFS"
-            values(1) = "FFS"
-            values(2) = "HFP"
-            values(3) = "FFP"
-            validate.AddRule(New ValueListRule(Tags.PatientPosition, values, IODType.SpatialRegistration, ErrorSeverity.RuleError))
 
             'C7.4.1 Frame Of reference Module 
-            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
-                validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.FrameofReferenceUID, IODType.PETImage, ErrorSeverity.RuleError, True))
-            ElseIf dialog.RegistratorDialogResult = DialogResult.CT_MR Then
-                validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.FrameofReferenceUID, IODType.MRImage, ErrorSeverity.RuleError, True))
-            Else
-                validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.FrameofReferenceUID, IODType.PETImage, ErrorSeverity.RuleError, True))
-                validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.FrameofReferenceUID, IODType.MRImage, ErrorSeverity.RuleError, True))
+
+            If dialog.sendBackPETImages.Checked = True Then
+                validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.FrameofReferenceUID, IODType.PETImage, ErrorSeverity.RuleError, False))
             End If
+
+            If dialog.sendBackMRImages.Checked = True Then
+                validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.FrameofReferenceUID, IODType.MRImage, ErrorSeverity.RuleError, False))
+            End If
+
 
             validate.AddRule(New SameFrameOfReferenceMappingRule(Tags.FrameofReferenceUID, IODType.SpatialRegistration, ErrorSeverity.RuleError, False))
 
             'C7.5.1 General Equipment module
-            If dialog.RegistratorDialogResult = DialogResult.CT_PET Then
+
+            If dialog.sendBackPETImages.Checked = True Then
                 'Manufacturer (0008,0070) If a new spatial registration object is created, the manufacturer of the equipment
                 'producing the new spatial registration object shall insert their identifier in this element
                 validate.AddRule(New ManufacturerMappingRule(Tags.Manufacturer, ErrorSeverity.RuleError, IODType.PETImage, ""))
                 'Manufacturer (0008,1090) If a new structure set is created from a previous structure set, the manufacturer of the equipment
                 'producing the new structure set shall insert their identifier in this element
                 validate.AddRule(New ManufacturerMappingRule(Tags.ManufacturersModelName, ErrorSeverity.RuleError, IODType.PETImage, ""))
-            ElseIf dialog.RegistratorDialogResult = DialogResult.CT_MR Then
-                'Manufacturer (0008,0070) If a new spatial registration object is created, the manufacturer of the equipment
-                'producing the new spatial registration object shall insert their identifier in this element
-                validate.AddRule(New ManufacturerMappingRule(Tags.Manufacturer, ErrorSeverity.RuleError, IODType.MRImage, ""))
-                'Manufacturer (0008,1090) If a new structure set is created from a previous structure set, the manufacturer of the equipment
-                'producing the new structure set shall insert their identifier in this element
-                validate.AddRule(New ManufacturerMappingRule(Tags.ManufacturersModelName, ErrorSeverity.RuleError, IODType.MRImage, ""))
-            Else
-                'Manufacturer (0008,0070) If a new spatial registration object is created, the manufacturer of the equipment
-                'producing the new spatial registration object shall insert their identifier in this element
-                validate.AddRule(New ManufacturerMappingRule(Tags.Manufacturer, ErrorSeverity.RuleError, IODType.PETImage, ""))
-                'Manufacturer (0008,1090) If a new structure set is created from a previous structure set, the manufacturer of the equipment
-                'producing the new structure set shall insert their identifier in this element
-                validate.AddRule(New ManufacturerMappingRule(Tags.ManufacturersModelName, ErrorSeverity.RuleError, IODType.PETImage, ""))
+            End If
+            If dialog.sendBackMRImages.Checked = True Then
                 'Manufacturer (0008,0070) If a new spatial registration object is created, the manufacturer of the equipment
                 'producing the new spatial registration object shall insert their identifier in this element
                 validate.AddRule(New ManufacturerMappingRule(Tags.Manufacturer, ErrorSeverity.RuleError, IODType.MRImage, ""))

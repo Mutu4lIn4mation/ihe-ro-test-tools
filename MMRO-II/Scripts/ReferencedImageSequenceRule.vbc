@@ -2,9 +2,6 @@ Class ReferencedImageSequenceRule
     Inherits MappingRule
 
     Private dialogResult As Integer
-    Private count As Integer = 0
-    Private UsedCTImages As List(Of Integer) = New List(Of Integer)
-
 
     Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal dialogResult As DialogResult)
 
@@ -29,179 +26,201 @@ Class ReferencedImageSequenceRule
 
             m_message = "All referenced images in '" + Tags.GetTagName(Tags.ReferencedImageSequence) + "' (" + Tags.ReferencedImageSequence + ") and '" + Tags.GetTagName(Tags.ReferencedImageSequence2) + "' (" + Tags.ReferencedImageSequence2 + ") are referenced correct"
 
-            If dialogResult = 1 Then
-                checkCT(dicomMessage)
-                checkPET(dicomMessage)
-            ElseIf dialogResult = 2 Then
-                checkCT(dicomMessage)
-                checkMR(dicomMessage)
-            ElseIf dialogResult = 3 Then
-                If count = 0 Then
-                    checkCT(dicomMessage)
-                    checkPET(dicomMessage)
-                    count = 1
-                Else
-                    checkCT(dicomMessage)
-                    checkMR(dicomMessage)
-                End If
-            ElseIf dialogResult = 4 Then
-                If count = 0 Then
-                    checkCT(dicomMessage)
-                    checkMR(dicomMessage)
-                    count = 1
-                Else
-                    checkCT(dicomMessage)
-                    checkPET(dicomMessage)
-                End If
-
-                ElseIf dialogResult = 5 Then
-                    checkCT(dicomMessage)
-                    checkMR(dicomMessage)
-                ElseIf dialogResult = 6 Then
-                    checkCT(dicomMessage)
-                    checkPET(dicomMessage)
-                End If
-
-                'Case dialogResult.CT_MR
-                'checkCT(dicomMessage)
-                'checkMR(dicomMessage)
-                'Case dialogResult.CT_PET_MR
-                'checkCT(dicomMessage)
-                'checkMR(dicomMessage)
-                'Case dialogResult.CT_MR_PET
-                'checkCT(dicomMessage)
-                'checkMR(dicomMessage)
-                'Case dialogResult.CTPET_MR
-                'checkCT(dicomMessage)
-                'checkMR(dicomMessage)
-                'Case dialogResult.CTMR_PET
-
-            End If
-
-            'If every modality is passed, then SetValid, else SetError
-            If m_valid Then
-                Me.SetValid(m_message)
-            Else
-                Me.SetError(m_message)
-            End If
-
-            'Reporter, write to results, if there is anything to report
-            Me.Report()
-    End Sub
-
-    Public Function checkCT(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
-
-            '[1] CT
             If Not dicomMessage.DataSet.Exists(Tags.ReferencedImageSequence) Then
                 m_valid = False
                 m_message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedImageSequence) + "' (" + Tags.ReferencedImageSequence + ") is not present."
-            Else
+            End If
+
+            If Not dicomMessage.DataSet.Exists(Tags.ReferencedImageSequence2) Then
+                m_valid = False
+                m_message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedImageSequence2) + "' (" + Tags.ReferencedImageSequence2 + ") is not present."
+            End If
+
+            If m_valid Then
+
                 ReferencedImageSequenceAttribute = dicomMessage.DataSet(Tags.ReferencedImageSequence)
+                seqItem = ReferencedImageSequenceAttribute.GetItem(1)
+                ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
 
-            For i As Integer = 1 To ReferencedImageSequenceAttribute.ItemCount()
-                If done = False Then
-                    seqItem = ReferencedImageSequenceAttribute.GetItem(i)
-                    ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
-                    ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute = seqItem(Tags.ReferencedSOPInstanceUIDMOVE)
-
-                    If Not (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.CTImageSOPClassUID) Then
-                        done = True
-                        m_valid = False
-                        m_message = "(" + Tags.ReferencedSOPClassUID + ") " + ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() + " is not equal to " + SOPclass.CTImageSOPClassUID.ToString
-                    End If
-                    Dim split As String() = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString().Split(".")
-                    Dim ReferencedSOPInstanceUID As String = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString()
-                    If count = 0 Then
-                        UsedCTImages.Add(Convert.ToInt16(split(split.Length - 1)))
-                    End If
-                    If Not (Strings.Left(ReferencedSOPInstanceUID, 39) = "1.2.826.0.1.3680043.8.431.1554.4.2.1.1." And Convert.ToInt16(split(split.Length - 1)) <= 250) Then
-                        done = True
-                        m_valid = False
-                        m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not in referenced CT-set"
-                    End If
-
-                    If count = 1 Then
-                        If Not UsedCTImages.Contains(Convert.ToInt16(split(split.Length - 1))) Then
-                            done = True
-                            m_valid = False
-                            m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not used in the other spatial registration, both spatial registration's must use the same CT-images"
-                        End If
-                    End If
+                If (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.CTImageSOPClassUID) Then
+                    checkCT(dicomMessage, Tags.ReferencedImageSequence)
+                ElseIf (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.MRImageSOPClassUID) Then
+                    checkMR(dicomMessage, Tags.ReferencedImageSequence)
+                ElseIf (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.PetImageSOPClassUID) Then
+                    checkPET(dicomMessage, Tags.ReferencedImageSequence)
                 End If
-            Next
 
-            If count = 1 Then
-                If Not UsedCTImages.Count() = ReferencedImageSequenceAttribute.ItemCount() Then
+                ReferencedImageSequenceAttribute = dicomMessage.DataSet(Tags.ReferencedImageSequence2)
+                seqItem = ReferencedImageSequenceAttribute.GetItem(1)
+                ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
+
+                If (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.CTImageSOPClassUID) Then
+                    checkCT(dicomMessage, Tags.ReferencedImageSequence2)
+                ElseIf (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.MRImageSOPClassUID) Then
+                    checkMR(dicomMessage, Tags.ReferencedImageSequence2)
+                ElseIf (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.PetImageSOPClassUID) Then
+                    checkPET(dicomMessage, Tags.ReferencedImageSequence2)
+                End If
+
+                'If dialogResult = 1 Then
+                '    checkCT(dicomMessage)
+                '    checkPET(dicomMessage)
+                'ElseIf dialogResult = 2 Then
+                '    checkCT(dicomMessage)
+                '    checkMR(dicomMessage)
+                'ElseIf dialogResult = 3 Then
+                '    If count = 0 Then
+                '        checkCT(dicomMessage)
+                '        checkPET(dicomMessage)
+                '        count = 1
+                '    Else
+                '        checkCT(dicomMessage)
+                '        checkMR(dicomMessage)
+                '    End If
+                'ElseIf dialogResult = 4 Then
+                '    If count = 0 Then
+                '        checkCT(dicomMessage)
+                '        checkMR(dicomMessage)
+                '        count = 1
+                '    Else
+                '        checkCT(dicomMessage)
+                '        checkPET(dicomMessage)
+                '    End If
+
+                'ElseIf dialogResult = 5 Then
+                '    checkCT(dicomMessage)
+                '    checkMR(dicomMessage)
+                'ElseIf dialogResult = 6 Then
+                '    checkCT(dicomMessage)
+                '    checkPET(dicomMessage)
+                'End If
+            End If
+
+
+
+            'Case dialogResult.CT_MR
+            'checkCT(dicomMessage)
+            'checkMR(dicomMessage)
+            'Case dialogResult.CT_PET_MR
+            'checkCT(dicomMessage)
+            'checkMR(dicomMessage)
+            'Case dialogResult.CT_MR_PET
+            'checkCT(dicomMessage)
+            'checkMR(dicomMessage)
+            'Case dialogResult.CTPET_MR
+            'checkCT(dicomMessage)
+            'checkMR(dicomMessage)
+            'Case dialogResult.CTMR_PET
+
+        End If
+
+        'If every modality is passed, then SetValid, else SetError
+        If m_valid Then
+            Me.SetValid(m_message)
+        Else
+            Me.SetError(m_message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+
+    Public Function checkCT(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal referencedImageSequenceTag As String)
+
+        '[1] CT
+        ReferencedImageSequenceAttribute = dicomMessage.DataSet(referencedImageSequenceTag)
+
+        For i As Integer = 1 To ReferencedImageSequenceAttribute.ItemCount()
+            If done = False Then
+                seqItem = ReferencedImageSequenceAttribute.GetItem(i)
+                ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
+                ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute = seqItem(Tags.ReferencedSOPInstanceUIDMOVE)
+
+                If Not (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.CTImageSOPClassUID) Then
                     done = True
                     m_valid = False
-                    m_message = "Number of used CT-images is not equal in both spatial registration's"
+                    m_message = "(" + Tags.ReferencedSOPClassUID + ") " + ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() + " is not equal to " + SOPclass.CTImageSOPClassUID.ToString
                 End If
+                Dim split As String() = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString().Split(".")
+                Dim ReferencedSOPInstanceUID As String = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString()
+
+                If Not (Strings.Left(ReferencedSOPInstanceUID, 39) = "1.2.826.0.1.3680043.8.431.1554.4.2.1.1." And Convert.ToInt16(split(split.Length - 1)) <= 250) Then
+                    done = True
+                    m_valid = False
+                    m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not in referenced CT-set"
+                End If
+
+                'If count = 1 Then
+                '    If Not UsedCTImages.Contains(Convert.ToInt16(split(split.Length - 1))) Then
+                '        done = True
+                '        m_valid = False
+                '        m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not used in the other spatial registration, both spatial registration's must use the same CT-images"
+                '    End If
+                'End If
             End If
-        End If
+        Next
+
+        'If count = 1 Then
+        '    If Not UsedCTImages.Count() = ReferencedImageSequenceAttribute.ItemCount() Then
+        '        done = True
+        '        m_valid = False
+        '        m_message = "Number of used CT-images is not equal in both spatial registration's"
+        '    End If
+        'End If
     End Function
 
-    Public Function checkMR(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+    Public Function checkMR(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal referencedImageSequenceTag As String)
 
         '[2] MR
-        If Not dicomMessage.DataSet.Exists(Tags.ReferencedImageSequence2) Then
-            m_valid = False
-            m_message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedImageSequence2) + "' (" + Tags.ReferencedImageSequence2 + ") is not present."
-        Else
-            ReferencedImageSequenceAttribute = dicomMessage.DataSet(Tags.ReferencedImageSequence2)
+        ReferencedImageSequenceAttribute = dicomMessage.DataSet(referencedImageSequenceTag)
 
-            For i As Integer = 1 To ReferencedImageSequenceAttribute.ItemCount()
-                If done = False Then
-                    seqItem = ReferencedImageSequenceAttribute.GetItem(i)
-                    ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
-                    ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute = seqItem(Tags.ReferencedSOPInstanceUIDMOVE)
+        For i As Integer = 1 To ReferencedImageSequenceAttribute.ItemCount()
+            If done = False Then
+                seqItem = ReferencedImageSequenceAttribute.GetItem(i)
+                ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
+                ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute = seqItem(Tags.ReferencedSOPInstanceUIDMOVE)
 
-                    If Not (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.MRImageSOPClassUID) Then
-                        done = True
-                        m_valid = False
-                        m_message = "(" + Tags.ReferencedSOPClassUID + ") " + ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() + " is not equal to " + SOPclass.MRImageSOPClassUID.ToString
-                    End If
-                    Dim split As String() = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString().Split(".")
-                    Dim ReferencedSOPInstanceUID As String = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString()
-                    If Not (Strings.Left(ReferencedSOPInstanceUID, 39) = "1.2.826.0.1.3680043.8.431.1554.4.2.1.2." And Convert.ToInt16(split(split.Length - 1)) <= 200) Then
-                        done = True
-                        m_valid = False
-                        m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not in referenced MR-set"
-                    End If
+                If Not (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.MRImageSOPClassUID) Then
+                    done = True
+                    m_valid = False
+                    m_message = "(" + Tags.ReferencedSOPClassUID + ") " + ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() + " is not equal to " + SOPclass.MRImageSOPClassUID.ToString
                 End If
-            Next
-        End If
+                Dim split As String() = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString().Split(".")
+                Dim ReferencedSOPInstanceUID As String = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString()
+                If Not (Strings.Left(ReferencedSOPInstanceUID, 39) = "1.2.826.0.1.3680043.8.431.1554.4.2.1.2." And Convert.ToInt16(split(split.Length - 1)) <= 200) Then
+                    done = True
+                    m_valid = False
+                    m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not in referenced MR-set"
+                End If
+            End If
+        Next
     End Function
 
-    Public Function checkPET(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+    Public Function checkPET(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal referencedImageSequenceTag As String)
 
         '[2] PET
-        If Not dicomMessage.DataSet.Exists(Tags.ReferencedImageSequence2) Then
-            m_valid = False
-            m_message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedImageSequence2) + "' (" + Tags.ReferencedImageSequence2 + ") is not present."
-        Else
-            ReferencedImageSequenceAttribute = dicomMessage.DataSet(Tags.ReferencedImageSequence2)
+        ReferencedImageSequenceAttribute = dicomMessage.DataSet(referencedImageSequenceTag)
 
-            For i As Integer = 1 To ReferencedImageSequenceAttribute.ItemCount()
-                If done = False Then
-                    seqItem = ReferencedImageSequenceAttribute.GetItem(i)
-                    ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
-                    ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute = seqItem(Tags.ReferencedSOPInstanceUIDMOVE)
+        For i As Integer = 1 To ReferencedImageSequenceAttribute.ItemCount()
+            If done = False Then
+                seqItem = ReferencedImageSequenceAttribute.GetItem(i)
+                ReferencedImageSequenceReferencedSOPClassUIDAttribute = seqItem(Tags.ReferencedSOPClassUID)
+                ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute = seqItem(Tags.ReferencedSOPInstanceUIDMOVE)
 
-                    If Not (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.PetImageSOPClassUID) Then
-                        done = True
-                        m_valid = False
-                        m_message = "(" + Tags.ReferencedSOPClassUID + ") " + ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() + " is not equal to " + SOPclass.PetImageSOPClassUID.ToString
-                    End If
-                    Dim split As String() = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString().Split(".")
-                    Dim ReferencedSOPInstanceUID As String = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString()
-                    If Not (Strings.Left(ReferencedSOPInstanceUID, 39) = "1.2.826.0.1.3680043.8.431.1554.4.2.1.3." And Convert.ToInt16(split(split.Length - 1)) <= 100) Then
-                        done = True
-                        m_valid = False
-                        m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not in referenced PET-set"
-                    End If
+                If Not (ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() = SOPclass.PetImageSOPClassUID) Then
+                    done = True
+                    m_valid = False
+                    m_message = "(" + Tags.ReferencedSOPClassUID + ") " + ReferencedImageSequenceReferencedSOPClassUIDAttribute.Values(0).ToString() + " is not equal to " + SOPclass.PetImageSOPClassUID.ToString
                 End If
-            Next
-        End If
+                Dim split As String() = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString().Split(".")
+                Dim ReferencedSOPInstanceUID As String = ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString()
+                If Not (Strings.Left(ReferencedSOPInstanceUID, 39) = "1.2.826.0.1.3680043.8.431.1554.4.2.1.3." And Convert.ToInt16(split(split.Length - 1)) <= 100) Then
+                    done = True
+                    m_valid = False
+                    m_message = "(" + Tags.ReferencedSOPInstanceUID + ") " + ReferencedImageSequenceReferencedSOPInstanceClassUIDAttribute.Values(0).ToString() + " is not in referenced PET-set"
+                End If
+            End If
+        Next
     End Function
 
 End Class

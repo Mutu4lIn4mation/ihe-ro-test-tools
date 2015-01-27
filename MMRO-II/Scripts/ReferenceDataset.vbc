@@ -505,6 +505,66 @@ Class ReferenceDataSet
 
         Return requestedDataset
     End Function
+
+    Public Function GetMRImage(ByVal MRImageSetNumber As Integer, ByVal ImageNumber As Integer) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim requestedDataset As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+        'Make a key for the HashTable based on the input parameters
+        Dim requestedKey As String = MRImageSetNumber.ToString + "," + ImageNumber.ToString
+
+        'Check if the CTImage file is loaded allready
+        If m_MRImageFiles.Contains(requestedKey) Then
+            'If its loaded allready then just return it
+            requestedDataset = CType(m_MRImageFiles(requestedKey), DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        Else 'If its not loaded yet then Load it, put it in the HashTable and return the DataSet
+            MRImageSetNumber = MRImageSetNumber
+            ImageNumber = ImageNumber
+            'Get the FileName (without the path) of the requested image
+            Dim requestedImageName As String = m_DataSetXML.SelectSingleNode("/DataSet/MRImageSet[" + MRImageSetNumber.ToString + "]/MRImage[" + ImageNumber.ToString + "]").InnerText
+            'Add the filename to the filepath the file is located
+            'Dim fileName As String = m_DataSetXML.SelectSingleNode("/DataSet/DataSetPath").InnerText + "\" + requestedImageName
+            Dim fileName As String = m_datasetPath + "\" + requestedImageName
+            Try
+                'Read the Dataset from the file
+                requestedDataset.DataSet.Read(fileName)
+                'Add the DataSet to the HashTable
+                m_MRImageFiles.Add(requestedKey, requestedDataset)
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception("Error Reading the file from the Dataset: " + fileName)
+            End Try
+        End If
+
+        Return requestedDataset
+    End Function
+
+    Public Function GetPETImage(ByVal PETImageSetNumber As Integer, ByVal ImageNumber As Integer) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim requestedDataset As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+        'Make a key for the HashTable based on the input parameters
+        Dim requestedKey As String = PETImageSetNumber.ToString + "," + ImageNumber.ToString
+
+        'Check if the CTImage file is loaded allready
+        If m_PETImageFiles.Contains(requestedKey) Then
+            'If its loaded allready then just return it
+            requestedDataset = CType(m_PETImageFiles(requestedKey), DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        Else 'If its not loaded yet then Load it, put it in the HashTable and return the DataSet
+            PETImageSetNumber = PETImageSetNumber
+            ImageNumber = ImageNumber
+            'Get the FileName (without the path) of the requested image
+            Dim requestedImageName As String = m_DataSetXML.SelectSingleNode("/DataSet/PETImageSet[" + PETImageSetNumber.ToString + "]/PETImage[" + ImageNumber.ToString + "]").InnerText
+            'Add the filename to the filepath the file is located
+            'Dim fileName As String = m_DataSetXML.SelectSingleNode("/DataSet/DataSetPath").InnerText + "\" + requestedImageName
+            Dim fileName As String = m_datasetPath + "\" + requestedImageName
+            Try
+                'Read the Dataset from the file
+                requestedDataset.DataSet.Read(fileName)
+                'Add the DataSet to the HashTable
+                m_PETImageFiles.Add(requestedKey, requestedDataset)
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception("Error Reading the file from the Dataset: " + fileName)
+            End Try
+        End If
+
+        Return requestedDataset
+    End Function
     'Returns the DataSet of the RTPlan Geometric Object in the ReferenceDataSet
     Public Function GetRTPlanGeometric() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
         'Dim fileName As String = m_DataSetXML.SelectSingleNode("/DataSet/DataSetPath").InnerText + "\" + m_DataSetXML.SelectSingleNode("/DataSet/RTPlanGeometric").InnerText
