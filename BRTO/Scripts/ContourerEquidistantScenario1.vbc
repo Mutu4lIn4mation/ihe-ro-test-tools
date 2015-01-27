@@ -68,7 +68,7 @@ Class ContourerEquidistantScenario1
         m_scenarioRules.Add(New NrIntOfSequenceItemRule(Tags.RTReferencedSeriesSequence, 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
         'Series Instance UID (0020,000E), Shall contain the series to which the set of CT images upon which the structure set is based belong. 
         'Contains an item fo each CT image in the volume up which the structure set is based.
-        m_scenarioRules.Add(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+        m_scenarioRules.Add(New SeriesInstanceUIDStuctureSetRule(IODType.Generic, ErrorSeverity.RuleError, IODType.CTImage))
         'Contour Image Sequence(0x30060016), 
         '1.Must be present, item in the sequence 
         '2.Number of items equals the number of CT images
@@ -111,7 +111,7 @@ Class ContourerEquidistantScenario1
         'Contour Image Sequence (0x30060016), Must be present with a single item. This item is the image upon which this 
         'contour should be placed. If the contour type is CLOSED_PLANAR, then the zcoordinates of the contour must match 
         'the z-coordinate of Image Position Patient in the image.
-        m_scenarioRules.Add(New ContourImageSequenceContourInterRelationRule(IODType.RTStructureSet, ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+        m_scenarioRules.Add(New ContourImageSequenceContourInterRelationRule(IODType.RTStructureSet, ErrorSeverity.RuleError, IODType.CTImage))
 
         '>ROI Display Color 3006,002A is optional
         m_scenarioRules.Add(New OptionalRule(Tags.ROIDisplayColor, IODType.RTStructureSet, ErrorSeverity.RuleError))
@@ -148,7 +148,7 @@ Class ContourerEquidistantScenario1
         '2.This z-coordinate must match the z-coordinate in the related CT image within 0.01 mm (contained in the Contour 
         'Image sequence in the same item of the ROI Contour sequence as this data). 
         '3. An implication of this is that the CLOSED_PLANAR contours are axial."  Implicitly tested by rule ImageOrientationPatientRule, not part of this rule
-        m_scenarioRules.Add(New ContourDataRule(ErrorSeverity.RuleError, CTSet.SingleSerieCTSet))
+        m_scenarioRules.Add(New ContourDataRule(IODType.Generic, ErrorSeverity.RuleError, IODType.CTImage))
 
         'C.8.8.8 RT ROI Observations Module
 

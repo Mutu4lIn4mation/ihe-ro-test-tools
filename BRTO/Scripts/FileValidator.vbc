@@ -1,26 +1,21 @@
 Class FileValidator
 
-    'has a Validator
-    Protected m_validator As Validator
-    'has a Reporter
-    Protected m_reporter As Reporter
-    'has rules
-    Private m_rules As System.Collections.ArrayList
-    'Has list of selected files
-    Private m_selectedFiles As System.Collections.ArrayList
-    'Depending on the selection of the user on the user interface
-    'Private m_isRTPlanGeometric = False
-    'The validator needs a DicomMessageCollection, so the dicom files are loaded into this collection 
-    Private m_dicomMessageCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
-
     'Constructor
     Public Sub New()
-        m_validator = New Validator(True)
-        m_reporter = Reporter.GetInstance()
-        m_rules = New ArrayList
-        m_selectedFiles = New ArrayList
-        m_dicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
     End Sub
+
+    'has a Validator
+    Protected m_validator As Validator = New Validator
+    'has a Reporter
+    Protected m_reporter As Reporter = Reporter.GetInstance()
+    'has rules
+    Private m_rules As ArrayList = New ArrayList
+    'Has list of selected files
+    Private m_selectedFiles As ArrayList = New ArrayList
+    'Depending on the selection of the user on the user interface
+    Private m_isRTPlanGeometric = False
+    'The validator needs a DicomMessageCollection, so the dicom files are loaded into this collection 
+    Private m_dicomMessageCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
 
     'Run a test scenario
     Public Function RunFileValidator() As Boolean
@@ -50,7 +45,7 @@ Class FileValidator
             'Add selected files of the dialog the the selected files list
             m_selectedFiles = dlg.GetList()
             'The user selected the type of RTPlan
-            'm_isRTPlanGeometric = dlg.IsGeometricPlan
+            m_isRTPlanGeometric = dlg.IsGeometricPlan
         End If
 
         'dlg.Dispose()
@@ -83,17 +78,16 @@ Class FileValidator
         dicomMessage.CommandSet.Set("0x00000800", DvtkData.Dimse.VR.US, 0)  ' Data Set Type
     End Sub
 
+
     Protected Sub AddRules()
-        AddSliceImageRules()
-        AddRTDoseRules()
         AddRTStructureSetRules()
-        AddSpatialRegistrationRules()
-        'Not needed for IHE RO 2008
-        'If m_isRTPlanGeometric Then
-        '    AddRTPlanGeometricRules()
-        'Else
-        '    AdRTPlanDosimetricRules()
-        'End If
+        AddCTImageRules()
+        AddRTDoseRules()
+        If m_isRTPlanGeometric Then
+            AddRTPlanGeometricRules()
+        Else
+            AdRTPlanDosimetricRules()
+        End If
     End Sub
 
     Private Sub AddRTStructureSetRules()
@@ -103,11 +97,43 @@ Class FileValidator
 
         'C.8.8.5 Structure Set Module
         'Referenced Frame of Reference Sequence (0x30060010), may only contain one item
-        m_rules.Add(New NrOfSequenceItemRule(Tags.ReferencedFrameofReferenceSequence, "1", IODType.RTStructureSet, ErrorSeverity.RuleError))
-        'RT Referenced study sequence (3006,0012) may only contain one item
-        m_rules.Add(New NrOfSequenceItemRule(Tags.RTReferencedStudySequence, "1", IODType.RTStructureSet, ErrorSeverity.RuleError))
+        m_rules.Add(New NrIntOfSequenceItemRule("0x30060010", 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
+        'RT Referenced Study Sequence (0x30060012), may only contain one item
+        m_rules.Add(New NrIntOfSequenceItemRule("0x30060010[1]/0x30060012", 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
         'RT Referenced Series Sequence, Only one item allowed in this sequence
-        m_rules.Add(New NrOfSequenceItemRule(Tags.RTReferencedSeriesSequence, "1", IODType.RTStructureSet, ErrorSeverity.RuleError))
+        m_rules.Add(New NrIntOfSequenceItemRule("0x30060010[1]/0x30060012[1]/0x30060014", 1, IODType.RTStructureSet, ErrorSeverity.RuleError))
+        'Referenced Frame Number (0x00081160), 	Shall not be present, so test the the attribute is not included
+        m_rules.Add(New NotPresentRule("0x00081160", IODType.RTStructureSet, ErrorSeverity.RuleError))
+        'ROI Number	(0x30060022), This defines an index to be used for referencing a particular ROI item from other sequences. 
+        'It is required to be unique within the scope of this message.  No limitation on values other than uniqueness within sequence"
+        m_rules.Add(New ROINumberRule(IODType.RTStructureSet, ErrorSeverity.RuleError))
+        'ROI Name (0x30060026),	Must be unique within ROI sequence
+        m_rules.Add(New ROINameRule(IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+        'C.8.8.6 ROI Contour Module
+        'Referenced Frame Number (0x00081160), This attribute shall not be present.
+        m_rules.Add(New ReferencedFrameNumberRule(IODType.Generic, ErrorSeverity.RuleError))
+
+        'Number of Contour Points (0x30060046) 
+        '1. Must match the actual number of points in Contour Data.
+        m_rules.Add(New NumberofContourPointsRule(IODType.Generic, ErrorSeverity.RuleError))
+
+        'C.8.8.8 RT ROI Observations Module
+
+        'Referenced ROI Number	(3006,0084)	
+        '1. Referenced ROI Number(3006,0084) of RT ROI Observations Sequence(3006,0080) 
+        'should contain a ROI Number(3006,0022) of the Structure Set ROI Sequence (3006,0020)
+        '2. More then one Referenced ROI Number with the same value can be present
+        m_rules.Add(New ReferencedROINumberRule(IODType.Generic, ErrorSeverity.RuleError))
+
+        'RT ROI Interpreted Type (3006,00A4) 
+        '1. When there are Referenced ROI numbers with the same value OR ROI Physical Properties Sequence(3006,00B0) 
+        'is PRESENT in this sequence item, this attribute should be present in at least once in those sequence items 
+        '2. If Contour Geometric Type of the observed ROI of the ROI CONTOUR MODULE has value CLOSED_PLANAR then this attribute should have one of the following values
+        'EXTERNAL, PTV, CTV, GTV, TREATED_VOLUME, IRRAD_VOLUME, BOLUS, AVOIDANCE, ORGAN, MARKER, CONTRAST_AGENT, CAVITY
+        '3.  If Contour Geometric Type of the observed ROI of ROI CONTOUR MODULE has value POINT then this attribute should
+        ' have one of the following values: MARKER, REGISTRATION, ISOCENTER
+        m_rules.Add(New RTROIInterpretedTypeRule(IODType.Generic, ErrorSeverity.RuleError))
 
         'C.12.1 SOP Common		
 
@@ -117,7 +143,7 @@ Class FileValidator
         '============== End Structure set rules =============================================
     End Sub
 
-    Private Sub AddSliceImageRules()
+    Private Sub AddCTImageRules()
         '============== CT-Image attribute rules  ===========================================
 
         'C.7.1.1 Patient Module
@@ -126,11 +152,12 @@ Class FileValidator
         'm_rules.Add(New SeriesInstanceUIDMultiCTRule(ErrorSeverity.RuleError))
 
         'C.7.6.2 Image Plane Module		
+        'Image Orientation(Patient)	(0020,0037) For an axial image (Image Type, (0008,0008) should be AXIAL), 
+        'direction cosines shall be (+/-1, 0, 0, 0, +/1, 0) with an angle tolerance of 0.001 radians (0.057 degrees)"
+        m_rules.Add(New ImageOrientationPatientRule(IODType.CTImage, ErrorSeverity.RuleError))
         'Pixel Spacing	(0028,0030)	"1. For CTImage IOD, non-isotropic pixels are outside the scope of the profile.
-        '2. For IHE-RO 2008 (MR, PET): We do require the X and Y resolutions are equal, the z resolution may be different
+        '2. For RT Dose IOD, pixel spacing may be nonisotropic"
         m_rules.Add(New PixelSpacingRule(IODType.CTImage, ErrorSeverity.RuleError))
-        m_rules.Add(New PixelSpacingRule(IODType.MRImage, ErrorSeverity.RuleError))
-        m_rules.Add(New PixelSpacingRule(IODType.PETImage, ErrorSeverity.RuleError))
 
         'C.12.1 SOP Common		
 
@@ -144,10 +171,23 @@ Class FileValidator
         '============== RT-Dose attribute rules =============================================
 
         'C.7.6.2 Image Plane Module		
+        'Image Orientation(Patient) (0020,0037)	
+        '1. Shall be present in every RT Dose IOD.
+        '2. For an axial image (Image Type, (0008,0008) should be AXIAL), direction cosines shall be (+/-1, 0, 0, 0, +/1, 0) with an angle tolerance of 0.001 radians (0.057 degrees)"
+        m_rules.Add(New ImageOrientationPatientRule(IODType.RTDose, ErrorSeverity.RuleError))
+
         'Pixel Spacing	(0028,0030)	For RT Dose IOD, pixel spacing may be nonisotropic"
         m_rules.Add(New PixelSpacingRule(IODType.RTDose, ErrorSeverity.RuleError))
 
+        'C.7.6.6 Multi-Frame Module		
+        'Frame Increment Pointer (0028,0009) Value should be the equal to the value of the Grid Offset Vector (3004,000C)
+        m_rules.Add(New FrameIncrementPointerRule(IODType.RTDose, ErrorSeverity.RuleError))
+
         'C.8.8.3 RT Dose
+        'Bits Stored (0028,0101) Value equal to Bits Allocated (0028,0100)
+        m_rules.Add(New EqualToRule("0x00280101", IODType.RTDose, ErrorSeverity.RuleError, "0x00280100"))
+        'High Bit (0028,0102) Value = Bits Stored(0028,0101) - 1
+        m_rules.Add(New HighBitRule(IODType.RTDose, ErrorSeverity.RuleError))
         'Grid Frame Offset Vector (3004,000C)
         '1. First z coordinate shall be equal to zero. 
         '2. The remaining z coordinates shall be relative to the starting z position in Image Position (Patient) (0020,0032).
@@ -161,40 +201,105 @@ Class FileValidator
         '============== End RT-Dos attribute rules ==========================================
     End Sub
 
-    Private Sub AddSpatialRegistrationRules()
-        'C.20.2 Spatial Registration
+    Private Sub AddRTPlanGeometricRules()
+        '============== RT-Plan (geometric) ================================================-
 
-        'Registration sequence (0070,0308) must contain exactly 2 items
-        m_rules.Add(New NrOfSequenceItemRule(Tags.RegistrationSequence, "2", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        'C.8.8.13 RT Fraction Scheme		
+        'Fraction Group Sequence	(300A,0070)	Only 1 item shall be present
+        m_rules.Add(New NrIntOfSequenceItemRule("0x300A0070", 1, IODType.RTPlanGeometric, ErrorSeverity.RuleError))
 
-        'each item in (0070,0308) must contain 1 item in (0070,0309)
-        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixRegistrationSequence, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
-        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixRegistrationSequence2, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        'C.8.8.14 RT Beams Module		
+        'Beam Sequence	(300A,00B0)	"Up to 100 beams should be supported, this rule is not tested
 
-        'each item in (0070,0309) must contain 1 item in (0070,030A)
-        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixSequence, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
-        m_rules.Add(New NrOfSequenceItemRule(Tags.MatrixSequence2, "1", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        'Beam Name	(300A,00C2)	
+        'The Beam Name is unique within the Beam Sequence"
+        m_rules.Add(New BeamNameIsUniqueRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'High-Dose Technique Type (300A,00C7) Geometric Plans shall not specify this attribute. Thus: This attribute SHALL NOT BE PRESENT"
+        m_rules.Add(New NotPresentRule("0x300A00C7", IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Beam Limiting Device Sequence	(300A,00B6)	
+        'If >>RT Beam Limiting Device Type(300A,00B8) = X, Y, ASYMX or ASYMY then the sequence should contain 
+        'descriptions of two sets of jaws, so 2 items should be present
+        'else if  >>RT Beam Limiting Device Type(300A,00B8) = MLCX  or MLCY then the sequence shall report at 
+        'least one set of MLC descriptions, so at least 1 item should be present"
+        m_rules.Add(New BeamLimitingDeviceSequenceRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Number of Blocks (300A,00F0) 1. Up to 8 block items shall be suported (test this with script and dataset)
+        'Block Sequence(300A,00FA) 2. Only one block with >>Block Type(300A,00F8) = APERTURE may be present in the 
+        'all blocks"
+        m_rules.Add(New BlockRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Block Number of Points	(300A,0104)	Value >= 3
+        m_rules.Add(New BlockNumberofPointsRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Block Data	(300A,0106)	"1. Shall not be 0 points. One or more points should be present.
+        '2.No boundary check done. See decision D.6"
+        m_rules.Add(New BlockDataRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Control Point Sequence	(300A,0111)	"For a Geometric Plans When Beam Type(300A,00C4) is STATIC then
+        'second control point (sequence item) shall contain(only) 
+        ' Control Point Index (300A,0112) with a value of 1 
+        ' Cumulative Meterset Weight (300A,0134) set NULL"
+        m_rules.Add(New ControlPointSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Cumulative Meterset Weight (300A,0134)	For a Geometric Plans 
+        '1. First control point Shall be NULL 
+        '2. Second control point Shall be NULL "
+        m_rules.Add(New CumulativeMetersetWeightRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Referenced Dose Reference Sequence (300C,0050) For a Geometric Plans Shall not be present
+        m_rules.Add(New ReferencedDoseReferenceSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Wedge Position Sequence (300A,0116) For a Geometric Plans Shall not be present"
+        m_rules.Add(New WedgePositionSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Beam Limiting Device Position Sequence	(300A,011A)	For a Geometric Plans 
+        '1. shall be presented Control Point index 0 only.
+        '2. correspond to the devices defined in the Beam Limiting Device Sequence, TODO: Find all relations"
+        m_rules.Add(New BeamLimitingDevicePositionSequenceRule(IODType.Generic, ErrorSeverity.RuleError))
+        'Gantry Rotation Direction (300A,011F) For a Geometric Plans - For Control Point Index 0 only, 
+        'this value must have the value of NONE"
+        m_rules.Add(New GantryRotationDirectionRule(IODType.Generic, ErrorSeverity.RuleError))
 
-        'each item in (0070,030A) must contain a 4x4 matrix in (3006,00C6) of which the last 4 positions are 0/0/0/1
-        m_rules.Add(New CorrectMatrixRule(Tags.FrameofReferenceTransformationMatrix, IODType.SpatialRegistration, ErrorSeverity.RuleError))
-        m_rules.Add(New CorrectMatrixRule("0x00700308[2]/0x00700309[1]/0x0070030A[1]/0x300600C6", IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        'C.12.1 SOP Common		
 
-        'the matrix in the first item in the registration sequence must have the values 1/0/0/0/0/1/0/0/0/0/1/0 in its first twelve positions
-        m_rules.Add(New CorrectIdentityMatrixRule(Tags.FrameofReferenceTransformationMatrix, IODType.SpatialRegistration, ErrorSeverity.RuleError))
-
-        'the value of the frame of reference UID must be the same both in the base of the object and in the first registration object
-        m_rules.Add(New EqualToRule(Tags.FrameofReferenceUID, IODType.SpatialRegistration, ErrorSeverity.RuleError, Tags.RegistrationFrameofReferenceUID))
-
-        'the referenced image sequence (0008,1140) must not exist
-        m_rules.Add(New NotPresentRule(Tags.ReferencedImageSequence, IODType.SpatialRegistration, ErrorSeverity.RuleError))
-        m_rules.Add(New NotPresentRule(Tags.ReferencedImageSequence2, IODType.SpatialRegistration, ErrorSeverity.RuleError))
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+        'm_rules.Add(New SOPInstanceUIDRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
     End Sub
+
+    Private Sub AdRTPlanDosimetricRules()
+        '============== RT-Plan (dosimetric) ================================================
+
+        'C.8.8.13 RT Fraction Scheme		
+        'Fraction Group Sequence	(300A,0070)	Only 1 item shall be present
+        m_rules.Add(New NrIntOfSequenceItemRule("0x300A0070", 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'C.8.8.14 RT Beams Module		
+        'Beam Sequence	(300A,00B0)	"Up to 100 beams should be supported, this rule is not tested
+
+        'Beam Name	(300A,00C2)	
+        '1. The Beam Name is unique within the Beam Sequence"
+        m_rules.Add(New BeamNameIsUniqueRule(IODType.RTPlanGeometric, ErrorSeverity.RuleError))
+        'Beam Limiting Device Sequence	(300A,00B6)	
+        'If >>RT Beam Limiting Device Type(300A,00B8) = X, Y, ASYMX or ASYMY then the sequence should contain 
+        'descriptions of two sets of jaws, so 2 items should be present
+        'else if  >>RT Beam Limiting Device Type(300A,00B8) = MLCX  or MLCY then the sequence shall report at 
+        'least one set of MLC descriptions, so at least 1 item should be present"
+        m_rules.Add(New BeamLimitingDeviceSequenceRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Number of Blocks (300A,00F0) 1. Up to 8 block items shall be suported (test this with script and dataset)
+        'Block Sequence(300A,00FA) 2. Only one block with >>Block Type(300A,00F8) = APERTURE may be present in the 
+        'all blocks"
+        m_rules.Add(New BlockRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Block Number of Points	(300A,0104)	Value >= 3
+        m_rules.Add(New BlockNumberofPointsRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'Block Data	(300A,0106)	"1. Shall not be 0 points. One or more points should be present.
+        '2.No boundary check done. See decision D.6"
+        m_rules.Add(New BlockDataRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'C.12.1 SOP Common		
+
+        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, 
+        'then the new Information Object instance shall be assigned a new UID.
+        'm_rules.Add(New SOPInstanceUIDRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        '============== End RT-Plan (dosimetric)rules =======================================
+    End Sub
+
     'validate the received transactions and report
     Protected Sub ValidateAndReport()
         If m_dicomMessageCollection.Count > 0 Then
-            'Not needed for IHE RO 2008
-            'm_validator.ValidateMessages(m_dicomMessageCollection, m_rules, m_isRTPlanGeometric)
-            m_validator.ValidateMessages(m_dicomMessageCollection, m_rules)
+            m_validator.ValidateMessages(m_dicomMessageCollection, m_rules, m_isRTPlanGeometric)
         End If
     End Sub
 End Class

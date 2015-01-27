@@ -129,7 +129,7 @@ Class Validator
         config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.CTImage))
         config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.RTDose))
         config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.RTStructureSet))
-        config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.RTPlanGeometric))
+        'config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.RTPlanGeometric))
         config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.RTPlanDosimetric))
         'load the appropriate rt plan definition file
         '        Logger.GetInstance.LogMessage("Selected plan definition file: " + RtPlanDefinitionFiletoLoad)

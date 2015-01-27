@@ -1,15 +1,15 @@
 Class SeriesInstanceUIDStuctureSetRule
     Inherits MessageCollectionRule
 
-    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal ctSet As CTSet)
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal expedtedReferencedIODType As IODType)
 
         MyBase.New("Series Instance UID Stucture Set Rule", iodType, severity)
-        m_ctSet = ctSet
+        m_expedtedReferencedIODType = expedtedReferencedIODType
 
     End Sub
     Private m_iodType As IODType
     Private m_severity As ErrorSeverity
-    Private m_ctSet As CTSet
+    Private m_expedtedReferencedIODType As IODType
     Private m_message As String
     Private m_valid As Boolean = False
     Private m_messageCollectionHelper As messageCollectionHelper
@@ -19,7 +19,7 @@ Class SeriesInstanceUIDStuctureSetRule
         m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
 
         Dim structureSetDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
-        Dim ctImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim referencedImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
         Dim done As Boolean = False
 
         Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
@@ -77,23 +77,43 @@ Class SeriesInstanceUIDStuctureSetRule
                                                         'Get the first image, for alle images in the series the Series Instance Uid is the same.
                                                         Dim refData As ReferenceDataSet = ReferenceDataSet.GetInstance
                                                         If Not refData.GetDataSetXML Is Nothing Then
-                                                            ctImageDataSet = ReferenceDataSet.GetInstance().GetCTImage(1, 1).DataSet
+                                                            If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                referencedImageDataSet = ReferenceDataSet.GetInstance().GetMRImage(1, 1).DataSet
+                                                            ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                referencedImageDataSet = ReferenceDataSet.GetInstance().GetPETImage(1, 1).DataSet
+                                                            ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                referencedImageDataSet = ReferenceDataSet.GetInstance().GetCTImage(1, 1).DataSet
+                                                            End If
                                                         Else
-                                                            ctImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, 1)
+                                                            If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.MRImage, 1)
+                                                            ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.PETImage, 1)
+                                                            ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                referencedImageDataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, 1)
+                                                            End If
+
                                                         End If
 
-                                                        If ctImageDataSet Is Nothing Then
+                                                        If referencedImageDataSet Is Nothing Then
                                                             m_valid = False
                                                             done = True
-                                                            m_message = "No CT-Images received"
+                                                            If m_expedtedReferencedIODType = IODType.MRImage Then
+                                                                m_message = "No MR-Images received"
+                                                            ElseIf m_expedtedReferencedIODType = IODType.PETImage Then
+                                                                m_message = "No PET-Images received"
+                                                            ElseIf m_expedtedReferencedIODType = IODType.CTImage Then
+                                                                m_message = "No CT-Images received"
+                                                            End If
+
                                                         Else
-                                                            If ctImageDataSet(Tags.SeriesInstanceUID).Values.Equals(seriesInstanceUIDAttribute.Values) Then
+                                                            If referencedImageDataSet(Tags.SeriesInstanceUID).Values.Equals(seriesInstanceUIDAttribute.Values) Then
                                                                 m_valid = True
-                                                                m_message = "'" + Tags.GetTagName(Tags.SeriesInstanceUID) + "' (" + Tags.SeriesInstanceUID + ") of the Structure Set matches the 'SeriesInstanceUID' of the CT-images"
+                                                                m_message = "'" + Tags.GetTagName(Tags.SeriesInstanceUID) + "' (" + Tags.SeriesInstanceUID + ") of the Structure Set matches the 'SeriesInstanceUID' of the " + m_expedtedReferencedIODType.ToString() + "'s"
                                                             Else
                                                                 m_valid = False
                                                                 done = True
-                                                                m_message = "'" + Tags.GetTagName(Tags.SeriesInstanceUID) + "' (" + Tags.SeriesInstanceUID + ") of the Structure Set does not match the 'SeriesInstanceUID' of the CT-images"
+                                                                m_message = "'" + Tags.GetTagName(Tags.SeriesInstanceUID) + "' (" + Tags.SeriesInstanceUID + ") of the Structure Set does not match the 'SeriesInstanceUID' of the " + m_expedtedReferencedIODType.ToString() + "'s"
                                                             End If
                                                         End If
                                                     Else
