@@ -291,7 +291,7 @@ Class RulesFactory
         m_rules.Add(New ControlPointValueRule(Tags.BeamLimitingDeviceRotationDirectionTagSequence, "NONE", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
         m_rules.Add(New SequenceLoopRule(Tags.BeamSequence, New ValueRule(Tags.WedgePosition, "IN", IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
 
-        m_rules.Add(New SequenceLoopRule(Tags.BeamSequence, New NotPresentRule(Tags.SourceToWedgeTrayDistance, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        'm_rules.Add(New SequenceLoopRule(Tags.BeamSequence, New NotPresentRule(Tags.SourceToWedgeTrayDistance, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
 
         'BEAM MODIFIERS
         Dim values(1) As String

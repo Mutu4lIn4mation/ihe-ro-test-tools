@@ -98,8 +98,8 @@ Class BeamTransaction
             dicomMessage.Set(Tags.AffectedSOPInstanceUID, UI, newSopInstanceUID)
         End If
 
-        dicomMessage.Set(Tags.RTPLanLabel, SH, m_rtPlanLabel)
-        dicomMessage.Set(Tags.RTPLanDescription, SH, m_rtPlanDescription)
+        'dicomMessage.Set(Tags.RTPLanLabel, SH, m_rtPlanLabel)
+        'dicomMessage.Set(Tags.RTPLanDescription, SH, m_rtPlanDescription)
 
         datasetMessages.Add(dicomMessage)
         'return the array with dataset(s)
