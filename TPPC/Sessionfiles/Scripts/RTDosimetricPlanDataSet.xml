@@ -6,14 +6,14 @@
     <MotorizedWedgeBeam>MotorizedWedgeBeam\RTPlanMotorizedWedgeBeam.dcm</MotorizedWedgeBeam>
     <VirtualWedgeBeam>VirtualWedgeBeam\RTPlanVirtualWedgeBeam.dcm</VirtualWedgeBeam>
     <ArcBeam>ArcBeam\RTPlanArcBeam.dcm</ArcBeam>
-    <ConformalArcBeam>ConformalArcBeam\RTPlanConformalArcBeam.dcm</ConformalArcBeam>
+    <MLCVariableApertureArcBeam>MLCVariableApertureArcBeam\RTPlanMLCVariableApertureArcBeam.dcm</MLCVariableApertureArcBeam>
     <StepAndShootBeam>StepAndShootBeam\RTPlanStepShootBeam.dcm</StepAndShootBeam>
     <SlidingWindowBeam>SlidingWindowBeam\RTPlanSlidingWindowBeam.dcm</SlidingWindowBeam>
     <StaticElectronBeam>StaticElectronBeam\RTPlanElectronBeamStaticElectronBeam.dcm</StaticElectronBeam>
     <PhotonApplicatorBeam>PhotonApplicatorBeam\RTPlanPhotonApplicatorBeam.dcm</PhotonApplicatorBeam>
 	<PhotonApplicatorArcBeam>PhotonApplicatorArcBeam\RTPlanPhotonApplicatorArcBeam.dcm</PhotonApplicatorArcBeam>
 	<BasicStaticMLCBeam>BasicStaticMLCBeam\RTPlanBasicStaticMLCBeam.dcm</BasicStaticMLCBeam>
-	<MLCArcBeam>MLCArcBeam\RTPlanMLCArcBeam.dcm</MLCArcBeam>
+	<MLCFixedApertureArcBeam>MLCFixedApertureArcBeam\RTPlanMLCFixedApertureArcBeam.dcm</MLCFixedApertureArcBeam>
     <IMATVMATBeam>IMATVMATBeam\RTPlanIMATVMATBeam.dcm</IMATVMATBeam>
     <StructureSet>StructureSet\RTSTRUCT.dcm</StructureSet>
     <CTImage>CT\CT_2.25.601473306079309293828095543923666337950.</CTImage>

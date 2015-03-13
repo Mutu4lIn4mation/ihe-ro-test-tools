@@ -68,7 +68,7 @@ Class ControlPointValueRule
                         Me.SetError(message)
                         Me.Report()
                     Else
-                        message = "The attribute: " + Tags.GetTagName(m_TagSequence) + " (" + m_TagSequence + ") is present " + countItemsInControlPointSeq.ToString() + " times in the control point sequence but should be presented 1 or " + controlPointSequenceAttribute.ItemCount() + " times."
+                        message = "The attribute: " + Tags.GetTagName(m_TagSequence) + " (" + m_TagSequence + ") is present " + countItemsInControlPointSeq.ToString() + " times in the control point sequence but should be presented 1 or " + controlPointSequenceAttribute.ItemCount().ToString() + " times."
                         Me.SetError(message)
                         Me.Report()
                     End If

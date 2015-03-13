@@ -30,7 +30,7 @@ Public Class ScenarioSelectionDialog
 
         m_Mapping.Add(ARTO_Scenario.BasicStaticBeam, Me.CheckBoxBasicStaticBeamStorage)
         m_Mapping.Add(ARTO_Scenario.ArcBeam, Me.CheckBoxArcBeamStorage)
-        m_Mapping.Add(ARTO_Scenario.ConformalArcBeam, Me.CheckBoxConformalArcBeamStorage)
+        m_Mapping.Add(ARTO_Scenario.MLCVariableApertureArcBeam, Me.CheckBoxMLCVariableApertureArcBeamStorage)
         m_Mapping.Add(ARTO_Scenario.HardWedgeBeam, Me.CheckBoxHardWedgeBeamStorage)
         m_Mapping.Add(ARTO_Scenario.IMATVMATBeam, Me.CheckBoxIMATVMATBeamStorage)
         m_Mapping.Add(ARTO_Scenario.MotorizedWedgeBeam, Me.CheckBoxMotorizedWedgeBeamStorage)
@@ -41,7 +41,7 @@ Public Class ScenarioSelectionDialog
         m_Mapping.Add(ARTO_Scenario.VirtualWedgeBeam, Me.CheckBoxVirtualWedgeBeamStorage)
         m_Mapping.Add(ARTO_Scenario.PhotonApplicatorArcBeam, Me.CheckBoxPhotonApplicatorArcBeamStorage)
         m_Mapping.Add(ARTO_Scenario.BasicStaticMLCBeam, Me.CheckBoxBasicStaticMLCBeamStorage)
-        m_Mapping.Add(ARTO_Scenario.MLCArcBeam, Me.CheckBoxMLCArcBeamStorage)
+        m_Mapping.Add(ARTO_Scenario.MLCFixedApertureArcBeam, Me.CheckBoxMLCFixedApertureArcBeamStorage)
   
     End Sub
 

@@ -154,8 +154,14 @@ Public Class Tags
 
     'wedge position in control points 'number of items the same as the number of wedges
     Public Shared ReadOnly WedgePositionSequence As String = String.Format("{0}[1]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence2 As String = String.Format("{0}[2]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence3 As String = String.Format("{0}[3]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence4 As String = String.Format("{0}[4]/{1}", ControlPointSequence, "0x300A0116")
     Public Shared ReadOnly OnlyWedgePositionSequence As String = "0x300A0116"
     Public Shared ReadOnly WedgePosition As String = String.Format("{0}[1]/{1}", WedgePositionSequence, "0x300A0118")
+    Public Shared ReadOnly WedgePosition2 As String = String.Format("{0}[1]/{1}", WedgePositionSequence2, "0x300A0118")
+    Public Shared ReadOnly WedgePosition3 As String = String.Format("{0}[1]/{1}", WedgePositionSequence3, "0x300A0118")
+    Public Shared ReadOnly WedgePosition4 As String = String.Format("{0}[1]/{1}", WedgePositionSequence4, "0x300A0118")
 
     Public Shared ReadOnly Test As String = String.Format("{0}[1]/{1}", ControlPointSequence, "0x300A0112")
 
@@ -339,6 +345,16 @@ Public Class Tags
     Public Shared ReadOnly ScheduledProcedureStepStartDateandTime As String = "0x00404005"
     Public Shared ReadOnly TransactionUID As String = "0x00081195"
 
+
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequence As String = "0x0074100E"
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequenceCodeValue As String = String.Format("{0}[1]/{1}", ProcedureStepDiscontinuationReasonCodeSequence, "0x00080100")
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", ProcedureStepDiscontinuationReasonCodeSequence, "0x00080102")
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning As String = String.Format("{0}[1]/{1}", ProcedureStepDiscontinuationReasonCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly ContactURI As String = "0x0074100A"
+    Public Shared ReadOnly ContactDisplayName As String = "0x0074100C"
+    Public Shared ReadOnly ReasonForCancellation As String = "0x00741238"
+
     'Unified Procedure Step Progress Information Module
     Public Shared ReadOnly UPSProgressInformationSequence As String = "0x00741002"
     Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepProgress As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741004")
@@ -366,7 +382,8 @@ Public Class Tags
     Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080102")
     Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080104")
 
-    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepEndDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400250")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepEndDate As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400250")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepEndTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400251")
 
     Public Shared ReadOnly AttributeIdentifierList As String = "0x00001005"
 
@@ -414,7 +431,8 @@ Public Class Tags
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080102")
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080104")
 
-    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepStartDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400244")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepStartDate As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400244")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepStartTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400245")
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepDescription As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400254")
     Public Shared ReadOnly UPSPerformedProcedureCommentsOnThePerformedProcedureStep As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400280")
 
@@ -516,6 +534,9 @@ Public Class Tags
     Public Shared ReadOnly retrieveAETitleMOVE As String = "0x00080054"
     Public Shared ReadOnly ReferencedSOPSequenceMOVE As String = "0x00081199"
     Public Shared ReadOnly ReferencedSOPInstanceUIDMOVE As String = "0x00081155"
+
+    Public Shared ReadOnly RequestingAE As String = "0x00741236"
+
 
     Public Shared ReadOnly MediaStorageSOPClassUID As String = "0x00020002"
     Public Shared ReadOnly MediaStorageSOPInstanceUID As String = "0x00020003"

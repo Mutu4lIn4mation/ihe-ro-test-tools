@@ -20,24 +20,24 @@ Partial Class ScenarioSelectionDialog
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents buttonOK As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.buttonOK = New System.Windows.Forms.Button
-        Me.Panel1 = New System.Windows.Forms.Panel
-        Me.CheckBoxSlidingWindowBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxBasicStaticBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxStaticElectronBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxStepandShootBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxPhotonApplicatorArcBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxConformalArcBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxMotorizedWedgeBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxArcBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxHardWedgeBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxIMATVMATBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxVirtualWedgeBeamStorage = New System.Windows.Forms.CheckBox
-        Me.checkBoxAll = New System.Windows.Forms.CheckBox
-        Me.CheckBoxPhotonApplicatorBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxBasicStaticMLCBeamStorage = New System.Windows.Forms.CheckBox
-        Me.CheckBoxMLCArcBeamStorage = New System.Windows.Forms.CheckBox
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.buttonOK = New System.Windows.Forms.Button()
+        Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.CheckBoxMLCFixedApertureArcBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxBasicStaticMLCBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxPhotonApplicatorArcBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxSlidingWindowBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxBasicStaticBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxStaticElectronBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxStepandShootBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxPhotonApplicatorBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxMLCVariableApertureArcBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxMotorizedWedgeBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxArcBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxHardWedgeBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxIMATVMATBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.CheckBoxVirtualWedgeBeamStorage = New System.Windows.Forms.CheckBox()
+        Me.checkBoxAll = New System.Windows.Forms.CheckBox()
         Me.Panel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -63,7 +63,7 @@ Partial Class ScenarioSelectionDialog
         '
         'Panel1
         '
-        Me.Panel1.Controls.Add(Me.CheckBoxMLCArcBeamStorage)
+        Me.Panel1.Controls.Add(Me.CheckBoxMLCFixedApertureArcBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxBasicStaticMLCBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxPhotonApplicatorArcBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxSlidingWindowBeamStorage)
@@ -71,7 +71,7 @@ Partial Class ScenarioSelectionDialog
         Me.Panel1.Controls.Add(Me.CheckBoxStaticElectronBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxStepandShootBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxPhotonApplicatorBeamStorage)
-        Me.Panel1.Controls.Add(Me.CheckBoxConformalArcBeamStorage)
+        Me.Panel1.Controls.Add(Me.CheckBoxMLCVariableApertureArcBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxMotorizedWedgeBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxArcBeamStorage)
         Me.Panel1.Controls.Add(Me.CheckBoxHardWedgeBeamStorage)
@@ -81,6 +81,42 @@ Partial Class ScenarioSelectionDialog
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(464, 205)
         Me.Panel1.TabIndex = 3
+        '
+        'CheckBoxMLCFixedApertureArcBeamStorage
+        '
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.AutoSize = True
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.Checked = True
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.Location = New System.Drawing.Point(241, 157)
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.Name = "CheckBoxMLCFixedApertureArcBeamStorage"
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.Size = New System.Drawing.Size(168, 17)
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.TabIndex = 26
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.Text = "MLC Fixed Aperture Arc Beam"
+        Me.CheckBoxMLCFixedApertureArcBeamStorage.UseVisualStyleBackColor = True
+        '
+        'CheckBoxBasicStaticMLCBeamStorage
+        '
+        Me.CheckBoxBasicStaticMLCBeamStorage.AutoSize = True
+        Me.CheckBoxBasicStaticMLCBeamStorage.Checked = True
+        Me.CheckBoxBasicStaticMLCBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBoxBasicStaticMLCBeamStorage.Location = New System.Drawing.Point(241, 134)
+        Me.CheckBoxBasicStaticMLCBeamStorage.Name = "CheckBoxBasicStaticMLCBeamStorage"
+        Me.CheckBoxBasicStaticMLCBeamStorage.Size = New System.Drawing.Size(137, 17)
+        Me.CheckBoxBasicStaticMLCBeamStorage.TabIndex = 25
+        Me.CheckBoxBasicStaticMLCBeamStorage.Text = "Basic Static MLC Beam"
+        Me.CheckBoxBasicStaticMLCBeamStorage.UseVisualStyleBackColor = True
+        '
+        'CheckBoxPhotonApplicatorArcBeamStorage
+        '
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.AutoSize = True
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.Checked = True
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.Location = New System.Drawing.Point(241, 111)
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.Name = "CheckBoxPhotonApplicatorArcBeamStorage"
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.Size = New System.Drawing.Size(199, 17)
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.TabIndex = 24
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.Text = "Photon Applicator Arc Beam Storage"
+        Me.CheckBoxPhotonApplicatorArcBeamStorage.UseVisualStyleBackColor = True
         '
         'CheckBoxSlidingWindowBeamStorage
         '
@@ -137,22 +173,22 @@ Partial Class ScenarioSelectionDialog
         Me.CheckBoxPhotonApplicatorBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBoxPhotonApplicatorBeamStorage.Location = New System.Drawing.Point(241, 65)
         Me.CheckBoxPhotonApplicatorBeamStorage.Name = "CheckBoxPhotonApplicatorBeamStorage"
-        Me.CheckBoxPhotonApplicatorBeamStorage.Size = New System.Drawing.Size(153, 17)
+        Me.CheckBoxPhotonApplicatorBeamStorage.Size = New System.Drawing.Size(180, 17)
         Me.CheckBoxPhotonApplicatorBeamStorage.TabIndex = 22
         Me.CheckBoxPhotonApplicatorBeamStorage.Text = "Photon Applicator Beam Storage"
         Me.CheckBoxPhotonApplicatorBeamStorage.UseVisualStyleBackColor = True
         '
-        'CheckBoxConformalArcBeamStorage
+        'CheckBoxMLCVariableApertureArcBeamStorage
         '
-        Me.CheckBoxConformalArcBeamStorage.AutoSize = True
-        Me.CheckBoxConformalArcBeamStorage.Checked = True
-        Me.CheckBoxConformalArcBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBoxConformalArcBeamStorage.Location = New System.Drawing.Point(19, 134)
-        Me.CheckBoxConformalArcBeamStorage.Name = "CheckBoxConformalArcBeamStorage"
-        Me.CheckBoxConformalArcBeamStorage.Size = New System.Drawing.Size(162, 17)
-        Me.CheckBoxConformalArcBeamStorage.TabIndex = 18
-        Me.CheckBoxConformalArcBeamStorage.Text = "Conformal Arc Beam Storage"
-        Me.CheckBoxConformalArcBeamStorage.UseVisualStyleBackColor = True
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.AutoSize = True
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.Checked = True
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.Location = New System.Drawing.Point(19, 134)
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.Name = "CheckBoxMLCVariableApertureArcBeamStorage"
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.Size = New System.Drawing.Size(221, 17)
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.TabIndex = 18
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.Text = "MLC Variable Aperture Arc Beam Storage"
+        Me.CheckBoxMLCVariableApertureArcBeamStorage.UseVisualStyleBackColor = True
         '
         'CheckBoxMotorizedWedgeBeamStorage
         '
@@ -226,42 +262,6 @@ Partial Class ScenarioSelectionDialog
         Me.checkBoxAll.Text = "Check / Uncheck All"
         Me.checkBoxAll.UseVisualStyleBackColor = True
         '
-        'CheckBoxPhotonApplicatorArcBeamStorage
-        '
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.AutoSize = True
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.Checked = True
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.Location = New System.Drawing.Point(241, 111)
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.Name = "CheckBoxPhotonApplicatorArcBeamStorage"
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.Size = New System.Drawing.Size(172, 17)
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.TabIndex = 24
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.Text = "Photon Applicator Arc Beam Storage"
-        Me.CheckBoxPhotonApplicatorArcBeamStorage.UseVisualStyleBackColor = True
-        '
-        'CheckBoxBasicStaticMLCBeamStorage
-        '
-        Me.CheckBoxBasicStaticMLCBeamStorage.AutoSize = True
-        Me.CheckBoxBasicStaticMLCBeamStorage.Checked = True
-        Me.CheckBoxBasicStaticMLCBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBoxBasicStaticMLCBeamStorage.Location = New System.Drawing.Point(241, 134)
-        Me.CheckBoxBasicStaticMLCBeamStorage.Name = "CheckBoxBasicStaticMLCBeamStorage"
-        Me.CheckBoxBasicStaticMLCBeamStorage.Size = New System.Drawing.Size(137, 17)
-        Me.CheckBoxBasicStaticMLCBeamStorage.TabIndex = 25
-        Me.CheckBoxBasicStaticMLCBeamStorage.Text = "Basic Static MLC Beam"
-        Me.CheckBoxBasicStaticMLCBeamStorage.UseVisualStyleBackColor = True
-        '
-        'CheckBoxMLCArcBeamStorage
-        '
-        Me.CheckBoxMLCArcBeamStorage.AutoSize = True
-        Me.CheckBoxMLCArcBeamStorage.Checked = True
-        Me.CheckBoxMLCArcBeamStorage.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBoxMLCArcBeamStorage.Location = New System.Drawing.Point(241, 157)
-        Me.CheckBoxMLCArcBeamStorage.Name = "CheckBoxMLCArcBeamStorage"
-        Me.CheckBoxMLCArcBeamStorage.Size = New System.Drawing.Size(97, 17)
-        Me.CheckBoxMLCArcBeamStorage.TabIndex = 26
-        Me.CheckBoxMLCArcBeamStorage.Text = "MLC Arc Beam"
-        Me.CheckBoxMLCArcBeamStorage.UseVisualStyleBackColor = True
-        '
         'ScenarioSelectionDialog
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -288,7 +288,7 @@ Partial Class ScenarioSelectionDialog
     Friend WithEvents CheckBoxBasicStaticBeamStorage As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxStaticElectronBeamStorage As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxStepandShootBeamStorage As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBoxConformalArcBeamStorage As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBoxMLCVariableApertureArcBeamStorage As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxMotorizedWedgeBeamStorage As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxArcBeamStorage As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxHardWedgeBeamStorage As System.Windows.Forms.CheckBox
@@ -298,6 +298,6 @@ Partial Class ScenarioSelectionDialog
     Friend WithEvents CheckBoxBasicStaticMLCBeamStorage As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxPhotonApplicatorBeamStorage As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxPhotonApplicatorArcBeamStorage As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckBoxMLCArcBeamStorage As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBoxMLCFixedApertureArcBeamStorage As System.Windows.Forms.CheckBox
     ' JWD Add buttons for CR 2
 End Class

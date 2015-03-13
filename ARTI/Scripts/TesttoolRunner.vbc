@@ -11,6 +11,9 @@ Class TesttoolRunner
     Public Shared ReadOnly TestSessionFileName_TCCP As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\TCCP\Sessionfiles\TestTool 2014 TCCP (TEST).ses"
     Public Shared ReadOnly TestSessionFileName_UPS_CLIENT As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\UPS-CLIENT-SERVER\Sessionfiles\TestTool - UPS CLIENT(TEST).ses"
     Public Shared ReadOnly TestSessionFileName_UPS_SERVER As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\UPS-CLIENT-SERVER\Sessionfiles\TestTool - UPS SERVER(TEST).ses"
+    Public Shared ReadOnly TestSessionFileName_TDIC As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\TDIC\Sessionfiles\TestTool TDIC (TEST).ses"
+    Public Shared ReadOnly TestSessionFileName_TDPC As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\TDPC\Sessionfiles\TestTool TDPC (TEST).ses"
+    Public Shared ReadOnly TestSessionFileName_TPIC As String = Left(System.Windows.Forms.Application.ExecutablePath, InStrRev(System.Windows.Forms.Application.ExecutablePath, "\IHE-RO-TestTool")) + "DVtkProject\TPIC\Sessionfiles\TestTool TPIC (TEST).ses"
 
     Public Shared Sub RunTool(ByVal theTestTool As TestToolBase, ByVal sessionFileName As String)
 

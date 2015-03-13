@@ -31,11 +31,15 @@ Public Class ModifierSelectionDialog
                 Case ARTO_Scenario.ArcBeam, ARTO_Scenario.ConformalArcBeam
 
                     mods.Add(Modifier.BolusBeamModifier)
+                    ' block
+                    mods.Add(Modifier.BlockBeamModifier)
 
                 Case ARTO_Scenario.StaticElectronBeam
 
                     mods.Add(Modifier.BolusBeamModifier)
                     mods.Add(Modifier.BlockBeamModifier)
+                    'comp
+                    mods.Add(Modifier.CompensatorBeamModifier)
 
                 Case ARTO_Scenario.StereotacticBeam, ARTO_Scenario.IMATVMATBeam
 
@@ -45,6 +49,7 @@ Public Class ModifierSelectionDialog
                     mods.Add(Modifier.BolusBeamModifier)
                     mods.Add(Modifier.BlockBeamModifier)
                     mods.Add(Modifier.HardWedgeBeamModifier)
+                    'comp
 
                 Case ARTO_Scenario.StereotacticArcBeam
                     mods.Add(Modifier.BolusBeamModifier)
