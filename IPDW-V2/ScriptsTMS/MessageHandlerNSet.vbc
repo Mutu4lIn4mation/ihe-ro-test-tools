@@ -1,0 +1,58 @@
+Class MessageHandlerNSet
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    'DimseCommand.NSETRSP
+    Public Overrides Function HandleNSetRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As Boolean
+
+        Dim requestedSOPClassUID As String = dicomMessage.CommandSet.Item(Tags.RequestedSOPClassUID).Values(0)
+        If requestedSOPClassUID = SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString() Then
+
+            Dim dicomMessageToSend As DicomMessage = MessageHandlerHelper.CreateResponseMessage(DvtkData.Dimse.DimseCommand.NSETRSP, dicomMessage)
+            'dicomMessageToSend.Set(Tags.TransactionUID, UI, dicomMessage(Tags.TransactionUID).Values.Item(0))
+            'dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, dicomMessage(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0))
+
+            Dim SOPInstanceUID As String = dicomMessage(Tags.RequestedSOPInstanceUID).Values.Item(0)
+            Dim TransactionUID As String = dicomMessage.DataSet(Tags.TransactionUID).Values(0).ToString()
+            Dim UPSdicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = ReferenceDataSet.GetInstance().GetAvailebleUPS(SOPInstanceUID, TransactionUID)
+
+            If Not UPSdicomFile Is Nothing Then
+
+                If UPSdicomFile.DataSet(Tags.ProcedureStepState).Values(0).Equals("IN PROGRESS") Then
+
+                    If UPSdicomFile.DataSet(Tags.TransactionUID).Values(0) = dicomMessage.DataSet(Tags.TransactionUID).Values(0) Then
+
+                        DataSetHandler.UpdateCacheUPS_Nset(dicomMessage)
+                    Else
+                        'UPS transactionUID doesn't match
+                        Dim n As Integer = &HC301
+                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+
+                    End If
+
+                Else
+                    'UPS not in IN PROGRESS State
+                    Dim n As Integer = &HC310
+                    dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                    dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                End If
+
+            Else
+                'SopInstanceUID not on UPS server
+                Dim n As Integer = &HC307
+                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+            End If
+
+
+            Send(dicomMessageToSend, dicomMessage.EncodedPresentationContextID)
+
+            Return True
+
+        Else
+            Throw New Exception(String.Format("Handling N-SET RQ of Requested SOP Class UID '{0}' not supported", requestedSOPClassUID))
+        End If
+
+    End Function
+
+End Class

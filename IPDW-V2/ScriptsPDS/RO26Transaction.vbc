@@ -1,0 +1,219 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class RO_26_Transaction
+    Inherits Transaction
+
+    Private ro26IODType As IODType = Nothing
+
+    'Constructor
+    Public Sub New()
+
+        MyBase.New("RO-26", "UPS Progress update", IODType.UnifiedProcedureStepPull, True)
+        ro26IODType = IODType.UnifiedProcedureStepPull
+        'm_isStartProcedure = isStartProcedure
+
+    End Sub
+
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+
+        ' Some rules need the dataset used in the request.
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance
+        referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim message As DicomMessage
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        Dim progressUpdateContent As ProgressUpdateContent = New ProgressUpdateContent()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Send N-Set-RQ with progress update to selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+
+
+
+
+            For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+                If (DataRow.Selected) Then
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                    If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+
+                        Dim selectedUPS As DvtkHighLevelInterface.Dicom.Other.DataSet = referenceData.GetSelectedCFindRsp(SOPInstanceUID)
+
+                        If Not (String.IsNullOrEmpty(selectedUPS(Tags.TransactionUID).Values(0))) Then
+
+                            If (selectedUPS(Tags.ScheduledWorkitemCodeValue).Values(0) = "121726") Then
+
+                            Else
+                                progressUpdateContent.Label3.Visible = False
+                                progressUpdateContent.tbTextValue.Visible = False
+                                progressUpdateContent.tbTextValue.Text = ""
+
+                            End If
+                            referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+                            If (String.IsNullOrEmpty(progressUpdateContent.selectedFile)) Then
+                                referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+                                progressUpdateContent.selectedFile = referenceData.m_datasetPath + "\N-SET-RQ[RO26].dcm"
+                            End If
+
+                            progressUpdateContent.OpenFileDialog1.InitialDirectory = progressUpdateContent.selectedFile
+                            progressUpdateContent.ShowDialog()
+
+                            If progressUpdateContent.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                                message = ReferenceDataSet.GetInstance().GetUnifiedProcedureStepPush_NSET_REQ_RO26(progressUpdateContent.selectedFile)
+
+                                Dim NSetRQ As DicomMessage = referenceData.createNSetRqUPSProgressUpdate(DataSetHandler.UPSCacheXMLFileName, SOPInstanceUID, message)
+                                ' Set the Requested SOPClassUID 
+                                NSetRQ.Set(Tags.RequestedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                                ' Set Unified Procedure Step Progress
+                                NSetRQ.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, progressUpdateContent.numProcudureStepProgress.Value.ToString())
+
+
+                                If Not (progressUpdateContent.tbTextValue.Text = "") Then
+                                    NSetRQ.Set(Tags.UPSPerformedProcedurePerformedProcessingParametersTextValue, UT, progressUpdateContent.tbTextValue.Text)
+                                Else
+                                    NSetRQ.DataSet.Delete(Tags.UPSPerformedProcedurePerformedProcessingParametersSequence)
+                                    'NSetRQ.DataSet.Delete(Tags.UPSPerformedProcedurePerformedProcessingParametersTextValue)
+                                End If
+
+                                If NSetRQ.Exists(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence) Then
+                                    If NSetRQ(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue).Values(0).ToString() = "" Then
+                                        ' Fill > (0x00404019)  Performed Workitem Code Sequence
+                                        If selectedUPS.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                                            ' Fill >> (0x00080100)  Code Value
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, selectedUPS(Tags.ScheduledWorkitemCodeValue).Values(0))
+                                            ' Fill >> (0x00080102)  Coding Scheme Designator
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, selectedUPS(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                                            ' Fill >> (0x00080104)  Code Meaning
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, selectedUPS(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                                        End If
+                                    End If
+                                Else
+                                    ' Fill > (0x00404019)  Performed Workitem Code Sequence
+                                    If selectedUPS.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                                        ' Fill >> (0x00080100)  Code Value
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, selectedUPS(Tags.ScheduledWorkitemCodeValue).Values(0))
+                                        ' Fill >> (0x00080102)  Coding Scheme Designator
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, selectedUPS(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                                        ' Fill >> (0x00080104)  Code Meaning
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, selectedUPS(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                                    End If
+                                End If
+
+
+                                datasetMessages.Add(NSetRQ)
+                            End If
+                        Else
+                            Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an Transaction UID"))
+                        End If
+                    Else
+                        Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                    End If
+                End If
+            Next
+
+        End If
+        Return datasetMessages
+    End Function
+
+    Public Function GetCommonTransactionRulesForRequest() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        '(0x00001001)  Requested SOP Instance UID
+        m_rules.Add(New IsRequiredRule(Tags.RequestedSOPInstanceUID, ro26IODType, ErrorSeverity.RuleError))
+
+        '(0x00081195)  Transaction UID
+        m_rules.Add(New IsRequiredRule(Tags.TransactionUID, ro26IODType, ErrorSeverity.RuleError))
+
+        '(0x00404003)  UPS Progress Information Sequence
+        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationSequence, ro26IODType, ErrorSeverity.RuleError))
+
+        ' > (0x00741004)  Unified Procedure Step Progress
+        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, ro26IODType, ErrorSeverity.RuleError))
+
+        m_rules.Add(New ValueInRangeRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, 0, 100, ro26IODType, ErrorSeverity.RuleError))
+
+        ' (0x00741216)  UPS Performed Procedure Sequence
+        m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureSequence, ro26IODType, ErrorSeverity.RuleError))
+
+
+
+        '' > (0x00741212)  Performed Processing Parameters Sequence
+        'm_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedurePerformedProcessingParametersSequence, ro26IODType, ErrorSeverity.RuleError))
+
+            ' >> (0x0040A040)  Value Type
+        'm_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedurePerformedProcessingParametersValueType, ro26IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ConditionalRequiredValueRule(Tags.UPSPerformedProcedurePerformedProcessingParametersValueType, "TEXT", Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, "121726", ro26IODType, ErrorSeverity.RuleError))
+
+            ' >>> (0x00080100)  Code Value
+        'm_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeCodeValue, ro26IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ConditionalRequiredValueRule(Tags.UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeCodeValue, "121700", Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, "121726", ro26IODType, ErrorSeverity.RuleError))
+            ' >>> (0x00080102)  Coding Scheme Designator
+        'm_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeCodingSchemeDesignator, ro26IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ConditionalRequiredValueRule(Tags.UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeCodingSchemeDesignator, "DCM", Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, "121726", ro26IODType, ErrorSeverity.RuleError))
+            ' >>> (0x00080104)  Code Meaning
+        'm_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeCodeMeaning, ro26IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ConditionalRequiredValueRule(Tags.UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeCodeMeaning, "Referenced Beam Number In Progress", Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, "121726", ro26IODType, ErrorSeverity.RuleError))
+
+        ' >> (0x0040A160)  Text Value
+        m_rules.Add(New ConditionalIsRequiredRule(Tags.UPSPerformedProcedurePerformedProcessingParametersTextValue, Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, "121726", ro26IODType, ErrorSeverity.RuleError))
+
+        ' > (0x00404033)  Output Information Sequence
+        m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequence, ro26IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New EmptySequenceRule(Tags.UPSPerformedProcedureOutputInformationSequence, ro26IODType, ErrorSeverity.RuleError))
+
+        ' > (0x00404032)  Non-DICOM Output Information Sequence
+        m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureNonDICOMOutputInformationSequence, ro26IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New EmptySequenceRule(Tags.UPSPerformedProcedureNonDICOMOutputInformationSequence, ro26IODType, ErrorSeverity.RuleError))
+
+        '' > (0x00404019)  Performed Workitem Code Sequence
+        'm_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence, ro26IODType, ErrorSeverity.RuleError))
+        '' >> (0x00080100)  Code Value
+        'm_rules.Add(New ConditionalSequenceRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence, New InterOperabilityRule(Tags.ScheduledWorkitemCodeValue, Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, DataSetHandler.UPSMessagesXMLFileName, "C-FIND-RSP4", ro26IODType, ErrorSeverity.RuleError)))
+        '' >> (0x00080102)  Coding Scheme Designator
+        'm_rules.Add(New ConditionalSequenceRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence, New InterOperabilityRule(Tags.ScheduledWorkitemCodingSchemeDesignator, Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, DataSetHandler.UPSMessagesXMLFileName, "C-FIND-RSP4", ro26IODType, ErrorSeverity.RuleError)))
+        '' >> (0x00080104)  Code Meaning
+        'm_rules.Add(New ConditionalSequenceRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence, New InterOperabilityRule(Tags.ScheduledWorkitemCodeMeaning, Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, DataSetHandler.UPSMessagesXMLFileName, "C-FIND-RSP4", ro26IODType, ErrorSeverity.RuleError)))
+
+        Return m_rules
+
+    End Function
+
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        ' Some rules need the dicomMessage send in the request
+        Dim msg As DicomMessage = DirectCast(TransactionDataMessages(0), DicomMessage)
+
+        '(0x00081195)  Transaction UID
+        'm_rules.Add(New IsRequiredRule(Tags.TransactionUID, ro26IODType, ErrorSeverity.RuleError))
+        'm_rules.Add(New ValueRule(Tags.TransactionUID, msg.DataSet(Tags.TransactionUID).Values(0), ro26IODType, ErrorSeverity.RuleError))
+
+        '(0x00000900)  Status
+        m_rules.Add(New ValueRuleIPDWUPS(Tags.StatusCommandElement, "0", msg, ro26IODType, ErrorSeverity.RuleError))
+
+        ' (0x00000002) Affected SOP Class UID
+        m_rules.Add(New IsRequiredRule(Tags.AffectedSOPClassUID, ro26IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.AffectedSOPClassUID, SOPclass.UnifiedProcedureStepPushSOPClassUID, ro26IODType, ErrorSeverity.RuleError))
+
+        '(0x00001000)  Affected SOP Instance UID
+        m_rules.Add(New IsRequiredRule(Tags.AffectedSOPInstanceUID, ro26IODType, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+End Class

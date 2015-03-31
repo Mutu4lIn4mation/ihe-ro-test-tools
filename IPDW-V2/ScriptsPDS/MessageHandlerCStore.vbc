@@ -1,0 +1,19 @@
+Class MessageHandlerCStore
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    'DimseCommand.CSTORERSP
+    Public Overrides Function HandleCStoreRequest(ByVal theDicomMessage As DicomMessage) As Boolean
+        Dim dicomMessageToSend As DicomMessage = New DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERSP)
+        dicomMessageToSend.Set(Tags.AffectedSOPClassUID, UI, theDicomMessage.CommandSet.Item(Tags.AffectedSOPClassUID).Values(0))
+        dicomMessageToSend.Set(Tags.AffectedSOPInstanceUID, UI, theDicomMessage.CommandSet.Item(Tags.AffectedSOPInstanceUID).Values(0))
+        dicomMessageToSend.Set(Tags.MessageIDBeingRespondedTo, US, theDicomMessage.CommandSet.Item(Tags.MessageID).Values(0))
+
+        dicomMessageToSend.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status.
+        Send(dicomMessageToSend, theDicomMessage.EncodedPresentationContextID)
+
+        Return (True)
+
+    End Function
+
+End Class
+

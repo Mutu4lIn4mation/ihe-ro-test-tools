@@ -1,0 +1,47 @@
+Class ValueInRangeRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' this rule verifies if the value in this attribute is in a certain range, between the lower and the upper bound
+    ''' </summary>
+    ''' <param name="valueTag">the attribute that needs to be checked</param>
+    ''' <param name="lowerBound">the lower bound</param>
+    ''' <param name="upperBound">the upper bound</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+
+    Public Sub New(ByVal valueTag As String, ByVal lowerBound As Integer, ByVal upperBound As Integer, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Value In Range Rule", valueTag, iodType, severity)
+        m_LowerBound = lowerBound
+        m_Upperbound = upperBound
+
+    End Sub
+    Private m_LowerBound As Integer
+    Private m_Upperbound As Integer
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        If (IODTypeRule = iodType) Then
+
+            If Not dicomMessage.Exists(m_TagSequence) Then
+
+                Me.SetValid("The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present.")
+
+            ElseIf (Integer.Parse(dicomMessage(m_TagSequence).Values(0)) >= m_LowerBound) And (Integer.Parse(dicomMessage(m_TagSequence).Values(0)) <= m_Upperbound) Then
+
+                Me.SetValid(String.Format("The attribute '{0}' ({1}) contains the value: {2}, which is in range: {3} - {4}.", Tags.GetTagName(m_TagSequence), m_TagSequence, dicomMessage(m_TagSequence).Values.Item(0).ToString(), m_LowerBound, m_Upperbound))
+
+            Else
+
+                Me.SetError(String.Format("The attribute '{0}' ({1}) contains the value: {2}, which is out of range: {3} - {4}.", Tags.GetTagName(m_TagSequence), m_TagSequence, dicomMessage(m_TagSequence).Values.Item(0).ToString(), m_LowerBound, m_Upperbound))
+
+            End If
+
+            Me.Report()
+
+        End If
+
+    End Sub
+
+End Class

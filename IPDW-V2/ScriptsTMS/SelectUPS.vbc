@@ -1,0 +1,29 @@
+﻿Public Class SelectUPS
+    Public responseDataSets As DvtkHighLevelInterface.Dicom.Other.DataSetCollection
+    Public UPSDataGridView As DataGridView
+    Public selectedDataGridRows As DataGridViewRowCollection
+    Private Sub SelectUPS_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+        For Each dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet In responseDataSets
+            If (dataSet.Exists(Tags.UPSProgressInformationUnifiedProcedureStepProgress) And dataSet.Exists(Tags.ScheduledProcessingParametersTextValue)) Then
+                DataGridUPS.Rows.Add(New String() {dataSet(Tags.PatientID).Values(0), dataSet(Tags.PatientName).Values(0), dataSet(Tags.ProcedureStepState).Values(0), dataSet(Tags.ProcedureStepLabel).Values(0), dataSet(Tags.SOPInstanceUID).Values(0), dataSet(Tags.ScheduledWorkitemCodeValue).Values(0), dataSet(Tags.ScheduledWorkitemCodeMeaning).Values(0), dataSet(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0), dataSet(Tags.ScheduledProcessingParametersTextValue).Values(0)})
+            ElseIf (dataSet.Exists(Tags.UPSProgressInformationUnifiedProcedureStepProgress)) Then
+                DataGridUPS.Rows.Add(New String() {dataSet(Tags.PatientID).Values(0), dataSet(Tags.PatientName).Values(0), dataSet(Tags.ProcedureStepState).Values(0), dataSet(Tags.ProcedureStepLabel).Values(0), dataSet(Tags.SOPInstanceUID).Values(0), dataSet(Tags.ScheduledWorkitemCodeValue).Values(0), dataSet(Tags.ScheduledWorkitemCodeMeaning).Values(0), dataSet(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0), "-"})
+            ElseIf (dataSet.Exists(Tags.ScheduledProcessingParametersTextValue)) Then
+                DataGridUPS.Rows.Add(New String() {dataSet(Tags.PatientID).Values(0), dataSet(Tags.PatientName).Values(0), dataSet(Tags.ProcedureStepState).Values(0), dataSet(Tags.ProcedureStepLabel).Values(0), dataSet(Tags.SOPInstanceUID).Values(0), dataSet(Tags.ScheduledWorkitemCodeValue).Values(0), dataSet(Tags.ScheduledWorkitemCodeMeaning).Values(0), "-", dataSet(Tags.ScheduledProcessingParametersTextValue).Values(0)})
+            Else
+                DataGridUPS.Rows.Add(New String() {dataSet(Tags.PatientID).Values(0), dataSet(Tags.PatientName).Values(0), dataSet(Tags.ProcedureStepState).Values(0), dataSet(Tags.ProcedureStepLabel).Values(0), dataSet(Tags.SOPInstanceUID).Values(0), dataSet(Tags.ScheduledWorkitemCodeValue).Values(0), dataSet(Tags.ScheduledWorkitemCodeMeaning).Values(0), "-", "-"})
+            End If
+        Next
+
+    End Sub
+
+    Private Sub SetUPSInProgress_Click(sender As System.Object, e As System.EventArgs) Handles SetUPSInProgress.Click
+
+        UPSDataGridView = DataGridUPS
+
+        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.Close()
+
+    End Sub
+End Class

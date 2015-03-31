@@ -1,0 +1,34 @@
+Class ReceiveUPSCompletedOrCanceled
+    Inherits Scenario
+
+    Public Sub New()
+
+        Dim TMSActor As TMSActor = New TMSActor()
+        Dim PDSActor As PDSActor = New PDSActor()
+        Dim isCompleted As Boolean
+
+        Dim receiveStep As ReceiveScenarioStep = New ReceiveScenarioStep(TMSActor, PDSActor, True, NACTIONRQ)
+
+        Dim completedOrCancelledForm As CompletedOrCancelledDialog = New CompletedOrCancelledDialog()
+
+        completedOrCancelledForm.Text = "Expected Unified Procedure Step State"
+
+        completedOrCancelledForm.ShowDialog()
+
+        If completedOrCancelledForm.DialogResult = Windows.Forms.DialogResult.OK Then
+            isCompleted = completedOrCancelledForm.Completed
+        End If
+
+        Dim ro25Transaction As RO_25_Transaction = New RO_25_Transaction(isCompleted, True)
+
+        receiveStep.AddTransaction(ro25Transaction)
+        m_scenarioSteps.Add(receiveStep)
+
+        ' Validate N-Action request
+        Dim validateNActionStep As ValidateScenarioStep = New ValidateScenarioStep(receiveStep)
+        validateNActionStep.AddRules(ro25Transaction.GetCommonTransactionRulesForRequest())
+        m_scenarioSteps.Add(validateNActionStep)
+
+    End Sub
+
+End Class

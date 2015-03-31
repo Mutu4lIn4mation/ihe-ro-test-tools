@@ -1,0 +1,108 @@
+Class ValidateScenarioStepCFindResp
+    Inherits ScenarioStep
+
+    Private m_rules As ArrayList = New ArrayList
+    Private m_ReceivedMessagesContainer As IReceivedMessagesContainer
+    Private m_validator As Validator
+    Private m_MessageIndex As Integer
+    Private m_dimseCommand As DvtkData.Dimse.DimseCommand
+
+
+    Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer)
+
+        MyClass.New(receivedMessagesContainer, -1)
+
+    End Sub
+
+    Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer, ByVal messageIndex As Integer)
+
+        m_ReceivedMessagesContainer = receivedMessagesContainer
+        m_validator = New Validator()
+        m_MessageIndex = messageIndex
+        m_dimseCommand = UNDEFINED
+
+    End Sub
+
+    Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer, ByVal dimseCommand As DvtkData.Dimse.DimseCommand)
+
+        m_ReceivedMessagesContainer = receivedMessagesContainer
+        m_validator = New Validator()
+        m_MessageIndex = -1  ' validate all messages with the given dimse command type
+        m_dimseCommand = dimseCommand
+
+    End Sub
+
+    ' - validating the received transactions (Validator)
+    Public Overrides Sub Execute()
+
+        If m_ReceivedMessagesContainer.ReceivedMessages.Count > 0 Then
+
+            If Not m_dimseCommand = UNDEFINED Then
+
+                ' only validate the messages containing the correct dimse command
+                Dim messagesToValidate As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+                For Each message As DicomMessage In m_ReceivedMessagesContainer.ReceivedMessages
+                    If message.CommandSet.DimseCommand = m_dimseCommand Then
+                        messagesToValidate.Add(message)
+                    End If
+                Next
+                If messagesToValidate.Count > 0 Then
+                    m_validator.ValidateMessages(messagesToValidate, m_rules)
+                Else
+                    Dim log As String = "No received messages found of type " + m_dimseCommand.ToString() + " to validate."
+                    Logger.GetInstance().LogErrorMessage(log)
+                End If
+
+            ElseIf m_MessageIndex < 0 Then
+
+                ' A m_MessageIndex < 0 means validate all messages
+                m_validator.ValidateMessages(m_ReceivedMessagesContainer.ReceivedMessages, m_rules)
+
+            Else
+
+                If m_MessageIndex >= m_ReceivedMessagesContainer.ReceivedMessages.Count Then
+                    Throw New Exception(String.Format("Message index '{0}' must be between 0 and the number " & _
+                                        "of received messages '{1}'", m_MessageIndex, m_ReceivedMessagesContainer.ReceivedMessages.Count))
+                End If
+
+
+                Dim responsCount As Integer = m_ReceivedMessagesContainer.ReceivedMessages().Count
+                Dim count As Integer = 1
+                For Each message As DicomMessage In m_ReceivedMessagesContainer.ReceivedMessages
+                    Dim messagesToValidate As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+                    If Not (count = responsCount) Then
+                        messagesToValidate.Add(message)
+                        m_validator.ValidateMessages(messagesToValidate, m_rules)
+                    Else
+
+                        m_rules = New ArrayList
+                        m_rules.Add(New ValueRule(Tags.StatusCommandElement, "0", IODType.UnifiedProcedureStepPull, ErrorSeverity.RuleError))
+                        messagesToValidate.Add(message)
+                        m_validator.ValidateMessages(messagesToValidate, m_rules)
+                    End If
+
+                    count = count + 1
+                Next
+
+
+            End If
+
+        End If
+
+    End Sub
+
+    'Add a rule
+    Public Sub AddRule(ByVal rule As Rule)
+        m_rules.Add(rule)
+    End Sub
+
+    'Add a set of rules
+    Public Sub AddRules(ByVal rules As System.Collections.Generic.IEnumerable(Of Rule))
+
+        For Each rule As Rule In rules
+            m_rules.Add(rule)
+        Next
+
+    End Sub
+
+End Class

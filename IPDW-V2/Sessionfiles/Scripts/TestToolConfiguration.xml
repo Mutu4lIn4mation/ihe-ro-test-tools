@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<TesttoolConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SoftwareVersion>
+    <Major>3</Major>
+    <Minor>0</Minor>
+  </SoftwareVersion>
+  <Debugging>
+    <ReportDebugMessages>true</ReportDebugMessages>
+    <DoCleanUp>true</DoCleanUp>
+    <ReportTBDRule>true</ReportTBDRule>
+  </Debugging>
+  <SupportedTransferSyntaxes>
+    <Sender>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.1</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+    </Sender>
+    <Receiver>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.1</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2</Value>
+        <Used>false</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.2</Value>
+        <Used>false</Used>
+      </TransferSyntax>
+    </Receiver>
+  </SupportedTransferSyntaxes>
+  <ApplicationEntityConfiguration>
+    <DVTKAEConfiguration Actor="PDS" Command="CSTORE">
+      <AETitle>PDS</AETitle>
+      <Port>107</Port>
+    </DVTKAEConfiguration>
+    <DVTKAEConfiguration Actor="TMS" Command="CMOVE">
+      <AETitle>TMS</AETitle>
+      <Port>105</Port>
+    </DVTKAEConfiguration>
+    <DVTKAEConfiguration Actor="TMS" Command="UPS">
+      <AETitle>TMS</AETitle>
+      <Port>105</Port>
+    </DVTKAEConfiguration>
+    <DVTKAEConfiguration Actor="OST" Command="CMOVE">
+      <AETitle>OST</AETitle>
+      <Port>106</Port>
+    </DVTKAEConfiguration>
+    <DVTKAEConfiguration Actor="OST" Command="CSTORE">
+      <AETitle>OST</AETitle>
+      <Port>106</Port>
+    </DVTKAEConfiguration>
+    <SUTAEConfiguration Actor="PDS">
+      <IPAddress>127.0.0.1</IPAddress>
+      <SUTAESetting Command="CSTORE">
+        <AETitle>PDS</AETitle>
+        <Port>107</Port>
+      </SUTAESetting>
+    </SUTAEConfiguration>
+    <SUTAEConfiguration Actor="TMS">
+      <IPAddress>127.0.0.1</IPAddress>
+      <SUTAESetting Command="UPS">
+        <AETitle>TMS</AETitle>
+        <Port>105</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CMOVE">
+        <AETitle>TMS</AETitle>
+        <Port>105</Port>
+      </SUTAESetting>
+    </SUTAEConfiguration>
+    <SUTAEConfiguration Actor="OST">
+      <IPAddress>127.0.0.1</IPAddress>
+      <SUTAESetting Command="CMOVE">
+        <AETitle>OST</AETitle>
+        <Port>106</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CSTORE">
+        <AETitle>OST</AETitle>
+        <Port>106</Port>
+      </SUTAESetting>
+    </SUTAEConfiguration>
+    <RTPlanFileName />
+  </ApplicationEntityConfiguration>
+</TesttoolConfig>

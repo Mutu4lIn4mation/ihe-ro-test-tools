@@ -1,0 +1,297 @@
+Class SenderThread
+    Inherits DvtkHighLevelInterface.Dicom.Threads.DicomThread
+
+#Region "Private Members"
+
+    Private m_logger As Logger = Logger.GetInstance()
+    Private m_ReceivedMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+
+    Private m_MessagesToSend As DicomMessageCollection = New DicomMessageCollection()
+
+    Private m_DvtkConfig As DVTKAEConfiguration
+
+#End Region
+
+#Region "Ctors"
+
+    Public Sub New(ByVal name As String)
+
+        Initialize(TestToolConfiguration.GetInstance.GetMainThread)
+
+        Options.CopyFrom(TestToolConfiguration.GetInstance.GetMainThread.Options)
+
+        Options.Name = name
+        Options.LogThreadStartingAndStoppingInParent = False
+        Options.AutoValidate = False
+        Options.ShowResults = False
+        Options.StartAndStopResultsGatheringEnabled = True
+        ResultsGatheringStarted = False
+
+    End Sub
+
+    Public Sub New(ByVal name As String, ByVal sutAESetting As SUTAESettingWrapper, ByVal dvtkConfig As DVTKAEConfiguration)
+
+        MyClass.New(name)
+
+        Options.LocalAeTitle = dvtkConfig.AETitle
+        Options.RemoteAeTitle = sutAESetting.AETitle
+        Options.RemotePort = CUShort(sutAESetting.Port)
+        Options.RemoteHostName = sutAESetting.IPAddress
+
+        m_DvtkConfig = dvtkConfig
+
+    End Sub
+
+#End Region
+
+#Region "Overridden Methods"
+
+    Protected Overrides Sub Execute()
+
+
+        If m_MessagesToSend.Count = 0 Then
+            Throw New Exception("Cannot use SendThread when there are no messages to send")
+        End If
+
+        Dim presentationContexts As DvtkHighLevelInterface.Dicom.Other.PresentationContext() = DeterminePresentationContexts(m_MessagesToSend(0))
+
+        Try
+
+            Dim presentationContext As Integer = CreateAssociation(presentationContexts)
+            SendDataObjects(m_MessagesToSend, presentationContext)
+            CloseAssociation()
+
+        Catch ex As System.Exception
+
+            Logger.GetInstance().LogErrorMessage(ex.Message)
+
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "Private Methods"
+
+    'Determine presentation contexts
+    Private Function DeterminePresentationContexts(ByVal message As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As DvtkHighLevelInterface.Dicom.Other.PresentationContext()
+
+        Dim UIDs As System.Collections.Specialized.StringCollection = New System.Collections.Specialized.StringCollection
+
+        'always use the SOP class UID from the commandset, the dataset doesn't always need to have a SOP Class UID
+        Dim sop_uid As String = message.CommandSet.GetSopClassUid()
+
+        'RVDH: When an UPS PUSH is in the requested SOP Class UID in the commandset of the DICOM message, 
+        'the transfersyntax that should be negotiated should be a UPS PULL
+        'this only occurs when sending an N-ACTION-RQ, N-SET-RQ or N-GET-RQ
+        If sop_uid = SOPclass.UnifiedProcedureStepPushSOPClassUID Then
+            If Not message.CommandSet.DimseCommand = CFINDRQ Then
+                sop_uid = SOPclass.UnifiedProcedureStepPullSOPClassUID
+            End If
+        End If
+
+
+        If Not UIDs.Contains(sop_uid) Then
+            UIDs.Add(sop_uid)
+        End If
+
+        'get the supported transfersyntaxes
+        Dim transferSyntaxes As System.Collections.Specialized.StringCollection = TestToolConfiguration.GetInstance().SupportedTransferSyntaxesSender
+
+        'an array we can use as an paramArray for the presentationcontexts
+        Dim presentationContextArray As DvtkHighLevelInterface.Dicom.Other.PresentationContext()
+        presentationContextArray = CType(Array.CreateInstance(GetType(DvtkHighLevelInterface.Dicom.Other.PresentationContext), UIDs.Count * transferSyntaxes.Count), Dicom.Other.PresentationContext())
+
+
+        Dim indexUIDs As Integer
+        Dim numberOfPresentationContexts As Integer = 0
+        'combine every UID with all the supported transfersyntaxes and create a presentationcontext of them together
+        For indexUIDs = 0 To UIDs.Count - 1
+            Dim indexSyntaxes As Integer
+            For indexSyntaxes = 0 To transferSyntaxes.Count - 1
+                presentationContextArray(numberOfPresentationContexts) = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(UIDs(indexUIDs), transferSyntaxes(indexSyntaxes))
+                numberOfPresentationContexts = numberOfPresentationContexts + 1
+            Next
+
+        Next
+
+        Return presentationContextArray
+
+    End Function
+
+    'Creates an association
+    Private Function CreateAssociation(ByRef presentationContextArray As DvtkHighLevelInterface.Dicom.Other.PresentationContext()) As Integer
+
+        Dim presentationContext As Integer = Nothing
+        'Handle some required global configuration variables when working with Dicomthreads
+
+        'Send the associationrequest
+        Try
+
+            Me.SendAssociateRq(presentationContextArray)
+        Catch ex As System.Exception
+            'Logger.GetInstance().LogErrorMessage(ex.Message + String.Format(" to IPaddress: '{0}' and portnumber: '{1}'", Me.Options.SutIpAddress, Me.Options.SutPort))
+            Throw New System.Exception(ex.Message + String.Format(" to IPaddress: '{0}' and portnumber: '{1}'", Me.Options.RemoteHostName, Me.Options.RemotePort))
+        End Try
+
+
+        Dim receivedMessage As DvtkHighLevelInterface.Dicom.Messages.DicomProtocolMessage = Nothing
+        'Receive the associate Ackknowledge
+        receivedMessage = ReceiveMessage()
+
+        'Check wether the received response is expected else throw an exception
+        If receivedMessage.IsAssociateAc Then
+            If receivedMessage.AssociateAc.PresentationContexts.AcceptedAbstractSyntaxes.Count = 0 Then
+                'throw exception, no presentationcontext accepted
+                Throw New System.Exception("No presentation context accepted by the SCP: " + receivedMessage.AssociateAc.CalledAETitle)
+            End If
+
+            m_logger.LogMessage("The association was accepted.")
+
+        ElseIf receivedMessage.IsAssociateRj Then
+            Throw New System.Exception("The SCP Rejected the association.")
+        ElseIf receivedMessage.IsAbort Then
+            Throw New System.Exception("The SCP sent an Abort.")
+        Else
+            'Unexpected message or error
+            Throw New System.Exception("The message was unexpected. Expected was an AssociateAccept. Received: " + receivedMessage.ToString())
+        End If
+
+        Dim receivedPresentationContext As String = receivedMessage.AssociateAc.PresentationContexts.AcceptedAbstractSyntaxes(0)
+        If receivedPresentationContext = SOPclass.UnifiedProcedureStepPullSOPClassUID Then
+            'compare received abstract syntaxes to original sended syntaxex and pick the correct ID
+
+            For Each presentation As DvtkHighLevelInterface.Dicom.Other.PresentationContext In receivedMessage.AssociateAc.PresentationContexts
+                If Not presentation.TransferSyntax = "" Then
+                    presentationContext = presentation.ID
+                    Return presentationContext
+                End If
+            Next
+        End If
+        Return presentationContext
+    End Function
+
+    'Sends the dicom) data objects (transactions to the actor
+    'presentationContext will be provided if the presentation context in the association is different as the
+    'presentation context in the data that will be send
+    'this is in particular important for the UPS pull and push mechanism
+    'when the presentation context are the same, than the value will be nothing
+    Protected Sub SendDataObjects(ByVal messages As DicomMessageCollection, ByVal presentationContext As Integer)
+
+        'loop through all the messages of 1 transaction
+        Dim count As Integer = 1
+
+        For Each sndMessage As DicomMessage In messages
+
+            Try
+                'C-Store thread for C-Move action
+                Dim cstoreReceiverThread As ReceiverThread = Nothing
+
+                If sndMessage.CommandSet.DimseCommand = DvtkData.Dimse.DimseCommand.CMOVERQ Then
+
+                    'when command is C-MOVE-RQ then first allow to receive C-STORE action(s)
+                    Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+                    Dim scenarioName As String = config.GetCurrentScenario().Name
+                    Dim threadName As String = "CSTORE Receiver (" + scenarioName + ")"
+                    If m_DvtkConfig Is Nothing Then
+                        cstoreReceiverThread = New ReceiverThread(threadName)
+                    Else
+                        cstoreReceiverThread = New ReceiverThread(threadName, m_DvtkConfig)
+                    End If
+
+                    cstoreReceiverThread.AddToBack(New MessageHandlerCStore())
+                    cstoreReceiverThread.AddToBack(New MessageHandlerAssociateRQ())
+                    cstoreReceiverThread.Start()
+
+                End If
+
+                Dim sopClassUid As String = sndMessage.CommandSet.GetSopClassUid()
+                Logger.GetInstance().LogMessage(String.Format("Sending message with Sop class '{0}' ({1})", SOPclass.GetIODType(sopClassUid), sopClassUid))
+
+                If Not presentationContext = Nothing Then
+                    Send(sndMessage, presentationContext)
+                Else
+                    Send(sndMessage, count)
+                    'count = count + 2
+                End If
+                'Options.AutoValidate = False
+
+                'handle all responses
+                Dim responseMessage As DicomMessage
+                Do
+                    responseMessage = ReceiveDicomMessage()
+                    m_ReceivedMessages.Add(responseMessage)  ' add to list for Validation later on
+
+                Loop Until (IsEndAckknowlege(responseMessage))
+
+                'Validate(rspMessage, "")
+                'Options.AutoValidate = True
+
+
+                If sndMessage.CommandSet.DimseCommand = DvtkData.Dimse.DimseCommand.CMOVERQ Then
+                    'when command is C-MOVE-RQ then first wait for all C-STORE action(s) to receive (wait for dialog)
+                    'at this point the C-MOVE-RSP is already being received
+
+                    cstoreReceiverThread.Stop()
+                    cstoreReceiverThread.WaitForCompletion()
+
+                    ' add received CStore requests messages also to the received messages list
+                    For i As Integer = 1 To cstoreReceiverThread.Messages.DicomMessages.Count
+                        Dim receivedCStore As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = cstoreReceiverThread.Messages.DicomMessages.Item(i - 1)
+
+                        'collect the received messages for the specific command
+                        If receivedCStore.CommandSet.DimseCommand = DvtkData.Dimse.DimseCommand.CSTORERQ Then
+                            m_ReceivedMessages.Add(receivedCStore)
+                        End If
+                    Next
+                End If
+
+            Catch ex As System.Exception
+
+                Dim logMessage As String = "Error sending the messages: " + ex.Message.ToString
+                Logger.GetInstance().LogMessage(logMessage)
+                Throw New System.Exception(logMessage, ex)
+
+            End Try
+
+        Next
+
+    End Sub
+
+    Private Function IsEndAckknowlege(ByVal rspMessage As DicomMessage) As Boolean
+
+        Dim statusString As String = rspMessage.CommandSet(Tags.StatusCommandElement).Values(0)
+        Dim status As System.UInt32 = System.UInt32.Parse(statusString)
+        Return (Not status = &HFF00 And Not status = &HFF01)
+
+    End Function
+
+    'Closes the association
+    Protected Function CloseAssociation() As Boolean
+        Try
+            SendReleaseRq()
+            ReceiveReleaseRp()
+        Catch ex As System.Exception
+
+            m_logger.LogMessage("Failed on releasing the Association, however the Messages have been sent to the SCP correctly.")
+            Reporter.GetInstance().ReportWarningMessage("Failed on releasing the Association, however the Messages have been sent to the SCP correctly.")
+        End Try
+    End Function
+
+#End Region
+
+    Public Sub AddMessageToSend(ByVal message As DicomMessage)
+
+        m_MessagesToSend.Add(message)
+
+    End Sub
+
+    Public ReadOnly Property ReceivedMessages() As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+        Get
+            Return m_ReceivedMessages
+        End Get
+    End Property
+
+
+End Class

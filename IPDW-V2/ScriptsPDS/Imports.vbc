@@ -1,0 +1,23 @@
+Option Strict Off
+#If DVT_INTERPRETS_SCRIPT Then
+Imports System
+Imports System.Collections
+Imports System.Collections.Generic
+Imports System.Collections.Specialized
+Imports System.IO
+Imports System.Threading
+Imports System.Windows.Forms
+Imports System.Xml.Serialization
+Imports System.Drawing
+Imports System.Reflection
+Imports System.Text.RegularExpressions
+Imports Microsoft.VisualBasic.Strings
+Imports DvtkData.Dimse.VR
+Imports DvtkData.Dimse.DimseCommand
+Imports DvtkHighLevelInterface
+Imports DvtkHighLevelInterface.Dicom.Messages
+Imports DvtkHighLevelInterface.Dicom.Other
+Imports DvtkHighLevelInterface.Common.UserInterfaces
+Imports DvtkHighLevelInterface.Common.Other
+Imports Microsoft.Win32
+#End If

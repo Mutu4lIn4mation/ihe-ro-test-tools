@@ -1,0 +1,27 @@
+' Beam Transaction (Dosimetric Plan Storage) class
+Class ComputedTomographyTransaction
+    Inherits Transaction
+    'Constructor
+    Public Sub New()
+
+        MyBase.New("RO-0", "CT Image Storage", IODType.CTImage, True)
+
+    End Sub
+
+    'method which returns the related reference data messages belonging to this transaction
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+
+        Dim dataSetMessages As ArrayList = New ArrayList()
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        dataSetMessages.Add(referenceData.GetComputedTomography(1))
+        For index As Integer = 5 To 114
+            dataSetMessages.Add(referenceData.GetComputedTomography(index))
+        Next index
+
+
+        Return dataSetMessages
+
+    End Function
+
+End Class

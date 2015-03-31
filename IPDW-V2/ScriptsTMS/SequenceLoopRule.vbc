@@ -1,0 +1,92 @@
+
+''' <summary>
+''' This rule uses the decorator design pattern to 'wrap' another AttributeRule. It determines the number of items in a
+''' sequence with a given tag, then calls 'ApplyRule' of the wrapped rule for each item in the sequence.
+''' </summary>
+''' <remarks></remarks>
+Class SequenceLoopRule
+    Inherits AttributeRule
+
+    Private m_WrappedRule As AttributeRule
+    Private m_skipLastSequenceItem As Boolean = False
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="tagSequence">The sequence tag to get the sequence items from.</param>
+    ''' <param name="attributeRule">The AttributeRule to apply for all sequence items present in the sequence tag.</param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal tagSequence As String, ByVal attributeRule As AttributeRule)
+
+        MyClass.New(tagSequence, attributeRule, False)
+
+    End Sub
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="tagSequence">The sequence tag to get the sequence items from.</param>
+    ''' <param name="attributeRule">The AttributeRule to apply for all sequence items present in the sequence tag.</param>
+    ''' <param name="skipLastSequenceItem">If true the last Item of the sequence is skiped.</param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal tagSequence As String, ByVal attributeRule As AttributeRule, ByVal skipLastSequenceItem As Boolean)
+
+        MyBase.New("Sequence Loop Rule", tagSequence, attributeRule.IODTypeRule, attributeRule.ErrSeverity)
+
+        If TypeOf attributeRule Is SequenceLoopRule Then
+            Throw New ArgumentException(String.Format("To keep things simple, please use the rule '{0}' to " _
+                                                    & "only wrap rules that are NOT {0}s. Don't use it to chain multiples.", _
+                                                        Me.Name), "attributeRule")
+        End If
+
+        m_WrappedRule = attributeRule
+        m_skipLastSequenceItem = skipLastSequenceItem
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        If iodType = m_WrappedRule.IODTypeRule Then
+
+            Dim nextTag As String = ""
+            Dim defaultTag As String = m_WrappedRule.getItemInSQTag(1, m_TagSequence)
+            Dim numberOfItems As Integer = GetNumberOfItemsInSequence(dicomMessage.DataSet)
+
+            If (m_skipLastSequenceItem) Then
+                ' if set the last item should be out of scope
+                numberOfItems = numberOfItems - 1
+            End If
+            Dim allValid As Boolean = True
+
+
+            For i As Integer = 1 To numberOfItems
+                m_WrappedRule.TagSequence = m_WrappedRule.getItemInSQTag(i, m_TagSequence)
+                m_WrappedRule.ApplyRule(dicomMessage, iodType)
+                If (Not (m_WrappedRule.IsValid)) Then
+                    allValid = False
+                End If
+                m_WrappedRule.TagSequence = defaultTag
+            Next
+            If (allValid) Then
+                Me.SetValid("No error in sequence loop rule")
+            Else
+                Me.SetError("Error in sequence loop rule")
+
+            End If
+
+
+        End If
+
+
+    End Sub
+
+    Private Function GetNumberOfItemsInSequence(ByVal dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet) As Integer
+
+        If (dataSet.Exists(m_TagSequence)) Then
+            Return dataSet.GetitemCount(m_TagSequence)
+        End If
+        Return 0
+
+    End Function
+
+End Class

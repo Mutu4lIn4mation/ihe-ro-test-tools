@@ -1,0 +1,103 @@
+Class ValueRuleIPDWUPS
+    Inherits AttributeRule
+    ''' <summary>
+    ''' this rule verifies if the value in this attribute is a correct one, according to the value that is provided
+    ''' </summary>
+    ''' <param name="valueTag">the attribute that needs to be checked</param>
+    ''' <param name="value">contains the value which the attribute may have</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+
+    Public Sub New(ByVal valueTag As String, ByVal value As String, ByVal sendedDicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+
+        MyClass.New(valueTag, "", value, 1, sendedDicomMessage, iodType, severity)
+
+
+    End Sub
+
+    Public Sub New(ByVal valueTag As String, ByVal value As String, ByVal sendedDicomMessages As ArrayList, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+
+        MyClass.New(valueTag, "", value, 1, Nothing, iodType, severity)
+        m_sendedDicomMessages = sendedDicomMessages
+
+    End Sub
+
+    Public Sub New(ByVal valueTag As String, ByVal sequenceItemTag As String, ByVal value As String, ByVal itemIndex As Integer, ByVal sendedDicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Value Rule", valueTag, iodType, severity)
+
+        m_Value = value
+        m_SequenceItemTag = sequenceItemTag
+        m_ItemIndex = itemIndex
+        m_sendedDicomMessage = sendedDicomMessage
+
+
+    End Sub
+
+    Private m_Value As String
+    Private m_SequenceItemTag As String
+    Private m_ItemIndex As Integer
+    Private m_sendedDicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+    Private m_sendedDicomMessages As ArrayList = Nothing
+
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim message As String = ""
+        Dim tagSequence As String = ""
+
+        If Not iodType = IODTypeRule Then
+            Try
+                Logger.GetInstance().LogWarningMessage(String.Format("IODtype of message is: '{0}' but should be '{1}' .", iodType.ToString(), IODTypeRule.ToString()))
+            Catch ex As Exception
+
+            End Try
+        End If
+
+        If (m_SequenceItemTag <> "") Then
+            tagSequence = getItemInSQTag(m_ItemIndex, m_SequenceItemTag)
+        Else
+            tagSequence = m_TagSequence
+        End If
+        If Not dicomMessage.Exists(tagSequence) Then
+            message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present in the dataset."
+            Me.SetValid(message)
+        ElseIf Not dicomMessage(tagSequence).Values.Item(0) = m_Value Then
+
+            If (tagSequence = Tags.StatusCommandElement) Then
+
+                Dim hexVal As String = Conversion.Hex(dicomMessage(tagSequence).Values.Item(0))
+                message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains the hexidecimal value: " + hexVal + " but should contain the value: " + m_Value + "."
+                Me.SetError(message)
+            Else
+                message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains the value: " + dicomMessage(tagSequence).Values.Item(0).ToString() + " but should contain the value: " + m_Value + "."
+                Me.SetError(message)
+            End If
+
+
+        Else
+            message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains the value: " + m_Value + "."
+            Me.SetValid(message)
+
+            If (tagSequence = Tags.StatusCommandElement) Then
+
+                If Not (m_sendedDicomMessages Is Nothing) Then
+
+                    For Each sendedMessage As DicomMessage In m_sendedDicomMessages
+                        ReferenceDataSet.GetInstance.UpdateCacheCFind_Response(sendedMessage(Tags.RequestedSOPInstanceUID).Values(0), sendedMessage)
+                    Next
+                Else
+                    ReferenceDataSet.GetInstance.UpdateCacheCFind_Response(m_sendedDicomMessage(Tags.RequestedSOPInstanceUID).Values(0), m_sendedDicomMessage)
+                End If
+
+
+            End If
+
+        End If
+        Me.Report()
+
+    End Sub
+
+End Class

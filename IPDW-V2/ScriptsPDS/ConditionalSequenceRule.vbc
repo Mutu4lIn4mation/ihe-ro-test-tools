@@ -1,0 +1,76 @@
+
+''' <summary>
+''' This rule uses the decorator design pattern to 'wrap' another MappingRule. It determines the number of items in a
+''' sequence with a given tag, then calls 'ApplyRule' of the wrapped rule for the first item in the sequence.
+''' </summary>
+''' <remarks></remarks>
+Class ConditionalSequenceRule
+    Inherits MappingRule
+
+    Private m_WrappedRule As MappingRule
+    Private m_WrappedRuleAttribute As AttributeRule
+    Private m_TagSequence As String
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="tagSequence">The sequence tag to get the sequence items from.</param>
+    ''' <param name="mappingRule">The MappingRule to apply for the first sequence item present in the sequence tag.</param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal tagSequence As String, ByVal mappingRule As MappingRule)
+
+        MyBase.New("Conditional Sequence Rule", mappingRule.IODTypeRule, mappingRule.ErrSeverity)
+
+        If TypeOf mappingRule Is ConditionalSequenceRule Then
+            Throw New ArgumentException(String.Format("To keep things simple, please use the rule '{0}' to " _
+                                                    & "only wrap rules that are NOT {0}s. Don't use it to chain multiples.", _
+                                                        Me.Name), "mappingRule")
+        End If
+
+        m_WrappedRuleAttribute = Nothing
+        m_WrappedRule = mappingRule
+        m_TagSequence = tagSequence
+
+    End Sub
+
+    Public Sub New(ByVal tagSequence As String, ByVal mappingRule As AttributeRule)
+
+        MyBase.New("Conditional Sequence Rule", mappingRule.IODTypeRule, mappingRule.ErrSeverity)
+
+        m_WrappedRule = Nothing
+        m_WrappedRuleAttribute = mappingRule
+        m_TagSequence = tagSequence
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        If Not (m_WrappedRule Is Nothing) Then
+
+            If iodType = m_WrappedRule.IODTypeRule Then
+
+                If (dicomMessage.CommandSet.Exists(m_TagSequence)) Or (dicomMessage.DataSet.Exists(m_TagSequence)) Then
+
+                    ' apply rule only on the first item in the sequence
+                    m_WrappedRule.ApplyRule(dicomMessage, iodType)
+
+                End If
+
+            End If
+        End If
+
+        If Not (m_WrappedRuleAttribute Is Nothing) Then
+            If iodType = m_WrappedRuleAttribute.IODTypeRule Then
+
+                If (dicomMessage.CommandSet.Exists(m_TagSequence)) Or (dicomMessage.DataSet.Exists(m_TagSequence)) Then
+
+                    ' apply rule only on the first item in the sequence
+                    m_WrappedRuleAttribute.ApplyRule(dicomMessage, iodType)
+
+                End If
+
+            End If
+        End If
+    End Sub
+
+End Class

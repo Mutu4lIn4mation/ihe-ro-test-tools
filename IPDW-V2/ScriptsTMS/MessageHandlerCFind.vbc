@@ -1,0 +1,74 @@
+Class MessageHandlerCFind
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    Private Sub CopyInterRelationAttributes(ByVal requestMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        Dim value As String = ""
+
+
+        '(0x00000002)  Affected SOP Class UID
+        value = requestMessage(Tags.AffectedSOPClassUID).Values.Item(0)
+        responseMessage.Set(Tags.AffectedSOPClassUID, UI, value)
+
+        '(0x00000110)  Message ID Being responded to
+        value = requestMessage(Tags.MessageID).Values.Item(0)
+        responseMessage.Set(Tags.MessageIDBeingRespondedTo, US, value)
+
+        '(0x00404025) R Scheduled Station Name Code Sequence
+        ' Copy >> (0x00080100)  Code Value
+        If requestMessage.Exists(Tags.ScheduledStationNameCodeSequence) Then
+            If requestMessage.DataSet.GetitemCount(Tags.ScheduledStationNameCodeSequence) > 0 Then
+                If requestMessage.DataSet.Exists(Tags.ScheduledStationCodeValue) Then
+                    value = requestMessage(Tags.ScheduledStationCodeValue).Values.Item(0)
+                    responseMessage.DataSet.Set(Tags.ScheduledStationCodeValue, SH, value)
+                End If
+                ' Copy >> (0x00080102)  Coding Scheme Designator
+                If requestMessage.DataSet.Exists(Tags.ScheduledStationCodingSchemeDesignator) Then
+                    value = requestMessage(Tags.ScheduledStationCodingSchemeDesignator).Values.Item(0)
+                    responseMessage.DataSet.Set(Tags.ScheduledStationCodingSchemeDesignator, SH, value)
+                End If
+                ' Copy >> (0x00080104)  Code Meaning
+                If requestMessage.DataSet.Exists(Tags.ScheduledStationCodeMeaning) Then
+                    value = requestMessage(Tags.ScheduledStationCodeMeaning).Values.Item(0)
+                    responseMessage.DataSet.Set(Tags.ScheduledStationCodeMeaning, LO, value)
+                End If
+            End If
+        End If
+        ' Copy the date and time to the C-FIND response
+        If requestMessage.DataSet.Exists(Tags.ScheduledProcedureStepStartDateandTime) Then
+            value = requestMessage(Tags.ScheduledProcedureStepStartDateandTime).Values.Item(0)
+            Dim ValueSubStrings As String() = value.Split("-"c)
+            responseMessage.DataSet.Set(Tags.ScheduledProcedureStepStartDateandTime, DT, ValueSubStrings(0))
+        End If
+
+    End Sub
+
+    'DimseCommand.CFINDRSP
+    Public Overrides Function HandleCFindRequest(ByVal theDicomMessage As DicomMessage) As Boolean
+
+        Dim affectedSOPClassUID As String = theDicomMessage.CommandSet.Item(Tags.AffectedSOPClassUID).Values(0)
+        If affectedSOPClassUID = SOPclass.UnifiedProcedureStepPullSOPClassUID.ToString() Then
+            ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+            Dim index As Integer = 0
+            For Each message As DicomMessage In ReferenceDataSet.GetInstance().GetUnifiedProcedureStepPull_Responses(theDicomMessage)
+                CopyInterRelationAttributes(theDicomMessage, message)
+
+                '' save the updated response message back to the UPSMessages directory
+                'index = index + 1
+                'If index <= 4 Then
+                '    DataSetHandler.SaveDatasetToFile(message.DataSet, DataSetHandler.UPSMessagesXMLFileName, "C-FIND-RSP" + index.ToString)
+                'End If
+
+                ' send the response message
+                Send(message, theDicomMessage.EncodedPresentationContextID)
+            Next
+
+            Return (True)
+
+        Else
+            Throw New Exception(String.Format("Handling C-FIND RQ of Affected SOP Class UID '{0}' not supported", affectedSOPClassUID))
+        End If
+
+    End Function
+
+End Class

@@ -1,0 +1,30 @@
+Class ReceiveUPSFinalUpdate
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim tmsActor As TMSActor = New TMSActor
+        Dim pdsActor As PDSActor = New PDSActor()
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = DataSetHandler.UPSDataXMLFileName
+
+        Dim receiveTMS As ReceiveScenarioStep = New ReceiveScenarioStep(tmsActor, pdsActor, True, NSETRQ)
+
+        Dim ro21transaction As RO_21_Transaction = New RO_21_Transaction()
+
+        receiveTMS.AddTransaction(ro21transaction)  ' RO-21: UPS Final Update  (N-SET)
+
+
+        'Configure the validate step
+        Dim validate1 As ValidateScenarioStep = New ValidateScenarioStep(receiveTMS, 0)
+        validate1.AddRules(ro21transaction.GetCommonTransactionRulesForRequest())
+
+        'Add the steps to the list
+        m_scenarioSteps.Add(receiveTMS)
+
+        'Add validate steps
+        m_scenarioSteps.Add(validate1)
+
+
+    End Sub
+End Class

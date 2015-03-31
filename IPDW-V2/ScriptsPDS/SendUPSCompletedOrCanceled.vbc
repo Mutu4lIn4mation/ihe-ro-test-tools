@@ -1,0 +1,31 @@
+Class SendUPSCompletedOrCanceled
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim TMSActor As TMSActor = New TMSActor()
+        Dim PDSActor As PDSActor = New PDSActor()
+        Dim isCompleted As Boolean
+
+        Dim completedOrCancelledForm As CompletedOrCancelledDialog = New CompletedOrCancelledDialog()
+        completedOrCancelledForm.ShowDialog()
+
+        If completedOrCancelledForm.DialogResult = Windows.Forms.DialogResult.OK Then
+            isCompleted = completedOrCancelledForm.Completed
+        End If
+
+        Dim RO_25Transaction As RO_25_Transaction = New RO_25_Transaction(isCompleted, False)
+
+        ' Send N-Action REQ (UPS Completed/Cancelled)
+        Dim sendNActionReq As SendScenarioStep = New SendScenarioStep(PDSActor, TMSActor, True)
+        sendNActionReq.AddTransaction(RO_25Transaction)
+
+        ' Validate N-Action RSP
+        Dim validateNActionResp As ValidateScenarioStep = New ValidateScenarioStep(sendNActionReq)
+        validateNActionResp.AddRules(RO_25Transaction.GetCommonTransactionRulesForResponse())
+
+        m_scenarioSteps.Add(sendNActionReq)
+        m_scenarioSteps.Add(validateNActionResp)
+
+    End Sub
+End Class

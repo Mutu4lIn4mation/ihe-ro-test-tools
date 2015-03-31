@@ -1,0 +1,23 @@
+Class SendUPSInProgress
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+
+        'Configure the send step
+        Dim sendStep As SendScenarioStep = New SendScenarioStep(New PDSActor(), New TMSActor(), True)
+        Dim ro19 As RO_19_Transaction = New RO_19_Transaction(False)
+        sendStep.AddTransaction(ro19)
+
+        ' Response validation step
+        Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(sendStep)
+        validateResponseStep.AddRules(ro19.GetCommonTransactionRulesForResponse())
+
+        'Dim updateStep As UpdateCacheScenarioStep = New UpdateCacheScenarioStep(sendStep)
+
+        m_scenarioSteps.Add(sendStep)
+        'm_scenarioSteps.Add(updateStep)
+        m_scenarioSteps.Add(validateResponseStep)
+
+    End Sub
+End Class

@@ -1,0 +1,69 @@
+Class DifferentValueRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' no value among the sequence item attributes may have the same value
+    ''' </summary>
+    ''' <param name="valueTag">tag sequence item with # of values to be checked</param>
+    ''' <param name="sequenceItemTag">attribute tag of which the value should be different</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal valueTag As String, ByVal sequenceItemTag As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Different Value Rule", valueTag, iodType, severity)
+
+        m_SequenceItemTag = sequenceItemTag
+
+    End Sub
+
+    Private m_SequenceItemTag As String
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim message As String = ""
+
+        If iodType = IODTypeRule Then
+            If Not dicomMessage.Exists(m_SequenceItemTag) Then
+                message = "The attribute '" + Tags.GetTagName(m_SequenceItemTag) + "' (" + m_SequenceItemTag + ") is not present in the dataset."
+                Me.SetValid(message)
+            Else
+                Dim sameValue As Boolean = False 'the check if values are the same
+                'number of attributes follows out the number of items in a sequence
+                Dim NumberOfAtributes As Integer = dicomMessage.DataSet.GetitemCount(m_SequenceItemTag)
+                'the rule is only applicable if two or more items are present
+                If NumberOfAtributes > 1 Then
+                    'the attributes should all be compared which each other to be sure that no values are the same
+                    For j As Integer = 1 To NumberOfAtributes - 1
+                        For i As Integer = j To NumberOfAtributes - 1
+                            Dim firstTagValue As String = getItemInSQTag(i, m_SequenceItemTag)
+                            Dim nextTagValue As String = getItemInSQTag(i + 1, m_SequenceItemTag)
+                            If Not dicomMessage.Exists(firstTagValue) Or Not dicomMessage.Exists(nextTagValue) Then
+                                message = "The attribute '" + Tags.GetTagName(firstTagValue) + "' (" + firstTagValue + ") and/or '" + Tags.GetTagName(nextTagValue) + "' (" + nextTagValue + ") is not present in the dataset."
+                                Me.SetValid(message)
+                                'todo: if one of the attributes is not present, the rule is ended and a valid message is generated
+                                GoTo endRule
+                            ElseIf dicomMessage(firstTagValue).Values.Item(0) = dicomMessage(nextTagValue).Values.Item(0) Then
+                                'values are the same, which results in an error
+                                sameValue = True
+                            End If
+                        Next i
+                    Next j
+                    If Not sameValue Then
+                        message = "The values in the sequence attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") are all different throughout the " + NumberOfAtributes.ToString + " items."
+                        Me.SetValid(message)
+                    Else
+                        message = "There are values in the attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") that have the same value in different items."
+                        For i As Integer = 1 To NumberOfAtributes - 1
+                            Dim tagValue As String = getItemInSQTag(i, m_SequenceItemTag)
+                            message = message + " " + i.ToString + ": " + dicomMessage(tagValue).Values.Item(0)
+                        Next
+                        message = message + " , however, all this values should be different."
+                        Me.SetError(message)
+                    End If
+                End If
+            End If
+
+endRule:
+            Me.Report()
+        End If
+    End Sub
+End Class

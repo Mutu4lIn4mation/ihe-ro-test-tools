@@ -1,0 +1,60 @@
+Class NrOfSequenceItemRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' This rule checks if the sequence item has indeed the number of items that is specified in the 
+    ''' tag that is meant to specfify these 
+    ''' (for example, the controlpointsequence has the number of items that are specified in the attribute: number of control points)
+    ''' </summary>
+    ''' <param name="valueTag">the attribute that contains the sequence items</param>
+    ''' <param name="NrOfSeqItemTag"> the attribute that contains the value of the number of items that should be present</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal valueTag As String, ByVal NrOfSeqItemTag As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+        MyBase.New("Nr Of Sequence Item Rule", valueTag, iodType, severity)
+        m_NrOfSeqItemTag = NrOfSeqItemTag
+
+    End Sub
+
+    Private m_NrOfSeqItemTag As String
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim message As String = ""
+
+        If iodType = IODTypeRule Then
+
+            If (Left(m_TagSequence, 10) = Left(m_NrOfSeqItemTag, 10)) Then
+                If (Left(m_TagSequence, 13).EndsWith("]")) Then
+                    m_NrOfSeqItemTag = Left(m_TagSequence, 13) + Right(m_NrOfSeqItemTag, m_NrOfSeqItemTag.Length - 13)
+                Else
+                    m_NrOfSeqItemTag = Left(m_TagSequence, 14) + Right(m_NrOfSeqItemTag, m_NrOfSeqItemTag.Length - 13)
+                End If
+
+
+            End If
+
+            Dim sequenceNr As Integer = 0
+            Dim sequenceItems As Integer = 0
+
+            If dicomMessage.Exists(m_NrOfSeqItemTag) Then
+
+                sequenceNr = CInt(dicomMessage(m_NrOfSeqItemTag).Values.Item(0))
+                If dicomMessage.Exists(m_TagSequence) Then
+                    sequenceItems = dicomMessage.DataSet.GetitemCount(m_TagSequence)
+                End If
+                If sequenceNr = sequenceItems Then
+                    message = "The sequence has a correct number of items: " + sequenceItems.ToString + " as specified by '" + dicomMessage(m_NrOfSeqItemTag).Name + "'(" + m_NrOfSeqItemTag + ")."
+                    Me.SetValid(message)
+                Else
+                    message = "The sequence has " + sequenceItems.ToString + " number of items, but " + sequenceNr.ToString + " where specified by " + dicomMessage(m_NrOfSeqItemTag).Name + "'(" + m_NrOfSeqItemTag + ")."
+                    Me.SetError(message)
+                End If
+                Me.Report()
+            End If
+
+        End If
+
+    End Sub
+
+End Class

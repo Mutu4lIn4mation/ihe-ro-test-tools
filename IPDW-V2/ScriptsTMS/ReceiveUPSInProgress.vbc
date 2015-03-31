@@ -1,0 +1,21 @@
+Class ReceiveUPSInProgress
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+
+        'Configure the receive step
+        Dim receiveStep As ReceiveScenarioStep = New ReceiveScenarioStep(New TMSActor(), New PDSActor(), True, DvtkData.Dimse.DimseCommand.NACTIONRQ)
+        Dim ro19 As RO_19_Transaction = New RO_19_Transaction(False)
+        receiveStep.AddTransaction(ro19)
+
+        'Configure the validate step
+        Dim validateStep As ValidateScenarioStep = New ValidateScenarioStep(receiveStep)
+        validateStep.AddRules(ro19.GetCommonTransactionRulesForRequest())
+
+        'Add the steps
+        m_scenarioSteps.Add(receiveStep)
+        m_scenarioSteps.Add(validateStep)
+
+    End Sub
+End Class

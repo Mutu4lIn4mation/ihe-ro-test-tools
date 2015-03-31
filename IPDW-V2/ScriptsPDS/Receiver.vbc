@@ -1,0 +1,281 @@
+'Receiver
+
+'Receives transactions from the actor under test
+'This class : 
+' - Listens for incoming associations
+' - Handles incoming associations correctly
+' - Stops when one or more stopcriteria are met.
+' Stopcriteria for the receiver are: 
+' * AllExpectedObjectsReceived
+' * UserPressedStop
+'( * ReceiveTimeout occurred)
+
+Class Receiver
+
+#Region "Private Fields"
+
+    Private m_DimseCommand As DvtkData.Dimse.DimseCommand
+    Private m_ReceiveActor As Actor
+    Private m_SendActor As Actor
+    Private m_secondReceiveActor As Actor
+
+    Private m_recievedMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+    Private m_errorMessage As String = "The received transactions do not match the expected transactions" + Environment.NewLine + "The transactions decribed below were not received:"
+
+    Private m_transactions As ArrayList = Nothing
+    Private m_receiverThread As ReceiverThread
+    Private m_secondReceiverThread As ReceiverThread
+
+    Private m_UsePortConfiguration As Boolean
+#End Region
+
+#Region "Constructors"
+
+    Public Sub New(ByVal receiveActor As Actor, ByVal sendActor As Actor)
+
+        MyClass.New(receiveActor, sendActor, False)
+
+    End Sub
+
+    Public Sub New(ByVal receiveActor As Actor, ByVal sendActor As Actor, ByVal usePortConfiguration As Boolean)
+
+        MyClass.New(receiveActor, sendActor, usePortConfiguration, Nothing, Nothing)
+
+    End Sub
+
+    Public Sub New(ByVal receiveActor As Actor, ByVal sendActor As Actor, ByVal usePortConfiguration As Boolean, ByVal secondReceiveActor As Actor, ByVal dimseCommand As DvtkData.Dimse.DimseCommand)
+
+        m_ReceiveActor = receiveActor
+        m_SendActor = sendActor
+        m_UsePortConfiguration = usePortConfiguration
+        m_secondReceiveActor = secondReceiveActor
+        m_DimseCommand = dimseCommand
+    End Sub
+
+#End Region
+
+#Region "Public Properties / Get and Set Methods"
+
+    'has received messages
+    Public ReadOnly Property ReceivedMessages() As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+        Get
+            Try
+                If m_recievedMessages.Count = 0 Then
+
+                    'collect all received messages from the receiver thread
+                    For i As Integer = 1 To m_receiverThread.Messages.DicomMessages.Count
+                        Dim dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = m_receiverThread.Messages.DicomMessages.Item(i - 1)
+                        m_DimseCommand = dicomMessage.CommandSet.DimseCommand
+
+                        'collect the received messages for the specific command
+                        Select Case m_DimseCommand
+                            Case DvtkData.Dimse.DimseCommand.CSTORERQ
+                                m_recievedMessages.Add(dicomMessage)
+                            Case DvtkData.Dimse.DimseCommand.CFINDRQ
+                                m_recievedMessages.Add(dicomMessage)
+                            Case DvtkData.Dimse.DimseCommand.CMOVERQ
+                                m_recievedMessages.Add(dicomMessage)
+                            Case DvtkData.Dimse.DimseCommand.NACTIONRQ
+                                m_recievedMessages.Add(dicomMessage)
+                            Case DvtkData.Dimse.DimseCommand.NSETRQ
+                                m_recievedMessages.Add(dicomMessage)
+                        End Select
+                    Next
+
+                    m_receiverThread.ClearMessages()
+
+                    If Not m_secondReceiveActor Is Nothing Then
+                        'collect all received messages from the second receiver thread
+                        For i As Integer = 1 To m_secondReceiverThread.Messages.DicomMessages.Count
+                            Dim dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = m_secondReceiverThread.Messages.DicomMessages.Item(i - 1)
+                            m_DimseCommand = dicomMessage.CommandSet.DimseCommand
+
+                            'collect the received messages for the specific command
+                            Select Case m_DimseCommand
+                                Case DvtkData.Dimse.DimseCommand.CSTORERQ
+                                    m_recievedMessages.Add(dicomMessage)
+                                Case DvtkData.Dimse.DimseCommand.CFINDRQ
+                                    m_recievedMessages.Add(dicomMessage)
+                                Case DvtkData.Dimse.DimseCommand.CMOVERQ
+                                    m_recievedMessages.Add(dicomMessage)
+                                Case DvtkData.Dimse.DimseCommand.NACTIONRQ
+                                    m_recievedMessages.Add(dicomMessage)
+                                Case DvtkData.Dimse.DimseCommand.NSETRQ
+                                    m_recievedMessages.Add(dicomMessage)
+                            End Select
+                        Next
+
+                        m_secondReceiverThread.ClearMessages()
+                    End If
+                End If
+                Return m_recievedMessages
+            Catch ex As System.NullReferenceException
+                Return New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+            End Try
+        End Get
+    End Property
+
+    'returns the missing transactions for the exeption
+    Public ReadOnly Property MissingTransactions() As String
+        Get
+            Return m_errorMessage
+        End Get
+    End Property
+
+#End Region
+
+#Region "Receiving Transactions Methods"
+
+    'Receive Transactionsfrom the actor under test
+    ' - Listens for incoming associations
+    ' - Handles incoming associations correctly
+    ' - Stops when one or more stopcriteria are met.
+    Public Function ReceiveTransactions(ByVal transactions As ArrayList) As Boolean
+
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+        Dim scenarioName As String = "_(" + config.GetCurrentScenario().GetType().Name + ")"
+
+        If m_UsePortConfiguration And Not m_DimseCommand = Nothing Then
+
+            m_receiverThread = New ReceiverThread("Receiver" + m_ReceiveActor.Id + scenarioName, config.GetDVTKAEConfiguration(m_ReceiveActor.Id, m_DimseCommand))
+        ElseIf m_UsePortConfiguration Then
+            m_receiverThread = New ReceiverThread("Receiver" + m_ReceiveActor.Id + scenarioName)
+        End If
+
+        If Not m_secondReceiveActor Is Nothing Then
+            If m_UsePortConfiguration Then
+                m_secondReceiverThread = New ReceiverThread("Receiver" + m_secondReceiveActor.Id + scenarioName, config.GetDVTKAEConfiguration(m_secondReceiveActor.Id))
+            Else
+                m_secondReceiverThread = New ReceiverThread("Receiver" + m_secondReceiveActor.Id + scenarioName)
+            End If
+            m_secondReceiverThread.Options.AutoValidate = True
+        End If
+
+
+        m_transactions = transactions
+
+        ' Add the different MessageHandlers.
+        m_receiverThread.AddToBack(New MessageHandlerCStore)
+        m_receiverThread.AddToBack(New MessageHandlerCFind)
+        m_receiverThread.AddToBack(New MessageHandlerCMove(m_SendActor.Id, m_ReceiveActor.Id))
+        m_receiverThread.AddToBack(New MessageHandlerNAction)
+        m_receiverThread.AddToBack(New MessageHandlerNSet)
+        m_receiverThread.AddToBack(New MessageHandlerAssociateRQ)
+        If Not m_secondReceiveActor Is Nothing Then
+            m_secondReceiverThread.AddToBack(New MessageHandlerCStore)
+            m_secondReceiverThread.AddToBack(New MessageHandlerAssociateRQ)
+            m_secondReceiverThread.AddToBack(New MessageHandlerCMove(m_SendActor.Id, m_secondReceiveActor.Id))
+        End If
+
+#If Not DVT_INTERPRETS_SCRIPT Then
+        ' Atatch HLIForm to receiverthread for logging purpose
+        HliForm.GetSingleton().Attach(m_receiverThread)
+        If Not m_secondReceiveActor Is Nothing Then
+            HliForm.GetSingleton().Attach(m_secondReceiverThread)
+        End If
+        HliForm.GetSingleton().AutoExit = True
+#End If
+        ' Log all allowed transfersyntaxes
+        LogUsedTransferSyntaxes()
+        ' Start the SCP listener
+        ' show the listening dialog
+
+        Dim TheForm As ListeningDlg = New ListeningDlg()
+        'TheForm.Text = scenarioName
+        TheForm.dvtkLogger.Attach(m_receiverThread)
+
+        m_receiverThread.Start()
+        If Not m_secondReceiveActor Is Nothing Then
+            m_secondReceiverThread.Start()
+        End If
+
+        If Not m_secondReceiveActor Is Nothing Then
+            TheForm.dvtkLogger.Attach(m_secondReceiverThread)
+        End If
+
+        Dim theDialogResult As Integer = TheForm.ShowDialog()
+
+        ' Stop Listening
+        If Not m_secondReceiveActor Is Nothing Then
+            m_secondReceiverThread.Stop()
+            m_secondReceiverThread.WaitForCompletion()
+        End If
+        m_receiverThread.Stop()
+        m_receiverThread.WaitForCompletion()
+        If m_receiverThread.HasExceptionOccured Then
+            Throw New System.Exception("An error occured while receiving transactions from the actor under test")
+        End If
+
+        If m_receiverThread.m_inAssociation Then
+            Throw New System.Exception("An abort occured while receiving transactions from the actor under test")
+            'MessageBox.Show("Receiver in association.")
+        End If
+
+        If Not m_secondReceiveActor Is Nothing Then
+            If m_secondReceiverThread.HasExceptionOccured Then
+                Throw New System.Exception("An error occured while receiving transactions from the actor under test")
+            End If
+
+            If m_secondReceiverThread.m_inAssociation Then
+                Throw New System.Exception("An abort occured while receiving transactions from the actor under test")
+                'MessageBox.Show("Receiver in association.")
+            End If
+        End If
+
+        Logger.GetInstance().LogMessage("Number of dicom messages received: " + ReceivedMessages.Count.ToString())
+
+    End Function
+
+    'Check if all transactions are received.
+    Public Function AllTransactionsReceived(ByRef expectedTransactions As ArrayList) As Boolean
+        Dim resultString As String = ""
+        Dim result As Boolean = True
+
+        For Each transaction As Transaction In expectedTransactions
+            If Not TransactionReceived(transaction.IODType) Then
+                result = False
+            End If
+        Next
+        Return result
+    End Function
+
+    'Check if the received message has the transaction IOD type.
+    Private Function TransactionReceived(ByRef searchIodType As IODType) As Boolean
+
+        Dim expectedSOPClassUID As String = ""
+        Dim messageSOPClassUID As String = ""
+
+        SOPclass.TryGetSOPClassUID(searchIodType, expectedSOPClassUID)
+
+        For Each message As DicomMessage In ReceivedMessages()
+            'Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = message.DataSet(Tags.SOPClassUID)
+            'messageSOPClassUID = Attribute.Values(0)
+            messageSOPClassUID = message.CommandSet.GetSopClassUid()
+            If expectedSOPClassUID = messageSOPClassUID Then
+                Return True
+            ElseIf searchIodType = IODType.NotSpecified Then
+                Return True
+            End If
+        Next
+
+        Me.m_errorMessage += Environment.NewLine + String.Format("The transaction of type '{0}' was not recieved", searchIodType)
+
+        Return False
+
+    End Function
+
+    Private Sub LogUsedTransferSyntaxes()
+
+        Dim message As String
+        message = "Supported Transfer Syntaxes for receiver:"
+
+        For Each stringvalue As String In TestToolConfiguration.GetInstance().SupportedTransferSyntaxesReceiver
+            message += vbCrLf + vbTab + stringvalue
+        Next
+        Logger.GetInstance().LogMessage(message)
+
+    End Sub
+
+#End Region
+
+End Class

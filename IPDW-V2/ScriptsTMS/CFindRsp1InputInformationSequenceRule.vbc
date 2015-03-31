@@ -1,0 +1,84 @@
+Class CFindRsp1InputInformationSequenceRule
+    Inherits AttributeRule
+    ''' <summary>
+    '''If the Code Value is in the range 121702-121706, one or more RT Image SOP Instance references shall be supplied in the Input Information Sequence (0040,4021).
+    '''If the Code Value is in the range 121707-121708, one CT Image Series reference shall be supplied in the Input Information Sequence (0040,4021).
+    '''The specified location of the SOP Instances shall be an OST. Note that a specific product implementation could fulfill the roles of both a TMS and an OST, 
+    '''in which case one AE Title could be used to retrieve and store all input and output SOP Instances for the UPS.
+    ''' </summary>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Input Information Sequence Rule, for first response", Tags.IisRssRssReferencedSOPClassUID, iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim message As String = ""
+
+        If iodType = IODTypeRule Then
+            Dim NrOfItems As Integer = 0
+            Dim items As Integer = 0
+            Dim itemTag As String = ""
+
+            If Not dicomMessage.Exists(Tags.InputInformationSequence) Then
+                message = "The attribute: '" + Tags.GetTagName(Tags.InputInformationSequence) + "' (" + Tags.InputInformationSequence + ") is not present"
+                Me.SetValid(message)
+            Else
+                NrOfItems = dicomMessage.DataSet.GetitemCount(Tags.InputInformationSequence)
+                If Not dicomMessage.Exists(Tags.ScheduledWorkitemCodeValue) Then
+                    message = "The attribute: '" + Tags.GetTagName(Tags.ScheduledWorkitemCodeValue) + "' (" + Tags.ScheduledWorkitemCodeValue + ") is not present"
+                    Me.SetValid(message)
+                Else
+                    Dim RTimages As Integer = 0
+                    Dim CTimages As Integer = 0
+                    Dim OtherIODs As Integer = 0
+                    Dim codeValue As Integer = Convert.ToInt32(dicomMessage(Tags.ScheduledWorkitemCodeValue).Values.Item(0))
+
+                    For items = 1 To NrOfItems
+
+                        If dicomMessage.Exists(m_TagSequence) Then
+                            'raise tag
+                            itemTag = getItemInSQTag(items, Tags.InputInformationSequence)
+                            If dicomMessage(itemTag).Values.Item(0) = SOPclass.RTImageSOPClassUID Then
+                                RTimages = RTimages + 1
+                            ElseIf dicomMessage(itemTag).Values.Item(0) = SOPclass.CTImageSOPClassUID Then
+                                CTimages = CTimages + 1
+                            Else
+                                OtherIODs = OtherIODs + 1
+                            End If
+
+                        End If
+                    Next
+
+                    If codeValue >= 121702 And codeValue <= 121706 Then 'only RT Images
+                        If RTimages > 0 And CTimages = 0 And OtherIODs = 0 Then
+                            message = "The code value (" + codeValue.ToString + " specified that one or more RT image(s) should be suplied, actual number RT images: " + RTimages.ToString + "."
+                            Me.SetValid(message)
+                        Else
+                            message = "The code value (" + codeValue.ToString + " specified that one or more RT image(s) should be suplied, actual number RT images: " + RTimages.ToString + " and: " + (CTimages + OtherIODs).ToString + " other iods."
+                            Me.SetError(message)
+                        End If
+                        Me.Report()
+                    ElseIf codeValue >= 121707 And codeValue <= 121708 Then 'one CT image
+                        If CTimages = 1 And RTimages = 0 And OtherIODs = 0 Then
+                            message = "The code value (" + codeValue.ToString + " specified that one CT image should be suplied, actual number CT images: " + CTimages.ToString + "."
+                            Me.SetValid(message)
+                        Else
+                            message = "The code value (" + codeValue.ToString + " specified that one CT image should be suplied, actual number CT images: " + CTimages.ToString + " and: " + (RTimages + OtherIODs).ToString + " other iods."
+                            Me.SetError(message)
+                        End If
+                        Me.Report()
+                    End If
+
+                End If
+            End If
+
+
+        End If
+    End Sub
+End Class
