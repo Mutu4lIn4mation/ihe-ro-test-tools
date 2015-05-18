@@ -23,19 +23,22 @@ Class MessageHandlerNAction
 
             dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
 
-            Dim upsState As String = dicomMessage.DataSet.Item(Tags.ProcedureStepState).Values(0)
-            dicomMessageToSend.Set(Tags.ProcedureStepState, CS, upsState)
+            'Dim upsState As String = dicomMessage.DataSet.Item(Tags.ProcedureStepState).Values(0)
+            'dicomMessageToSend.Set(Tags.ProcedureStepState, CS, upsState)
 
-            If upsState = "COMPLETED" Then
-                dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, 100)
-            ElseIf upsState = "CANCELED" Then
-                dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, ReferenceDataSet.GetInstance.ReceivedProgress)
-            End If
+            'If upsState = "COMPLETED" Then
+            '    dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, 100)
+            'ElseIf upsState = "CANCELED" Then
+            '    dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, ReferenceDataSet.GetInstance.ReceivedProgress)
+            'End If
 
             'dicomMessageToSend.Set(Tags.TransactionUID, UI, getTransactionUID(dicomMessage)) 'TransactionUID
             dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
 
-            CopyInterRelationAttributes(dicomMessage, dicomMessageToSend)
+            'CopyInterRelationAttributes(dicomMessage, dicomMessageToSend)
+            Dim value As String = dicomMessage(Tags.RequestedSOPInstanceUID).Values.Item(0)
+            dicomMessageToSend.Set(Tags.AffectedSOPInstanceUID, DvtkData.Dimse.VR.UI, value)
+
             Send(dicomMessageToSend, dicomMessage.EncodedPresentationContextID)
 
             'The RO-60 request will allways send IN PROGRESS, RO-65 uses values COMPLETED en CANCELLED

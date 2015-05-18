@@ -77,11 +77,11 @@
     <SUTAEConfiguration Actor="OST">
       <IPAddress>127.0.0.1</IPAddress>
       <SUTAESetting Command="CMOVE">
-        <AETitle>OST_AE</AETitle>
+        <AETitle>OST</AETitle>
         <Port>106</Port>
       </SUTAESetting>
       <SUTAESetting Command="CSTORE">
-        <AETitle>OST_AE</AETitle>
+        <AETitle>OST</AETitle>
         <Port>106</Port>
       </SUTAESetting>
     </SUTAEConfiguration>

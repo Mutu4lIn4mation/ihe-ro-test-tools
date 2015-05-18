@@ -172,6 +172,17 @@ Class RO58Transaction
         m_rules.Add(New IsRequiredRule(Tags.InputInformationSequence, ro58IODType, ErrorSeverity.RuleError))
         m_rules.Add(New CFindRspInputInformationSequenceRule(ro58IODType, ErrorSeverity.RuleError))
 
+        '(0x00080054) retrieveAETitle
+        Dim sutSettingTMS As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(New TMSActor().Id, CMOVERQ)
+        Dim sutSettingOST As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(New OSTActor().Id, CMOVERQ)
+
+        Dim values(1) As String
+        values(0) = sutSettingTMS.AETitle
+        values(1) = sutSettingOST.AETitle
+
+        m_rules.Add(New SequenceLoopRule(Tags.InputInformationSequence, New IsRequiredRule(Tags.retrieveAETitle1, ro58IODType, ErrorSeverity.RuleError)))
+        m_rules.Add(New SequenceLoopRule(Tags.InputInformationSequence, New ValueListRule(Tags.retrieveAETitle1, values, ro58IODType, ErrorSeverity.RuleError)))
+
         If treatmentType = DataSetHandler.DicomTextValueTreatment Then
             m_rules.Add(New ValueRule(Tags.ScheduledProcessingParametersTextValue, DataSetHandler.DicomTextValueTreatment, ro58IODType, ErrorSeverity.RuleError))
         ElseIf treatmentType = DataSetHandler.DicomTextValueContinuation Then

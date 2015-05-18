@@ -155,10 +155,10 @@ Class RO62Transaction
         m_rules.Add(New InterOperabilityRule(Tags.SOPInstanceUID, Tags.AffectedSOPInstanceUID, DataSetHandler.UPSCacheXMLFileName, "C-FIND-RSP", ro62IODType, ErrorSeverity.RuleError))
 
 
-        '(0x00081195)  Transaction UID
-        m_rules.Add(New IsRequiredRule(Tags.TransactionUID, ro62IODType, ErrorSeverity.RuleError))
-        'Use Transaction UID of RO-60 that is send by tms, this transaction UID is used during the total delivery.
-        m_rules.Add(New InterOperabilityRule(Tags.TransactionUID, Tags.TransactionUID, DataSetHandler.UPSCacheXMLFileName, "N-ACTION-REQ-RO60", ro62IODType, ErrorSeverity.RuleError))
+        ''(0x00081195)  Transaction UID
+        'm_rules.Add(New IsRequiredRule(Tags.TransactionUID, ro62IODType, ErrorSeverity.RuleError))
+        ''Use Transaction UID of RO-60 that is send by tms, this transaction UID is used during the total delivery.
+        'm_rules.Add(New InterOperabilityRule(Tags.TransactionUID, Tags.TransactionUID, DataSetHandler.UPSCacheXMLFileName, "N-ACTION-REQ-RO60", ro62IODType, ErrorSeverity.RuleError))
         Return m_rules
 
     End Function

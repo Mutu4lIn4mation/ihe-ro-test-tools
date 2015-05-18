@@ -104,25 +104,25 @@ Class RO65Transaction
         '(0x00000900)  Status
         m_rules.Add(New ValueRule(Tags.StatusCommandElement, "0", ro65IODType, ErrorSeverity.RuleError))
 
-        '(0x00741000)  Unified Procedure Step State
-        m_rules.Add(New IsRequiredRule(Tags.ProcedureStepState, ro65IODType, ErrorSeverity.RuleError))
-        If m_isCancelled = True Then
-            m_rules.Add(New ValueRule(Tags.ProcedureStepState, "CANCELED", ro65IODType, ErrorSeverity.RuleError))
-        Else
-            m_rules.Add(New ValueRule(Tags.ProcedureStepState, "COMPLETED", ro65IODType, ErrorSeverity.RuleError))
-        End If
+        ''(0x00741000)  Unified Procedure Step State
+        'm_rules.Add(New IsRequiredRule(Tags.ProcedureStepState, ro65IODType, ErrorSeverity.RuleError))
+        'If m_isCancelled = True Then
+        '    m_rules.Add(New ValueRule(Tags.ProcedureStepState, "CANCELED", ro65IODType, ErrorSeverity.RuleError))
+        'Else
+        '    m_rules.Add(New ValueRule(Tags.ProcedureStepState, "COMPLETED", ro65IODType, ErrorSeverity.RuleError))
+        'End If
 
-        ' (0x00741002)  UPS Progress Information Sequence
-        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationSequence, ro65IODType, ErrorSeverity.RuleError))
+        '' (0x00741002)  UPS Progress Information Sequence
+        'm_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationSequence, ro65IODType, ErrorSeverity.RuleError))
 
-        ' > (0x00741004)  Unified Procedure Step Progress
-        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, ro65IODType, ErrorSeverity.RuleError))
+        '' > (0x00741004)  Unified Procedure Step Progress
+        'm_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, ro65IODType, ErrorSeverity.RuleError))
 
-        If m_isCancelled = True Then
-            m_rules.Add(New ValueInRangeRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, 0, 99, ro65IODType, ErrorSeverity.RuleError))
-        Else
-            m_rules.Add(New ValueRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, "100", ro65IODType, ErrorSeverity.RuleError))
-        End If
+        'If m_isCancelled = True Then
+        '    m_rules.Add(New ValueInRangeRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, 0, 99, ro65IODType, ErrorSeverity.RuleError))
+        'Else
+        '    m_rules.Add(New ValueRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, "100", ro65IODType, ErrorSeverity.RuleError))
+        'End If
         Return m_rules
 
     End Function

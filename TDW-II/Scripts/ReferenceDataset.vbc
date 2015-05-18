@@ -155,7 +155,8 @@ Class ReferenceDataSet
             responseMessage.DataSet.Read(fileName)
             Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (UnifiedProcedureStepPull RSP): '{0}'.", fileName))
 
-            responseMessage.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, &HFF00) ' Status.
+            'responseMessage.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, &HFF00) ' Status.
+            responseMessage.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status = Success
 
             'The values in the C-FIND RSP are dependant on the configuration file
             'at least for the OST and the TMS actor, the names should be conform the configuration
@@ -171,10 +172,10 @@ Class ReferenceDataSet
 
         responseMessages.Add(responseMessage)
 
-        'Add Success response
-        Dim responseMessage2 As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CFINDRSP)
-        responseMessage2.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status = Success
-        responseMessages.Add(responseMessage2)
+        ''Add Success response
+        'Dim responseMessage2 As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CFINDRSP)
+        'responseMessage2.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status = Success
+        'responseMessages.Add(responseMessage2)
 
         Return responseMessages
     End Function
@@ -554,7 +555,7 @@ Class ReferenceDataSet
         Return retVal
     End Function
 
-    Public Shared Function createCMoveRqDynamic(ByVal XMLFileName As String, ByVal sutActorId As String, ByVal storeActorId As String) As DicomMessageCollection
+    Public Shared Function createCMoveRqRtBeamsDelivery(ByVal XMLFileName As String, ByVal sutActorId As String, ByVal storeActorId As String) As DicomMessageCollection
         'RVDH: in order to request the appropiate data from the system under test, we need several UIDs
         'the study UID, the series UID and the SOP instance UID(s)
         'these can be found in the 4 workitems in the input information sequence
@@ -596,6 +597,70 @@ Class ReferenceDataSet
                             Dim sopClassUID As String = sqIisItem.GetValues(Tags.ReferencedSOPSequenceSOPClassUID).Item(0)
 
                             If sopClassUID = SOPclass.RTBeamsDeliveryInstructionSOPClassUID Then
+                                Dim serieInstanceUID As String = sqIisItem.GetValues(Tags.SeriesInstanceUID).Item(0)
+
+                                Dim nrOfSopItems As Integer = sqIisItem.GetitemCount(Tags.ReferencedSOPSequenceMOVE)
+                                For sopItem As Integer = 1 To nrOfSopItems
+                                    Dim sqSopItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.ReferencedSOPSequenceMOVE, sopItem)
+
+                                    Dim sopInstanceUID As String = sqSopItem.GetValues(Tags.ReferencedSOPInstanceUIDMOVE).Item(0)
+
+                                    'everything is known now, add to message collection
+                                    AddMoveMessageToRQ(retVal, studyInstanceUID, serieInstanceUID, sopInstanceUID, storeActorId)
+                                Next 'number of sop instance items
+                            End If
+                        End If
+                        'Next 'number of serie items
+                    End If
+                Next 'number of information sequence items
+
+            End If
+        End If
+        Return retVal
+    End Function
+
+    Public Shared Function createCMoveRqRtPlan(ByVal XMLFileName As String, ByVal sutActorId As String, ByVal storeActorId As String) As DicomMessageCollection
+        'RVDH: in order to request the appropiate data from the system under test, we need several UIDs
+        'the study UID, the series UID and the SOP instance UID(s)
+        'these can be found in the 4 workitems in the input information sequence
+        'also in there is the specific location (AEtitle) where the image can be found
+
+        'we use a message collection, but for the IPDW workflow we only allow one C-MOVE-RQ, multiple C-MOVE's are not supported (yet)
+        Dim retVal As DicomMessageCollection = New DicomMessageCollection()
+
+        'open workitem in dataset
+        Dim datasetName As String = "C-FIND-RSP"
+        Dim dataSet As Dicom.Other.DataSet = DataSetHandler.LoadDatasetFromFile(XMLFileName, datasetName)
+        If dataSet.Exists(Tags.InputInformationSequence) Then
+            'loop trough items in the input information sequence
+
+            Dim nrOfIisItems As Integer = dataSet.Item(Tags.InputInformationSequence).ItemCount
+            If nrOfIisItems > 0 Then
+
+                For iisItem As Integer = 1 To nrOfIisItems
+                    Dim sqIisItem As Dicom.Other.SequenceItem = dataSet.Item(Tags.InputInformationSequence).GetItem(iisItem)
+
+                    'loop through items
+
+                    If sqIisItem.Exists(Tags.StudyInstanceUID) Then
+                        Dim studyInstanceUID As String = sqIisItem.GetValues(Tags.StudyInstanceUID).Item(0)
+
+                        ' Dim nrOfSeriesItems As Integer = sqIisItem.GetitemCount(Tags.ReferencedSeriesSequenceMOVE)
+                        'For serieItem As Integer = 1 To nrOfSeriesItems
+                        'Dim sqSerieItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.ReferencedSeriesSequenceMOVE, serieItem)
+
+                        Dim sutSetting As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(sutActorId, CMOVERQ)
+                        Dim sutAeTitle As String = sutSetting.AETitle
+                        Dim retrieveAeTitle As String = sutAeTitle
+                        If sqIisItem.Exists(Tags.retrieveAETitleMOVE) Then
+                            retrieveAeTitle = sqIisItem.GetValues(Tags.retrieveAETitleMOVE).Item(0)
+                        End If
+
+                        'compare AE titles
+                        If retrieveAeTitle = sutAeTitle Then
+                            Dim sopClassUID As String = sqIisItem.GetValues(Tags.ReferencedSOPSequenceSOPClassUID).Item(0)
+
+                            If sopClassUID = SOPclass.RTPlanDosimetricSOPClassUID Then
                                 Dim serieInstanceUID As String = sqIisItem.GetValues(Tags.SeriesInstanceUID).Item(0)
 
                                 Dim nrOfSopItems As Integer = sqIisItem.GetitemCount(Tags.ReferencedSOPSequenceMOVE)

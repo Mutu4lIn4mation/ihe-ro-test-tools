@@ -129,14 +129,15 @@ Class MessageHandlerCFind
             responseMessage.Set(indexedRssSeriesInstanceUid, UI, currentRssSiuid)
             responseMessage.Set(indexedRssStudyInstanceUid, UI, currentStudyIUID)
 
+            Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+            Dim dvtkSettingOST As DVTKAEConfiguration = config.GetDVTKAEConfiguration(New OSTActor().Id)
+            Dim dvtkSettingTMS As DVTKAEConfiguration = config.GetDVTKAEConfiguration(New TMSActor().Id)
+
             If (dataSetInfo(DataSetHandler.DatasetInfoClassIdx) = SOPclass.RTBeamsDeliveryInstructionSOPClassUID) Then
-                responseMessage.Set(aeTitleTag, AE, DataSetHandler.GetAeTitleFromConfiguration(New TDDActor))
+                responseMessage.Set(aeTitleTag, AE, dvtkSettingTMS.AETitle)
             Else
-                responseMessage.Set(aeTitleTag, AE, DataSetHandler.GetAeTitleFromConfiguration(New OSTActor))
-
+                responseMessage.Set(aeTitleTag, AE, dvtkSettingOST.AETitle)
             End If
-
-
 
             'responseMessage.Set(aeTitleTag, AE, aeTitle)
 
@@ -149,7 +150,6 @@ Class MessageHandlerCFind
             'set current referenced class uid, instance uid
             responseMessage.Set(indexedRssRsopsRsopsCuid, UI, dataSetInfo(DataSetHandler.DatasetInfoClassIdx))
             responseMessage.Set(indexedRssRsopsRsopsIuid, UI, dataSetInfo(DataSetHandler.DatasetInfoInstanceIdx))
-
         Next
     End Sub
 

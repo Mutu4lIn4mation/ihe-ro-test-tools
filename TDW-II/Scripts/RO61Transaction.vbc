@@ -22,7 +22,7 @@ Class RO61Transaction
         Dim datasetMessages As ArrayList = New ArrayList()
         Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
 
-        Dim messages As DicomMessageCollection = ReferenceDataSet.createCMoveRqDynamic(DataSetHandler.UPSCacheXMLFileName, m_sutActorId, m_storeActorId)
+        Dim messages As DicomMessageCollection = ReferenceDataSet.createCMoveRqRtBeamsDelivery(DataSetHandler.UPSCacheXMLFileName, m_sutActorId, m_storeActorId)
         If messages.Count = 0 Then
             'NO messages found in the C-FIND repsonses to retrieve from the SCP
             Dim log As String = "The response of the first scenario should have at least a reference to the RT Beams Delivery Instruction Storage file in the TMS (it could be that the AeTitle in the C-FIND-RSP is not the same as the TMS ae title in the configuration file."

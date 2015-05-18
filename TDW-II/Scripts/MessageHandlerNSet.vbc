@@ -9,8 +9,10 @@ Class MessageHandlerNSet
 
             Dim dicomMessageToSend As DicomMessage = MessageHandlerHelper.CreateResponseMessage(DvtkData.Dimse.DimseCommand.NSETRSP, dicomMessage)
 
-            dicomMessageToSend.Set(Tags.TransactionUID, UI, dicomMessage.DataSet(Tags.TransactionUID).Values(0))
+            'dicomMessageToSend.Set(Tags.TransactionUID, UI, dicomMessage.DataSet(Tags.TransactionUID).Values(0))
             'dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, dicomMessage.DataSet.Item(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0))
+
+            dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
 
             Send(dicomMessageToSend, dicomMessage.EncodedPresentationContextID)
 

@@ -49,7 +49,7 @@ Class RO64Transaction
         ' Fill > (0x00404033)  Output Information Sequence
         If DataSetHandler.AttributeExistsInDataSet(DataSetHandler.UPSCacheXMLFileName, createCFindRespString(), Tags.ScheduledWorkitemCodeSequence) Then
             ' Fill >> (0x0040E021)  Type of Instances
-            message.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceTypeOfInstances, SH, "DICOM")
+            message.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceTypeOfInstances, CS, "DICOM")
 
             Dim datasetPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName)
             Dim RTRecordDataSet As Dicom.Other.DataSet = DataSetHandler.LoadDatasetFromFolderByClassUid(datasetPath, SOPclass.RTBeamsTreatmentRecordSTOREOPClassUID)
@@ -84,6 +84,7 @@ Class RO64Transaction
         CopyInterOperabilityAttributes(message)
 
         If m_isCancelled = True Then
+            message.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, "0")
             message.DataSet(Tags.UPSPerformedProcedureSequence).Delete()
         End If
 
@@ -170,12 +171,18 @@ Class RO64Transaction
             ' > (0x00404032)   DICOM Retrieval Sequence
             m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequence, ro64IODType, ErrorSeverity.RuleError))
 
+            '(0x00080054) retrieveAETitle
+            Dim sutSettingOST As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(New OSTActor().Id, CMOVERQ)
+
+            m_rules.Add(New SequenceLoopRule(Tags.OutputInformationSequence, New ValueRule(Tags.UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequenceAETitle, sutSettingOST.AETitle, ro64IODType, ErrorSeverity.RuleError)))
+
             ' > (0x00404032)   Non-DICOM Output Code Sequence
             'm_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureNonDICOMOutputInformationSequence, ro64IODType, ErrorSeverity.RuleError))
             'm_rules.Add(New EmptySequenceRule(Tags.UPSPerformedProcedureNonDICOMOutputInformationSequence, ro64IODType, ErrorSeverity.RuleError))
 
         Else
 
+            m_rules.Add(New ValueRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, "0", ro64IODType, ErrorSeverity.RuleError))
             m_rules.Add(New NotPresentRule(Tags.UPSPerformedProcedureSequence, ro64IODType, ErrorSeverity.RuleError))
 
         End If
@@ -202,8 +209,8 @@ Class RO64Transaction
         m_rules.Add(New ValueRule(Tags.StatusCommandElement, "0", ro64IODType, ErrorSeverity.RuleError))
 
         '(0x00081195)  Transaction UID
-        m_rules.Add(New IsRequiredRule(Tags.TransactionUID, ro64IODType, ErrorSeverity.RuleError))
-        m_rules.Add(New InterRelationRule(msg, Tags.TransactionUID, Tags.TransactionUID, ro64IODType, ErrorSeverity.RuleError))
+        'm_rules.Add(New IsRequiredRule(Tags.TransactionUID, ro64IODType, ErrorSeverity.RuleError))
+        'm_rules.Add(New InterRelationRule(msg, Tags.TransactionUID, Tags.TransactionUID, ro64IODType, ErrorSeverity.RuleError))
 
         Return m_rules
 

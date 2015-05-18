@@ -8,6 +8,7 @@ Class ConditionalSequenceRule
     Inherits MappingRule
 
     Private m_WrappedRule As MappingRule
+    Private m_WrappedRuleAttribute As AttributeRule
     Private m_TagSequence As String
 
     ''' <summary>
@@ -26,24 +27,50 @@ Class ConditionalSequenceRule
                                                         Me.Name), "mappingRule")
         End If
 
+        m_WrappedRuleAttribute = Nothing
         m_WrappedRule = mappingRule
+        m_TagSequence = tagSequence
+
+    End Sub
+
+    Public Sub New(ByVal tagSequence As String, ByVal mappingRule As AttributeRule)
+
+        MyBase.New("Conditional Sequence Rule", mappingRule.IODTypeRule, mappingRule.ErrSeverity)
+
+        m_WrappedRule = Nothing
+        m_WrappedRuleAttribute = mappingRule
         m_TagSequence = tagSequence
 
     End Sub
 
     Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
 
-        If iodType = m_WrappedRule.IODTypeRule Then
+        If Not (m_WrappedRule Is Nothing) Then
 
-            If (dicomMessage.CommandSet.Exists(m_TagSequence)) Or (dicomMessage.DataSet.Exists(m_TagSequence)) Then
+            If iodType = m_WrappedRule.IODTypeRule Then
 
-                ' apply rule only on the first item in the sequence
-                m_WrappedRule.ApplyRule(dicomMessage, iodType)
+                If (dicomMessage.CommandSet.Exists(m_TagSequence)) Or (dicomMessage.DataSet.Exists(m_TagSequence)) Then
+
+                    ' apply rule only on the first item in the sequence
+                    m_WrappedRule.ApplyRule(dicomMessage, iodType)
+
+                End If
 
             End If
-
         End If
 
+        If Not (m_WrappedRuleAttribute Is Nothing) Then
+            If iodType = m_WrappedRuleAttribute.IODTypeRule Then
+
+                If (dicomMessage.CommandSet.Exists(m_TagSequence)) Or (dicomMessage.DataSet.Exists(m_TagSequence)) Then
+
+                    ' apply rule only on the first item in the sequence
+                    m_WrappedRuleAttribute.ApplyRule(dicomMessage, iodType)
+
+                End If
+
+            End If
+        End If
     End Sub
 
 End Class

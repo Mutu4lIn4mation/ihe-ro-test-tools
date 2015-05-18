@@ -51,7 +51,7 @@ Class TMSRetrievalofworklistScenario
 
             'Configure the validate response steps
             Dim validate1 As ValidateScenarioStep = New ValidateScenarioStep(send, 0)
-            Dim validate2 As ValidateScenarioStep = New ValidateScenarioStep(send, 1)
+            Dim validate2 As ValidateScenarioStep = New ValidateScenarioStep(send, True, 0)
 
             ' apply rules for C-FIND Response
             validate1.AddRules(ro58transaction.GetCommonTransactionRulesForResponse(queryForm.m_DateTimePickerStart.Value, queryForm.m_DateTimePickerStop.Value, queryForm.m_requestDataset))

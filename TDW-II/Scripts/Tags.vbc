@@ -25,6 +25,8 @@ Public Class Tags
     Public Shared ReadOnly FinalCumulativeMetersetWeight As String = String.Format("{0}[1]/{1}", BeamSequence, "0x300A010E")
     Public Shared ReadOnly ReferencedToleranceTableNumber As String = String.Format("{0}[1]/{1}", BeamSequence, "0x300A00A0")
 
+    Public Shared ReadOnly PrimaryFluenceModeSequence As String = String.Format("{0}[1]/{1}", BeamSequence, "0x30020050")
+
     Public Shared ReadOnly HighDoseTechniqueTypeTag As String = "0x300A00C7"
 
     Public Shared ReadOnly BeamLimitingDeviceSequenceTagSequence As String = "0x300A00B6"
@@ -222,10 +224,37 @@ Public Class Tags
     'RT PRESCRIPTION MODULE
     Public Shared ReadOnly DoseReferenceSequence As String = "0x300A0010"
     Public Shared ReadOnly DoseReferenceUID As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0013")
+    Public Shared ReadOnly DoseReferenceStructureType As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0014")
     Public Shared ReadOnly DoseReferenceDescription As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0016")
+    Public Shared ReadOnly DoseReferencePointCoordinates As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0018")
+    Public Shared ReadOnly DoseReferenceType As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0020")
+    Public Shared ReadOnly ConstraintWeight As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0021")
+    Public Shared ReadOnly DeliveryWarningDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0022")
+    Public Shared ReadOnly DeliveryMaximumDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0023")
+    Public Shared ReadOnly TargetMinimumDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0025")
+    Public Shared ReadOnly TargetPrescriptionDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0026")
+    Public Shared ReadOnly TargetMaximumDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0027")
 
     'RT FRACTION SCHEME MODULE
     Public Shared ReadOnly FractionGroupSequence As String = "0x300A0070"
+
+    Public Shared ReadOnly FractionGroupSequenceFractionGroupNumber As String = String.Format("{0}[1]/{1}", FractionGroupSequence, "0x300A0071")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseSequence As String = String.Format("{0}[1]/{1}", FractionGroupSequence, "0x300C0080")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequence As String = String.Format("{0}[1]/{1}", FractionGroupSequence, "0x300C0050")
+
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceRefDoseRefNumber As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300C0051")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceConstraintWeight As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0021")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceDeliveryWarningDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0022")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceDeliveryMaximumDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0023")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceTargetMinimumDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0025")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceTargetPrescriptionDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0026")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceTargetMaximumDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0027")
+
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseSequenceRefSopClassUID As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseSequence, "0x00081150")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseSequenceRefSopInstanceUID As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseSequence, "0x00081155")
+
+
+
     Public Shared ReadOnly FractionGroupNumber As String = "0x300A0071"
     Public Shared ReadOnly ReferencedBeamNumberItem As String = "0x300C0006"
     Public Shared ReadOnly ReferencedBeamSequenceItem As String = "0x300C0004"
@@ -273,6 +302,9 @@ Public Class Tags
     Public Shared ReadOnly InstanceCreationTime As String = "0x00080013"
     Public Shared ReadOnly InstanceCreatorUID As String = "0x00080014"
     Public Shared ReadOnly InstanceNumber As String = "0x00200013"
+    Public Shared ReadOnly ReceivingAE As String = "0x00741234"
+    Public Shared ReadOnly DeletionLock As String = "0x00741230"
+
 
     'OUTPUT INFORMATION SEQUENCE
     Public Shared ReadOnly OutputInformationSequence As String = "0x00404033"
@@ -333,6 +365,8 @@ Public Class Tags
     'Unified Procedure Step Scheduled Procedure Information Module
     Public Shared ReadOnly ScheduledProcedureStepModificationDateandTime As String = "0x00404010"
 
+    Public Shared ReadOnly InputReadinessState As String = "0x00404041"
+
     'Command Data
     Public Shared ReadOnly MessageID As String = "0x00000110"
     Public Shared ReadOnly MessageIDBeingRespondedTo As String = "0x00000120"
@@ -353,14 +387,24 @@ Public Class Tags
     'INPUT INFORMATION SEQUENCE
     Public Shared ReadOnly InputInformationSequence As String = "0x00404021"
     'Public Shared ReadOnly IisReferencedSeriesSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x00081115")
+    Public Shared ReadOnly IisTypeOfInstances As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E020")
     Public Shared ReadOnly IisRssReferencedSOPSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x00081199")
     Public Shared ReadOnly ReferencedSOPClassUID As String = "0x00081150"
     Public Shared ReadOnly IisRssRssReferencedSOPClassUID As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x00081150")
     'Public Shared ReadOnly ReferencedSOPInstanceUID As String = String.Format("0x00081155")
     Public Shared ReadOnly IisRssRssReferencedSOPInstanceUID As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x00081155")
+
+    Public Shared ReadOnly IisRssRssHL7InstanceIdentifier As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x0040E001")
+    Public Shared ReadOnly IisRssRssReferencedFrameNumber As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x00081160")
+    Public Shared ReadOnly IisRssRssReferencedSegmentNumber As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x0062000B")
+
     Public Shared ReadOnly IisStudyInstanceUID As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0020000D")
     Public Shared ReadOnly IisRssSeriesInstanceUID As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0020000E")
     'Public Shared ReadOnly IisRssRetrieveAeTitle As String = String.Format("{0}[1]/{1}", IisReferencedSeriesSequence, "0x00080054")
+
+    Public Shared ReadOnly IisMediaRetrievalSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E022")
+    Public Shared ReadOnly IisWADORetrievalSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E023")
+    Public Shared ReadOnly IisXDSRetrievalSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E024")
 
     'SCHEDULED PROCESSING PARAMETERS SEQUENCE
     Public Shared ReadOnly ScheduledProcessingParametersSequence As String = "0x00741210"
@@ -429,6 +473,9 @@ Public Class Tags
     'specific tags needed to dynamically change the AE title of the C-FIND-RSPs
     'Public Shared ReadOnly IisReferencedSeriesSequence2 As String = String.Format("{0}[2]/{1}", InputInformationSequence, "0x00081115")
 
+    Public Shared ReadOnly DICOMRetrievalSequence As String = "0x0040E021"
+
+
     Public Shared ReadOnly InputInformationSequenceDICOMRetrievalSequence1 As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E021")
     Public Shared ReadOnly InputInformationSequenceDICOMRetrievalSequence2 As String = String.Format("{0}[2]/{1}", InputInformationSequence, "0x0040E021")
     Public Shared ReadOnly InputInformationSequenceDICOMRetrievalSequence3 As String = String.Format("{0}[3]/{1}", InputInformationSequence, "0x0040E021")
@@ -451,6 +498,7 @@ Public Class Tags
     Public Shared ReadOnly ContinuationStartMeterset As String = "0x00740120"
     Public Shared ReadOnly ContinuationEndMeterset As String = "0x00740121"
     Public Shared ReadOnly ReferencedRTPlanSequence As String = "0x300C0002"
+    Public Shared ReadOnly RTPlanRelationship As String = "0x300A0055"
     Public Shared ReadOnly ReferencedFractionGroupSequence As String = String.Format("{0}[1]/{1}", ReferencedRTPlanSequence, "0x300C0020")
     Public Shared ReadOnly DoseComment As String = "0x30040006"
     Public Shared ReadOnly ReferencedFrameNumberTag As String = "0x00081160"

@@ -25,6 +25,9 @@ Public Enum IODType
     CStoreRequest
     NAction
     RTPlanGeometric
+    NCreate
+    NEventReport
+    NGet
 
     ' Unknown  ' can be used when the SOP Class UID of a received message can not be identified
 

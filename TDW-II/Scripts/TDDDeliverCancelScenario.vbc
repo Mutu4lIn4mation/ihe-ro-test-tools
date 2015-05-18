@@ -45,6 +45,9 @@ Class TDDDeliverCancelScenario
 
 
             If radiationDialog.Delivered Then
+
+                ro64transaction = New RO64Transaction(False)
+
                 'Add transactions to the receiver
                 receive.AddTransaction(ro62transaction)  ' RO-62: Treatment Delivery Progress Update
                 receive.AddTransaction(ro62transaction_50)  ' RO-62: Treatment Delivery Progress Update

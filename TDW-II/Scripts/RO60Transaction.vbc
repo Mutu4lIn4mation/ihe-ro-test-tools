@@ -84,9 +84,9 @@ Class RO60Transaction
         Dim msg As DicomMessage = DirectCast(TransactionDataMessages(0), DicomMessage)
 
         '(0x00741000) Procedure Step State
-        m_rules.Add(New IsRequiredRule(Tags.ProcedureStepState, m_ro60IODType, ErrorSeverity.RuleError))
-        m_rules.Add(New InterRelationRule(msg, Tags.ProcedureStepState, Tags.ProcedureStepState, m_ro60IODType, ErrorSeverity.RuleError))
-        m_rules.Add(New ValueRule(Tags.ProcedureStepState, "IN PROGRESS", m_ro60IODType, ErrorSeverity.RuleError))
+        'm_rules.Add(New IsRequiredRule(Tags.ProcedureStepState, m_ro60IODType, ErrorSeverity.RuleError))
+        'm_rules.Add(New InterRelationRule(msg, Tags.ProcedureStepState, Tags.ProcedureStepState, m_ro60IODType, ErrorSeverity.RuleError))
+        'm_rules.Add(New ValueRule(Tags.ProcedureStepState, "IN PROGRESS", m_ro60IODType, ErrorSeverity.RuleError))
 
         ' (0x00001000) Affected SOP Instance UID
         m_rules.Add(New OptionalRule(Tags.AffectedSOPInstanceUID, m_ro60IODType, ErrorSeverity.RuleError))

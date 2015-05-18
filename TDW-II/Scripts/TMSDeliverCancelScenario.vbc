@@ -39,23 +39,27 @@ Class TMSDeliverCancelScenario
             radiationDialog.ShowDialog()
 
             ' Create transactions used in both scenario flows
-            Dim ro64transaction As RO64Transaction = New RO64Transaction(True)
+            Dim ro64transaction As RO64Transaction
             Dim ro65transaction As RO65Transaction = New RO65Transaction(True)
 
             ' Create senders used in both scenario flows
             Dim sendRO64 As SendScenarioStep = New SendScenarioStep(tddActor, tmsActor, True)
             Dim sendRO65 As SendScenarioStep = New SendScenarioStep(tddActor, tmsActor, True)
-            sendRO64.AddTransaction(ro64transaction)  ' RO-64: Treatment Delivery Final Update
+
             sendRO65.AddTransaction(ro65transaction)  ' RO-65: Treatment Delivery Completed/Canceled
 
             'Configure the validate step for RO-64
             Dim validateRO64 As ValidateScenarioStep = New ValidateScenarioStep(sendRO64)
             'Configure the validate step for RO-65
             Dim validateRO65 As ValidateScenarioStep = New ValidateScenarioStep(sendRO65)
-            validateRO64.AddRules(ro64transaction.GetCommonTransactionRulesForResponse())
+
             validateRO65.AddRules(ro65transaction.GetCommonTransactionRulesForResponse())
 
             If radiationDialog.Delivered Then
+
+                ro64transaction = New RO64Transaction(False)
+                sendRO64.AddTransaction(ro64transaction)  ' RO-64: Treatment Delivery Final Update
+
                 Dim ro62transaction_0 As RO62Transaction = New RO62Transaction(0)    '(progress = 0%)
                 Dim ro62transaction_UserDefined As RO62Transaction = New RO62Transaction(radiationDialog.Percentage)
                 Dim ro63transaction As RO63Transaction = New RO63Transaction(True)
@@ -88,6 +92,7 @@ Class TMSDeliverCancelScenario
                 validateRO62_0.AddRules(ro62transaction_0.GetCommonTransactionRulesForResponse())
                 validateRO62_UserDefined.AddRules(ro62transaction_UserDefined.GetCommonTransactionRulesForResponse())
                 validateRO63.AddRules(ro63transaction.GetCommonTransactionRulesForResponse())
+                validateRO64.AddRules(ro64transaction.GetCommonTransactionRulesForResponse())
 
                 'Add the validate steps to the list
                 m_scenarioSteps.Add(validateRO62_0)
@@ -97,9 +102,15 @@ Class TMSDeliverCancelScenario
                 m_scenarioSteps.Add(validateRO65)
 
             Else
+
+                ro64transaction = New RO64Transaction(True)
+                sendRO64.AddTransaction(ro64transaction)  ' RO-64: Treatment Delivery Final Update
+
                 'Add the send steps to the list
                 m_scenarioSteps.Add(sendRO64)
                 m_scenarioSteps.Add(sendRO65)
+
+                validateRO64.AddRules(ro64transaction.GetCommonTransactionRulesForResponse())
 
                 'Add the validate steps to the list
                 m_scenarioSteps.Add(validateRO64)
