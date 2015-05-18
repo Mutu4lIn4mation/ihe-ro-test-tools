@@ -62,21 +62,21 @@ Class BeamLimitingDeviceTypeRule
 
                 'validate the results, the scenario determines what the result should be
                 Select Case m_scenario
-                    Case ARTO_Scenario.BasicStaticBeam, ARTO_Scenario.ArcBeam, ARTO_Scenario.StaticElectronBeam, ARTO_Scenario.StereotacticBeam, ARTO_Scenario.StereotacticArcBeam
+                    Case ARTO_Scenario.BasicStaticBeam, ARTO_Scenario.ArcBeam, ARTO_Scenario.StaticElectronBeam, ARTO_Scenario.StereotacticBeam, ARTO_Scenario.StereotacticArcBeam, ARTO_Scenario.PhotonApplicatorArcBeam, ARTO_Scenario.PhotonApplicatorBeam
                         message = "The beam limiting device type contains " + NrOfASYMs.ToString + " JAW types (2 should be present) and " + NrOfMLCs.ToString + " MLC types (none should be present)."
                         If (NrOfJAWs = 2) And (NrOfMLCs = 0) Then
                             Me.SetValid(message)
                         Else
                             Me.SetError(message)
                         End If
-                    Case ARTO_Scenario.HardWedgeBeam, ARTO_Scenario.MotorizedWedgeBeam, ARTO_Scenario.VirtualWedgeBeam, ARTO_Scenario.ConformalArcBeam
+                    Case ARTO_Scenario.HardWedgeBeam, ARTO_Scenario.MotorizedWedgeBeam, ARTO_Scenario.VirtualWedgeBeam, ARTO_Scenario.ConformalArcBeam, ARTO_Scenario.MLCVariableApertureArcBeam
                         message = "The beam limiting device type contains " + NrOfASYMs.ToString + " JAW types (at least 2 should be present, or at least 1 if MLC is present) and " + NrOfMLCs.ToString + " MLC types (max=1)."
                         If (((NrOfJAWs > 0) And (NrOfMLCs = 1)) Or ((NrOfJAWs > 1) And (NrOfMLCs = 0))) Then
                             Me.SetValid(message)
                         Else
                             Me.SetError(message)
                         End If
-                    Case ARTO_Scenario.StepAndShootBeam, ARTO_Scenario.SlidingWindowBeam, ARTO_Scenario.IMATVMATBeam, ARTO_Scenario.BasicStaticMLCBeam, ARTO_Scenario.MLCArcBeam
+                    Case ARTO_Scenario.StepAndShootBeam, ARTO_Scenario.SlidingWindowBeam, ARTO_Scenario.IMATVMATBeam, ARTO_Scenario.BasicStaticMLCBeam, ARTO_Scenario.MLCArcBeam, ARTO_Scenario.MLCFixedApertureArcBeam
                         message = "The beam limiting device type contains " + NrOfASYMs.ToString + " JAW types and " + NrOfMLCs.ToString + " MLC types (at least one should be present)."
                         If (NrOfMLCs > 0) Then
                             Me.SetValid(message)

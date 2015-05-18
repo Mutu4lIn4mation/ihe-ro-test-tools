@@ -101,7 +101,7 @@ MODULE "Unified Procedure Step Relationship Module" M
  >(0x00080103,1C,SH,1) "Coding Scheme Version" 
  >(0x00080104,1,LO,1) "Code Meaning"
 ) "Admitting Diagnoses Code Sequence" 
-(0x0040A370,2,SQ,2,
+(0x0040A370,2,SQ,1,
  >(0x0020000D,1,UI,1) "Study Instance UID"
  >(0x00080050,2,SH,1) "Accession Number"
  >(0x00080051,2,SQ,1,
@@ -539,7 +539,7 @@ MODULE "Unified Procedure Step Relationship Module" M
 (0x00100010,3,PN,1) "Patient's Name"
 (0x00100020,3,LO,1) "Patient ID" 
 (0x00100021,2,LO,1) "Issuer of Patient ID"
-(0x00100024,2,SQ,1,
+(0x00100024,3,SQ,1,
  >(0x00400032,2,UT,1) "Universal Entity ID"
  >(0x00400033,1C,CS,1) "Universal Entity ID Type"
  >(0x00400035,2,CS,1) "Identifier Type Code"
@@ -749,7 +749,7 @@ MODULE "Unified Procedure Step Scheduled Procedure Information Module" M
  >(0x00080104,1C,LO,1) "Code Meaning" 
 ) "Scheduled Workitem Code Sequence" 
 (0x00400400,3,LT,1) "Comments on the Scheduled Procedure Step" 
-(0x00404041,1,CS,1,E,"INCOMPLETE"
+(0x00404041,2,CS,1,E,"INCOMPLETE"
                     |"UNAVAILABLE"
 					|"READY") "Input Readiness State" 
 (0x00404021,3,SQ,1,
@@ -2550,8 +2550,7 @@ ENDDEFINE
 
 DEFINE N-ACTION-RSP "Unified Procedure Step - Pull SOP Class"
 
-SOPCLASS "1.2.840.10008.5.1.4.34.6.3" "Unified Procedure Step - Pull SOP Class"
-           
+SOPCLASS "1.2.840.10008.5.1.4.34.6.3" "Unified Procedure Step - Pull SOP Class"   
 
 ENDDEFINE
 

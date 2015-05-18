@@ -130,7 +130,7 @@ Class RO58Transaction
         m_rules.Add(New ValueRule(Tags.ScheduledProcessingParametersValueType, "TEXT", ro58IODType, ErrorSeverity.RuleError))
 
         m_rules.Add(New IsRequiredRule(Tags.ScheduledProcessingParameters_ConceptNameCodeSequence_CodeValue, ro58IODType, ErrorSeverity.RuleError))
-        m_rules.Add(New ValueRule(Tags.ScheduledProcessingParameters_ConceptNameCodeSequence_CodeValue, "ccc001", ro58IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.ScheduledProcessingParameters_ConceptNameCodeSequence_CodeValue, "121740", ro58IODType, ErrorSeverity.RuleError))
 
         m_rules.Add(New IsRequiredRule(Tags.ScheduledProcessingParameters_ConceptNameCodeSequence_CodingSchemeDesignator, ro58IODType, ErrorSeverity.RuleError))
         m_rules.Add(New ValueRule(Tags.ScheduledProcessingParameters_ConceptNameCodeSequence_CodingSchemeDesignator, "DCM", ro58IODType, ErrorSeverity.RuleError))

@@ -352,7 +352,7 @@ Class TestToolConfiguration
         thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("Verification.def")
         thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("FileMeta.def")
 
-        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("RTTreatmentSummaryRecordStorage.def")
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("RT Treatment Summary Record Storage.def")
 
         thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.CTImage))
 

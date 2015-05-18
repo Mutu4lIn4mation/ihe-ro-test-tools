@@ -29,8 +29,8 @@ Class IODReceivedRule
                     If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.RTBeamsTreatmentRecordSTOREOPClassUID Then
                         nrOffSoppClassUIDsFound = nrOffSoppClassUIDsFound + 1
                     End If
-                ElseIf m_atLeastPresent = IODType.BasicTextSR Then
-                    If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.BasicTextSRSOPClassUID Then
+                ElseIf m_atLeastPresent = IODType.EnhancedSR Then
+                    If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.EnhancedSRSOPClassUID Then
                         nrOffSoppClassUIDsFound = nrOffSoppClassUIDsFound + 1
                     End If
                 Else
@@ -48,7 +48,7 @@ Class IODReceivedRule
             ElseIf m_atLeastPresent = IODType.RTBeamsTreatmentRecordSTORE Then
                 errorMessage = "No RT Beams Treatement Record received"
             Else
-                errorMessage = "No Base Text Structured Report received"
+                errorMessage = "No Enhanced Structured Report received"
             End If
             errorEncountered = True
         Else
@@ -59,7 +59,7 @@ Class IODReceivedRule
             ElseIf m_atLeastPresent = IODType.RTBeamsTreatmentRecordSTORE Then
                 errorMessage = nrOffSoppClassUIDsFound.ToString() + " RT Beams Treatment Record(s) is/are received"
             Else
-                errorMessage = nrOffSoppClassUIDsFound.ToString() + " Base Text Structured Report(s) is/are received"
+                errorMessage = nrOffSoppClassUIDsFound.ToString() + " Enhanced Structured Report(s) is/are received"
             End If
         End If
 
