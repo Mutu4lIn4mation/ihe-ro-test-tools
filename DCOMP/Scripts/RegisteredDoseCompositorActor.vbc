@@ -1,0 +1,11 @@
+
+Class RegisteredDoseCompositorActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("Registered Dose Compositor", "Registered Dose Compositor Actor")
+
+    End Sub
+
+End Class

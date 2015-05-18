@@ -1,0 +1,56 @@
+Class EmptyValueRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' this rule verifies if the value in this attribute is a empty
+    ''' </summary>
+    ''' <param name="valueTag">the attribute that needs to be checked</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+
+    Public Sub New(ByVal valueTag As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+
+        MyClass.New(valueTag, "", 1, iodType, severity)
+
+
+    End Sub
+
+    Public Sub New(ByVal valueTag As String, ByVal sequenceItemTag As String, ByVal itemIndex As Integer, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Empty Value Rule", valueTag, iodType, severity)
+
+        m_SequenceItemTag = sequenceItemTag
+        m_ItemIndex = itemIndex
+
+
+    End Sub
+
+    Private m_SequenceItemTag As String
+    Private m_ItemIndex As Integer
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim message As String = ""
+        Dim tagSequence As String = ""
+
+        If iodType = IODTypeRule Then
+            If (m_SequenceItemTag <> "") Then
+                tagSequence = getItemInSQTag(m_ItemIndex, m_SequenceItemTag)
+            Else
+                tagSequence = m_TagSequence
+            End If
+            If Not dicomMessage.Exists(tagSequence) Then
+                message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present in the dataset."
+                Me.SetValid(message)
+            ElseIf Not dicomMessage(tagSequence).Values.Item(0) = "" Then
+                message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains the value: " + dicomMessage(tagSequence).Values.Item(0).ToString() + " but should contain an empty value."
+                Me.SetError(message)
+            Else
+                message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains an empty value."
+                Me.SetValid(message)
+            End If
+            Me.Report()
+        End If
+    End Sub
+
+End Class

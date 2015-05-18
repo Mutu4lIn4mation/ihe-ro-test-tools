@@ -1,0 +1,11 @@
+
+Class RegisteredGeneralDoseViewerActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("Registered General Dose Viewer", "Registered General Dose Viewer Actor")
+
+    End Sub
+
+End Class

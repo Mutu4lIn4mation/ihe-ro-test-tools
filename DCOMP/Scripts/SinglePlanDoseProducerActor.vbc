@@ -1,0 +1,11 @@
+
+Class SinglePlanDoseProducerActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("Single Plan Dose Producer", "Single Plan Dose Producer Actor")
+
+    End Sub
+
+End Class

@@ -1,0 +1,128 @@
+
+''' <summary>
+''' Compares the value of 2 given tags in 2 given datasets.
+''' </summary>
+''' <remarks></remarks>
+Class InterOperabilityRule
+    Inherits MappingRule
+
+    Private m_SourceDataSetName As String ' for logging purposes
+    Private m_sourceDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet
+    Private m_sourceTag As String
+    Private m_targetTag As String
+    Private m_allowTargetToBeEmpty As Boolean
+
+    ''' <summary>
+    ''' Ctor.
+    ''' </summary>
+    ''' <param name="sourceXmlFileName">The Name of the XML file that holds the refference to the dataset</param>
+    ''' <param name="sourceDataSetName">The Name of the XMLNode for the dataset</param>
+    ''' <param name="sourceTag">The Tag for the source dataset</param>
+    ''' <param name="targetTag">The Tag for the target dataset</param>
+    ''' <param name="iodType">IODType of the rule</param>
+    ''' <param name="severity">Error severiry of the rule</param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal sourceTag As String, ByVal targetTag As String, ByVal sourceXmlFileName As String, ByVal sourceDataSetName As String, ByVal allowTargetToBeEmpty As Boolean, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyClass.New(sourceTag, targetTag, DataSetHandler.LoadDatasetFromFile(sourceXmlFileName, sourceDataSetName), IODType, severity)
+
+        m_SourceDataSetName = sourceDataSetName
+        m_allowTargetToBeEmpty = allowTargetToBeEmpty
+
+    End Sub
+
+    ''' <summary>
+    ''' Ctor.
+    ''' </summary>
+    ''' <param name="sourceXmlFileName">The Name of the XML file that holds the refference to the dataset</param>
+    ''' <param name="sourceDataSetName">The Name of the XMLNode for the dataset</param>
+    ''' <param name="sourceTag">The Tag for the source dataset</param>
+    ''' <param name="targetTag">The Tag for the target dataset</param>
+    ''' <param name="iodType">IODType of the rule</param>
+    ''' <param name="severity">Error severiry of the rule</param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal sourceTag As String, ByVal targetTag As String, ByVal sourceXmlFileName As String, ByVal sourceDataSetName As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyClass.New(sourceTag, targetTag, DataSetHandler.LoadDatasetFromFile(sourceXmlFileName, sourceDataSetName), iodType, severity)
+
+        m_SourceDataSetName = sourceDataSetName
+        m_allowTargetToBeEmpty = False
+
+    End Sub
+
+
+    ''' <summary>
+    ''' Ctor.
+    ''' </summary>
+    ''' <param name="sourceDataSet">The source dataset</param>
+    ''' <param name="sourceTag">The Tag for the source dataset</param>
+    ''' <param name="targetTag">The Tag for the target dataset</param>
+    ''' <param name="iodType">IODType of the rule</param>
+    ''' <param name="severity">Error severiry of the rule</param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal sourceTag As String, ByVal targetTag As String, ByVal sourceDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("InterOperabilityRule", iodType, severity)
+
+        m_sourceDataSet = sourceDataSet
+        m_sourceTag = sourceTag
+        m_targetTag = targetTag
+
+        ' Set the dataset name to a FIXED value for logging purpose:
+        m_SourceDataSetName = "Reference Dataset"
+        m_allowTargetToBeEmpty = False
+
+    End Sub
+
+
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim sourceValue As String = ""
+        Dim targetValue As String = ""
+        Dim errorEncountered As Boolean = False
+
+        If iodType = IODTypeRule Then
+            ' If source tag exists in reference dataset, get it's value
+            If m_sourceDataSet.Exists(m_sourceTag) Then
+                sourceValue = m_sourceDataSet.Item(m_sourceTag).Values(0)
+            Else
+                Me.SetError("The Attribute: " + Tags.GetTagName(m_sourceTag) + "'(" + m_sourceTag + ") is not present in the reference Dataset: " + m_SourceDataSetName + ".")
+                errorEncountered = True
+            End If
+
+            ' If target tag exist in received message, get it's value
+            targetValue = getValueOfTag(dicomMessage, m_targetTag)
+            If targetValue Is Nothing Then
+                Me.SetError("The Attribute: " + Tags.GetTagName(m_targetTag) + "'(" + m_targetTag + ") is not present in the received message.")
+                errorEncountered = True
+            ElseIf (targetValue Is "") And m_allowTargetToBeEmpty Then
+                'Target tag contains empty value, this is allowed, setValid and stop processing
+                Me.SetValid("The Attribute: " + Tags.GetTagName(m_targetTag) + "'(" + m_targetTag + ") contains an empty value.")
+                errorEncountered = True
+            End If
+
+            If Not errorEncountered Then
+                If (sourceValue = targetValue) Then
+                    Me.SetValid("The Attribute: '" + Tags.GetTagName(m_targetTag) + "'(" + m_targetTag + ") with value: " + targetValue + " in the received message is the same as Attribute '" + Tags.GetTagName(m_sourceTag) + "'(" + m_sourceTag + ") in the reference dataset: " + m_SourceDataSetName + ".")
+                Else
+                    Me.SetError("The Attribute: '" + Tags.GetTagName(m_targetTag) + "'(" + m_targetTag + ") with value: " + targetValue + " in the received message is NOT the same as Attribute '" + Tags.GetTagName(m_sourceTag) + "'(" + m_sourceTag + ") in the reference dataset: " + m_SourceDataSetName + " with value: " + sourceValue + ".")
+                End If
+            End If
+            Me.Report()
+        End If
+    End Sub
+
+    ' Checks if the given tag is present in the Commandset or the DataSet of the Dicom Message and returns the value. 
+    ' If tag is not pressent in both, 'Nothing' is returned
+    Private Function getValueOfTag(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal tag As String) As String
+        Dim retVal As String = Nothing
+
+        If (dicomMessage.DataSet.Exists(tag)) Then
+            retVal = dicomMessage.DataSet(tag).Values(0)
+        ElseIf (dicomMessage.CommandSet.Exists(tag)) Then
+            retVal = dicomMessage.CommandSet(tag).Values(0)
+        End If
+        Return retVal
+    End Function
+End Class

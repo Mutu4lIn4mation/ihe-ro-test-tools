@@ -1,0 +1,52 @@
+Class SinglePlanDoseProducerScenario
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+
+        ' Specify data sets to use.
+        m_scenarioDatasetXmlFileName = "DataSets.xml"
+        ReferenceDataSet.GetInstance().LoadNewDataSet(m_scenarioDatasetXmlFileName)
+
+        ' Create actors.
+        Dim archiveActor As ArchiveActor = New ArchiveActor()
+        Dim singlePlanDoseProducerActor As SinglePlanDoseProducerActor = New SinglePlanDoseProducerActor()
+
+        ' Create transactions.
+        Dim rad_4_8_Transaction As RAD_4_8_Transaction = New RAD_4_8_Transaction(IODType.CTImage, "CT1*.dcm") ' Modality Images Stored (CT images).
+        Dim mmro_4_Transaction As MMRO_4_Transaction = New MMRO_4_Transaction(New String() {"RS1.dcm"}) ' Registered Structure Set Retrieval.
+        Dim ro_DC3_Transaction As RO_DC3_Transaction = New RO_DC3_Transaction() ' Single Plan Dose Storage.
+
+        ' Send scenario step.
+        Dim sendTestDataDialog As SendTestDataDialog = New SendTestDataDialog(singlePlanDoseProducerActor)
+        sendTestDataDialog.ShowDialog()
+
+        If (sendTestDataDialog.DialogResult = Windows.Forms.DialogResult.Yes) Then
+            Dim sendScenarioStep As SendScenarioStep = New SendScenarioStep(archiveActor, singlePlanDoseProducerActor)
+            sendScenarioStep.AddTransaction(rad_4_8_Transaction)
+            sendScenarioStep.AddTransaction(mmro_4_Transaction)
+            m_scenarioSteps.Add(sendScenarioStep)
+
+        End If
+
+        ' Receive scenario step.
+        Dim receiveScenarioStep As ReceiveScenarioStep = New ReceiveScenarioStep(archiveActor, singlePlanDoseProducerActor, DvtkData.Dimse.DimseCommand.CSTORERQ)
+        receiveScenarioStep.AddTransaction(ro_DC3_Transaction)
+        m_scenarioSteps.Add(receiveScenarioStep)
+
+        ' Validate scenario step
+        Dim validateScenarioStep As ValidateScenarioStep = New ValidateScenarioStep(receiveScenarioStep)
+        validateScenarioStep.AddRules(RORulesFactory.CreateCriticalAttributeMappingRules(ReferenceDataSet.GetInstance().GetStorageSopInstance("CT11.dcm", IODType.CTImage), IODType.RTDose))
+        validateScenarioStep.AddRules(RORulesFactory.CreateRTDoseIodCriticalModuleRules())
+        validateScenarioStep.AddRules(RORulesFactory.CreateRTDoseIodCriticalAttributeRules())
+        validateScenarioStep.AddRules(RulesFactory.Create_RO_DC3_TransactionRules(IODType.RTDose))
+        m_scenarioSteps.Add(validateScenarioStep)
+
+        ' Clean up scenario step
+        If TestToolConfiguration.GetInstance.DoCleanUp = True Then
+            m_scenarioSteps.Add(New CleanUpScenarioStep(TestToolConfiguration.GetInstance.GetSession.ResultsRootDirectory))
+        End If
+
+    End Sub
+
+End Class

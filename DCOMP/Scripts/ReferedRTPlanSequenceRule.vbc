@@ -1,0 +1,212 @@
+Class ReferedRTPlanSequenceRule
+    Inherits MessageCollectionRule
+    'One single plan RT dose object must be present in order to perfom this rule
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal refFileName1 As String)
+
+        MyBase.New("Referenced RTplan Sequence Rule", iodType, severity)
+        m_RefFileName1 = refFileName1
+    End Sub
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal refFileName1 As String, ByVal refFileName2 As String)
+
+        MyBase.New("Referenced RTplan Sequence Rule", iodType, severity)
+        m_RefFileName1 = refFileName1
+        m_RefFileName2 = refFileName2
+        m_MultipleDoseObjects = True
+
+    End Sub
+
+    Private m_messageCollectionHelper As messageCollectionHelper
+    Private m_RefFileName1 As String = ""
+    Private m_RefFileName2 As String = ""
+    Private m_MultipleDoseObjects = False
+    Private m_tagSequence = Tags.ReferencedRTPlanSequence
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+        Dim RtDoseDatasetCollection As DvtkHighLevelInterface.Dicom.Other.DataSetCollection = Nothing
+        Dim message As String = ""
+        Dim LoadingSuccess As Boolean = False
+        Dim refDoseDataset1 As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim refDoseDataset2 As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim CompositeDoseDataset As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim refChecklist1 As System.Collections.Specialized.StringCollection = New System.Collections.Specialized.StringCollection
+        Dim refChecklist2 As System.Collections.Specialized.StringCollection = New System.Collections.Specialized.StringCollection
+        Dim refChecklist3 As System.Collections.Specialized.StringCollection = New System.Collections.Specialized.StringCollection
+
+        Dim i As Integer = 0
+        Dim FoundValue = False
+        Dim attributeCount As Integer = 0
+
+        Me.SetValid("Referenced RTplan Sequence rule could not be checked.")
+
+        Try
+            RtDoseDatasetCollection = m_messageCollectionHelper.GetRTDoseDatasetCollection
+
+            If RtDoseDatasetCollection.Count = 0 Then
+                message = "No RT Dose Object received. The Referenced RTplan Sequence rule could not be checked."
+                Me.SetError(message)
+            Else
+                'get the reference data objects
+                LoadingSuccess = GetRTDoseDatasets(RtDoseDatasetCollection, refDoseDataset1, refDoseDataset2, CompositeDoseDataset)
+
+                If LoadingSuccess Then
+                    refChecklist1 = GetCheckListFromReferenceData(refChecklist1, refDoseDataset1)
+                    refChecklist2 = GetCheckListFromReferenceData(refChecklist2, refDoseDataset2)
+                    refChecklist3 = GetCheckListFromReferenceData(refChecklist3, CompositeDoseDataset)
+
+                    Dim referenceValue As String = GetFirtItemfromRTPlansequence(refChecklist1, refChecklist2, refChecklist3)
+
+                    'check ik the FOR entries are in the same frame of reference.
+                    CheckFirtItemOfRTPlansequence(refChecklist1, referenceValue)
+                    CheckFirtItemOfRTPlansequence(refChecklist2, referenceValue)
+                    CheckFirtItemOfRTPlansequence(refChecklist3, referenceValue)
+
+                    'Check if the FOR entries in the compostie object are matching
+                    checkCompositeRTPlanSequenceEntries(refChecklist1, refChecklist2, refChecklist3)
+
+                    'No exeptions occured, the rule is valid.
+                    Me.SetValid("The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") contains the correct values")
+                End If
+            End If
+
+        Catch ex As Exception
+            Me.SetError(ex.Message)
+        End Try
+
+        If Not Me.IsValid Then
+            Me.SetError(message)
+        End If
+        Me.Report()
+    End Sub
+    'Get the correct value for the Dose Type, first look in the reference data, then in the recieved data to check the dose type value.
+    Private Function GetRTDoseDatasets(ByRef doseDatasetCollection As DvtkHighLevelInterface.Dicom.Other.DataSetCollection, ByRef refDoseDataset1 As DvtkHighLevelInterface.Dicom.Other.DataSet, ByRef refDoseDataset2 As DvtkHighLevelInterface.Dicom.Other.DataSet, ByRef CompositeDoseDataset As DvtkHighLevelInterface.Dicom.Other.DataSet) As Boolean
+        Dim LoadingSuccesfull As Boolean = False
+        Dim referenceValue As String = "PHYSICAL"
+        Dim doseTypeValue As String = ""
+        Dim doseSummationType As String = ""
+
+        If Not m_RefFileName1.Equals("") Then
+            refDoseDataset1 = ReferenceDataSet.GetInstance.GetStorageSopInstance(m_RefFileName1, IODType.RTDose).DataSet
+        Else
+            Throw New Exception("Reference dataset 1 could not be loaded")
+        End If
+
+        If m_MultipleDoseObjects Then
+            If Not m_RefFileName2.Equals("") Then
+                refDoseDataset2 = ReferenceDataSet.GetInstance.GetStorageSopInstance(m_RefFileName2, IODType.RTDose).DataSet
+            Else
+
+                Throw New Exception("Reference dataset 2 could not be loaded")
+            End If
+        End If
+
+        For Each dataset As DvtkHighLevelInterface.Dicom.Other.DataSet In doseDatasetCollection
+            If doseSummationType.Equals("MULTI_PLAN") Then
+                CompositeDoseDataset = dataset
+                LoadingSuccesfull = True
+            Else
+                refDoseDataset2 = dataset
+            End If
+        Next
+        Return LoadingSuccesfull
+    End Function
+    Private Function GetCheckListFromReferenceData(ByRef Checklist As System.Collections.Specialized.StringCollection, ByRef refDoseDataset As DvtkHighLevelInterface.Dicom.Other.DataSet)
+        Dim referenceValue As String = ""
+        Dim i As Integer = 0
+        Dim attributeCount As Integer = 0
+
+        If Not refDoseDataset Is Nothing Then
+
+            If refDoseDataset.Exists(m_tagSequence) Then
+                attributeCount = refDoseDataset(m_tagSequence).Values().Count
+                For i = 0 To attributeCount - 1
+                    referenceValue = refDoseDataset(m_tagSequence).Values().Item(i)
+
+                    If Not Checklist.Contains(referenceValue) Then
+                        Checklist.Add(referenceValue)
+                    End If
+                Next
+            Else
+                Throw New Exception("The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") is not present.")
+            End If
+        Else
+            Throw New Exception("Reference dataset is empty")
+        End If
+
+        Return Nothing
+    End Function
+    Private Function GetFirtItemfromRTPlansequence(ByRef Checklist As System.Collections.Specialized.StringCollection, ByRef Checklist2 As System.Collections.Specialized.StringCollection, ByRef Checklist3 As System.Collections.Specialized.StringCollection) As String
+        Dim referenceValue As String = ""
+
+        If Checklist.Count = 1 Then
+            'single plan, FOR found
+            referenceValue = Checklist.Item(0)
+
+        ElseIf Checklist2.Count = 1 Then
+            'single plan, FOR found
+            referenceValue = Checklist.Item(0)
+
+        ElseIf Checklist3.Count = 1 Then
+            'single plan, FOR found
+            referenceValue = Checklist.Item(0)
+
+        Else
+            Throw New Exception("The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") is not present.")
+        End If
+
+        Return referenceValue
+    End Function
+    Private Function CheckFirtItemOfRTPlansequence(ByRef Checklist As System.Collections.Specialized.StringCollection, ByRef referenceValue As String)
+        If referenceValue.Equals(Checklist.Item(0)) Then
+            Me.SetValid("The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") contains the correct values")
+        Else
+            Dim Message As String = "The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has a different FOR as first entry : "
+            Throw New Exception(Message)
+        End If
+        Return Nothing
+    End Function
+    Private Function checkCompositeRTPlanSequenceEntries(ByRef Checklist As System.Collections.Specialized.StringCollection, ByRef Checklist2 As System.Collections.Specialized.StringCollection, ByRef Checklist3 As System.Collections.Specialized.StringCollection)
+        Dim list As System.Collections.ArrayList = New ArrayList
+        Dim compostieObjectCount As Integer = 0
+
+        If Checklist.Count > 1 Then
+            list.Add(Checklist)
+            compostieObjectCount = compostieObjectCount + 1
+        End If
+
+        If Checklist2.Count > 1 Then
+            list.Add(Checklist2)
+            compostieObjectCount = compostieObjectCount + 1
+        End If
+
+        If Checklist3.Count > 1 Then
+            list.Add(Checklist3)
+            compostieObjectCount = compostieObjectCount + 1
+        End If
+
+        If compostieObjectCount = 3 Then
+            For Each referenceValue As String In Checklist
+                If Not Checklist2.Contains(referenceValue) Then
+                    Throw New Exception("The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") are different in the other compostie objects")
+                End If
+
+                If Not Checklist3.Contains(referenceValue) Then
+                    Throw New Exception("The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") are different in the other compostie objects")
+                End If
+            Next
+        ElseIf compostieObjectCount = 2 Then
+            Dim list1 As System.Collections.Specialized.StringCollection = list.Item(0)
+            Dim list2 As System.Collections.Specialized.StringCollection = list.Item(1)
+
+            For Each referenceValue As String In list1
+                If Not list2.Contains(referenceValue) Then
+                    Throw New Exception("The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") are different in the other compostie objects")
+                End If
+            Next
+        End If
+
+        Return Nothing
+    End Function
+End Class

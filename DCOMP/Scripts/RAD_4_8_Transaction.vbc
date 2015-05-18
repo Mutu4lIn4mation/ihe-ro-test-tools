@@ -1,0 +1,41 @@
+
+' Transaction RO-8 (Modality Images Stored) class
+Class RAD_4_8_Transaction
+    Inherits Transaction
+
+    'Constructor
+    Public Sub New(ByVal iodType As IODType)
+        MyBase.New("RAD-8", "Modality Images Stored", iodType, False)
+    End Sub
+
+    'Constructor
+    Public Sub New(ByVal iodType As IODType, ByVal wildcard As String)
+        Me.New(iodType)
+
+        m_wildcard = wildcard
+
+    End Sub
+
+    Private m_wildcard As String = String.Empty
+
+    'method which returns the related reference data messages belonging to this transaction
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim dicomMessages As ArrayList = New ArrayList()
+
+        If Not (m_wildcard = String.Empty) Then
+            Dim referenceDataSingleton As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+            Dim SopInstances As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = referenceDataSingleton.GetStorageSopInstances(m_wildcard, m_Iodtype)
+
+            For Each sopInstance As DvtkHighLevelInterface.Dicom.Messages.DicomMessage In SopInstances
+                dicomMessages.Add(sopInstance)
+
+            Next
+
+        End If
+
+        Return dicomMessages
+
+    End Function
+
+End Class

@@ -1,0 +1,312 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports DvtkHighLevelInterface.Dicom.Other
+Imports DvtkHighLevelInterface.Dicom.Messages
+#End If
+
+' Contains general IHE-RO rules as specified in "IHE Radiation Oncology Technical Framework - Volume II (RO TF-2) - Revision 1.7 – Final Text - 9 May, 2011"
+' See "IHE_RO_TF_Rev1-7_Vol2_2011-0509.pdf".
+Public Class RORulesFactory
+
+#Region "Critical Attribute Mapping Rules"
+
+    ' This method is currently only applicable for IODTypes RTPlanGeometric, RTPlanDosimetric and RTDose!
+    Public Shared Function CreateCriticalAttributeMappingRules(ByVal sourceMessage As DicomMessage, ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        rules.Add(New InterRelationRule(sourceMessage, Tags.PatientName, Tags.PatientName, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.PatientID, Tags.PatientID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.PatientsBirthDate, Tags.PatientsBirthDate, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.PatientSex, Tags.PatientSex, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.StudyInstanceUID, Tags.StudyInstanceUID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.StudyDate, Tags.StudyDate, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.StudyTime, Tags.StudyTime, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.ReferringPhysiciansName, Tags.ReferringPhysiciansName, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.StudyID, Tags.StudyID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.AccessionNumber, Tags.AccessionNumber, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.StudyDescription, Tags.StudyDescription, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.FrameofReferenceUID, Tags.FrameofReferenceUID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New InterRelationRule(sourceMessage, Tags.PositionReferenceIndicator, Tags.PositionReferenceIndicator, iodType, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+#End Region
+
+#Region "Critical Module Rules for specific IOD's"
+    ' This method checks modules that are not always mandatory in the DICOM standard but are always mandatory in IHE-RO, by checking if one type 1 or type 2 attribute of a module (as defined in the DICOM standard) is present.
+    ' In combination with the DICOM definition files, this will validate if these mandatory modules are present or not (when one attribute of module is present, the complete module should be present).
+    ' See "IHE Radiation Oncology Technical Framework - Volume II (RO TF-2) - Revision 1.7 – Final Text - 9 May, 2011 - Appendix A.2: Radiation Oncology Critical Modules"
+    ' See IHE_RO_TF_Rev1-7_Vol2_2011-0509.pdf.
+    Public Shared Function CreateRTDoseIodCriticalModuleRules() As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Mandatory Patient module already validated by DICOM definition files.
+        ' Mandatory General Study module already validated by DICOM definition files.
+        ' Mandatory RT Series module already validated by DICOM definition files.
+        ' Mandatory Frame of Reference module already validated by DICOM definition files.
+        ' Mandatory General Equipment module already validated by DICOM definition files.
+        ' Mandatory General Image Module
+        rules.Add(New IsRequiredRule(Tags.InstanceNumber, IODType.RTDose, ErrorSeverity.RuleError))
+        ' Mandatory Image Plane Module
+        rules.Add(New IsRequiredRule(Tags.PixelSpacing, IODType.RTDose, ErrorSeverity.RuleError))
+        ' Mandatory Image Pixel Module
+        rules.Add(New IsRequiredRule(Tags.SamplesperPixel, IODType.RTDose, ErrorSeverity.RuleError))
+        ' Mandatory Multi-Frame Module
+        rules.Add(New IsRequiredRule(Tags.FrameIncrementPointer, IODType.RTDose, ErrorSeverity.RuleError))
+        ' Mandatory RT Dose module already validated by DICOM definition files.
+        ' Mandatory SOP Common module already validated by DICOM definition files.
+
+        Return rules
+
+    End Function
+
+#End Region
+
+#Region "Critical Attribute Rules for specific IOD's"
+
+    ' "Dose summation type" attribute is not present as this interferes with DCOMP transaction rules.
+    ' "Dose type" attribute is not present as this interferes with DCOMP transaction rules.
+    Public Shared Function CreateRTDoseIodCriticalAttributeRules() As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        rules.AddRange(CreatePatientModuleCriticalAttributeRules(IODType.RTDose))
+        rules.AddRange(CreateGeneralStudyModuleCriticalAttributeRules(IODType.RTDose))
+        rules.AddRange(CreateGeneralEquipmentModuleCriticalAttributeRules(IODType.RTDose))
+        rules.AddRange(CreateFrameOfReferenceModuleCriticalAttributeRules(IODType.RTDose))
+        rules.AddRange(CreateMultiFrameModuleCriticalAttributeRules())
+        rules.AddRange(CreateRTDoseModuleCriticalAttributeRules(IODType.RTDose))
+        rules.AddRange(CreateImagePlaneModuleCriticalAttributeRules(IODType.RTDose))
+        rules.AddRange(CreateSopCommonModuleCriticalAttributeRules(IODType.RTDose))
+
+        Return rules
+
+    End Function
+
+#End Region
+
+#Region "Critical Attribute Rules for specific modules (used by Critical Attribute Rules for specific IOD's)"
+
+    Private Shared Function CreatePatientModuleCriticalAttributeRules(ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Patient Name attribute.
+        ' "Attribute Note" in table "Patient Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New IsRequiredRule(Tags.PatientName, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.PatientName, iodType, ErrorSeverity.RuleError))
+
+        ' Patient ID attribute.
+        ' "Attribute Note" in table "Patient Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New IsRequiredRule(Tags.PatientID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.PatientID, iodType, ErrorSeverity.RuleError))
+
+        'Patient's Birth Date attribute.
+        ' "Attribute Note" in table "Patient Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New HasValueIfPresentRule(Tags.PatientsBirthDate, iodType, ErrorSeverity.RuleError))
+
+        'Patient's Sex attribute.
+        ' "Attribute Note" in table "Patient Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New HasValueIfPresentRule(Tags.PatientSex, iodType, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+    Private Shared Function CreateGeneralStudyModuleCriticalAttributeRules(ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Study Instance UID attribute.
+        ' "Attribute Note" in table "General Study Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New IsRequiredRule(Tags.StudyInstanceUID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.StudyInstanceUID, iodType, ErrorSeverity.RuleError))
+
+        ' Study Date attribute.
+        ' "Attribute Note" in table "General Study Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New IsRequiredRule(Tags.StudyDate, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.StudyDate, iodType, ErrorSeverity.RuleError))
+
+        ' Study Time attribute.
+        ' "Attribute Note" in table "General Study Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New IsRequiredRule(Tags.StudyTime, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.StudyTime, iodType, ErrorSeverity.RuleError))
+
+        ' Study ID attribute.
+        ' "Attribute Note" in table "General Study Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New IsRequiredRule(Tags.StudyID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.StudyID, iodType, ErrorSeverity.RuleError))
+
+        ' StudyDescription attribute.
+        ' "Attribute Note" in table "General Study Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New HasValueIfPresentRule(Tags.StudyDescription, iodType, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+    Private Shared Function CreateGeneralEquipmentModuleCriticalAttributeRules(ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Manufacturer attribute.
+        rules.Add(New IsRequiredRule(Tags.Manufacturer, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ManufacturerMappingRule(Tags.Manufacturer, ErrorSeverity.RuleError))
+
+        ' ManufacturersModelName attribute.
+        rules.Add(New IsRequiredRule(Tags.ManufacturersModelName, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ManufacturerMappingRule(Tags.ManufacturersModelName, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+    Private Shared Function CreateFrameOfReferenceModuleCriticalAttributeRules(ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Frame of Reference UID attribute.
+        ' "Attribute Note" in table "Frame Of Reference Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New IsRequiredRule(Tags.FrameofReferenceUID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.FrameofReferenceUID, iodType, ErrorSeverity.RuleError))
+
+        ' PositionReferenceIndicator attribute.
+        ' "Attribute Note" in table "Frame Of Reference Module" already covered by method CreateCriticalAttributeMappingRules.
+        rules.Add(New HasValueIfPresentRule(Tags.PositionReferenceIndicator, iodType, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+    Private Shared Function CreateMultiFrameModuleCriticalAttributeRules() As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        '  Frame Increment Pointer attribute.
+        rules.Add(New EqualToRule(Tags.FrameIncrementPointer, IODType.RTDose, ErrorSeverity.RuleError, Tags.GridFrameOffsetVector))
+
+        Return rules
+
+    End Function
+
+    ' "Dose summation type" attribute is not present as this interferes with DCOMP transaction rules.
+    ' "Dose type" attribute is not present as this interferes with DCOMP transaction rules.
+    Private Shared Function CreateRTDoseModuleCriticalAttributeRules(ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Samples per Pixel attribute.
+        rules.Add(New IsRequiredRule(Tags.SamplesperPixel, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ValueRule(Tags.SamplesperPixel, "1", iodType, ErrorSeverity.RuleError))
+
+        ' Photometric Interpretation attribute.
+        rules.Add(New IsRequiredRule(Tags.PhotometricInterpretation, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ValueRule(Tags.PhotometricInterpretation, "MONOCHROME2", iodType, ErrorSeverity.RuleError))
+
+        ' Bits Allocated attribute.
+        rules.Add(New IsRequiredRule(Tags.BitsAllocated, iodType, ErrorSeverity.RuleError))
+        Dim bitsAllocatedValues() As String = {"16", "32"}
+        rules.Add(New ValueListRule(Tags.BitsAllocated, bitsAllocatedValues, iodType, ErrorSeverity.RuleError))
+
+        ' Bits Stored attribute.
+        rules.Add(New IsRequiredRule(Tags.BitsStored, iodType, ErrorSeverity.RuleError))
+        rules.Add(New EqualToRule(Tags.BitsStored, iodType, ErrorSeverity.RuleError, Tags.BitsAllocated))
+
+        ' High Bit attribute.
+        rules.Add(New IsRequiredRule(Tags.HighBit, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HighBitRule(iodType, ErrorSeverity.RuleError))
+
+        ' Pixel Representation attribute.
+        rules.Add(New IsRequiredRule(Tags.PixelRepresentation, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ValueRule(Tags.PixelRepresentation, "0", iodType, ErrorSeverity.RuleError))
+
+        ' Dose Units attribute.
+        rules.Add(New IsRequiredRule(Tags.DoseUnits, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ValueRule(Tags.DoseUnits, "GY", iodType, ErrorSeverity.RuleError))
+
+        ' Dose Type attribute.
+        ' No rules specified as this interferes with DCOMP transaction rules.
+
+        ' Dose Comment attribute.
+        rules.Add(New IsRequiredRule(Tags.DoseComment, iodType, ErrorSeverity.RuleError))
+        rules.Add(New DoseCommentRule(iodType, ErrorSeverity.RuleError))
+
+        ' Normalization Point attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.NormalizationPoint, iodType, ErrorSeverity.RuleError))
+
+        ' Dose Summation Type attribute.
+        ' No rules specified as this interferes with DCOMP transaction rules.
+
+        ' Referenced RT Plan Sequence attribute.
+        rules.Add(New IsRequiredRule(Tags.ReferencedRTPlanSequence, iodType, ErrorSeverity.RuleError))
+
+        ' Referenced Fraction Group Sequence attribute.
+        rules.Add(New SequenceLoopRule(Tags.ReferencedRTPlanSequence, New IsRequiredRule(Tags.ReferencedFractionGroupSequence, iodType, ErrorSeverity.RuleError), False))
+
+        ' Grid Frame Offset Vector attribute.
+        rules.Add(New IsRequiredRule(Tags.GridFrameOffsetVector, iodType, ErrorSeverity.RuleError))
+        rules.Add(New GridFrameOffsetVectorRule(Tags.GridFrameOffsetVector, iodType, ErrorSeverity.RuleError))
+
+        ' Tissue Heterogeneity Correction attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.TissueHeterogeneityCorrection, iodType, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+
+    Private Shared Function CreateImagePlaneModuleCriticalAttributeRules(ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Image Orientation Patient attribute.
+        rules.Add(New IsRequiredRule(Tags.ImageOrientationPatient, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ImageOrientationPatientRule(iodType, ErrorSeverity.RuleError))
+
+        ' Slice Thickness attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.SliceThickness, iodType, ErrorSeverity.RuleError))
+
+        ' Slice Location attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.SliceLocation, iodType, ErrorSeverity.RuleError))
+
+        ' Pixel Spacing attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.PixelSpacing, iodType, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+    Private Shared Function CreateSopCommonModuleCriticalAttributeRules(ByVal iodType As IODType) As IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' SOP Instance UID attribute.
+        rules.Add(New IsRequiredRule(Tags.SOPInstanceUID, iodType, ErrorSeverity.RuleError))
+        rules.Add(New HasValueRule(Tags.SOPInstanceUID, iodType, ErrorSeverity.RuleError))
+
+        ' Specific Character Set attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.SpecificCharacterSet, iodType, ErrorSeverity.RuleError))
+
+        ' Instance Creation Date attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.InstanceCreationDate, iodType, ErrorSeverity.RuleError))
+
+        ' Instance Creation Time attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.InstanceCreationTime, iodType, ErrorSeverity.RuleError))
+
+        ' Instance Creator Uid attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.InstanceCreatorUid, iodType, ErrorSeverity.RuleError))
+
+        ' Instance Number attribute.
+        rules.Add(New HasValueIfPresentRule(Tags.InstanceNumber, iodType, ErrorSeverity.RuleError))
+
+        Return rules
+
+    End Function
+
+#End Region
+
+End Class

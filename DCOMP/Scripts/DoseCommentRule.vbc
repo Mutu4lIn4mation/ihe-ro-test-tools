@@ -1,0 +1,59 @@
+Class DoseCommentRule
+    Inherits MessageCollectionRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Dose Comment Rule", iodType, severity)
+
+    End Sub
+
+    Private m_messageCollectionHelper As messageCollectionHelper
+
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+        Dim RtDoseDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim RtPlanDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim message As String
+
+        If m_messageCollectionHelper.GetRTDose Is Nothing Then
+            message = "No RT Dose Object received. The Dose Comment rule could not be checked."
+            Me.SetValid(message)
+        ElseIf m_messageCollectionHelper.GetRTPlan Is Nothing Then
+            message = "No RT Plan Object received. The Dose Comment rule could not be checked."
+            Me.SetValid(message)
+        Else
+            RtDoseDataSet = m_messageCollectionHelper.GetRTDose()
+            RtPlanDataSet = m_messageCollectionHelper.GetRTPlan()
+
+            'if Referenced RT Plan Sequence is NOT PRESENT
+            If Not RtDoseDataSet.Exists(Tags.ReferencedRTPlanSequence) Then
+                If Not RtDoseDataSet.Exists(Tags.DoseComment) Then
+                    message = "The attribute: '" + Tags.GetTagName(Tags.DoseComment) + "' (" + Tags.DoseComment + ") is not present."
+                Else
+                    Dim doseCommentValue As String = RtDoseDataSet(Tags.DoseComment).Values().Item(0)
+
+                    If Not RtPlanDataSet.Exists(Tags.RTPLanDescription) Then
+                        message = "The attribute: '" + Tags.GetTagName(Tags.RTPLanDescription) + "' (" + Tags.RTPLanDescription + ") is not present."
+                    ElseIf doseCommentValue = "" Then
+                        message = "The attribute: '" + Tags.GetTagName(Tags.DoseComment) + "' (" + Tags.DoseComment + ") is empty."
+                    ElseIf Not (doseCommentValue = RtPlanDataSet(Tags.RTPLanDescription).Values().Item(0)) Then
+                        message = "The attribute: '" + Tags.GetTagName(Tags.DoseComment) + "' (" + Tags.DoseComment + ") does not equal '" + Tags.GetTagName(Tags.RTPLanDescription) + "' (" + Tags.RTPLanDescription + ")."
+                    Else
+                        message = "'" + Tags.GetTagName(Tags.DoseComment) + "' (" + Tags.DoseComment + ") equals '" + Tags.GetTagName(Tags.RTPLanDescription) + "' (" + Tags.RTPLanDescription + ")."
+                        Me.SetValid(message)
+                    End If
+                End If
+            Else
+                message = "'" + Tags.GetTagName(Tags.ReferencedRTPlanSequence) + "' (" + Tags.ReferencedRTPlanSequence + ") is present."
+                Me.SetValid(message)
+            End If
+        End If
+
+        If Not Me.IsValid Then
+            Me.SetError(message)
+        End If
+        Me.Report()
+    End Sub
+End Class

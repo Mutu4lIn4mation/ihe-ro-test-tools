@@ -1,0 +1,11 @@
+
+Class RegisteredCompositingPlannerActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("Registered Compositing Planner", "Registered Compositing Planner Actor")
+
+    End Sub
+
+End Class

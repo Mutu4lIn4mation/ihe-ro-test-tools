@@ -1,0 +1,111 @@
+
+Class SOPclass
+
+#Region "SOP UIDs"
+
+    'todo: rename uids to let the name also resemble the service ("storage" for example) of the SOP
+    Public Shared ReadOnly CTImageSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.2"
+    Public Shared ReadOnly RTDoseSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.2"
+    Public Shared ReadOnly RTStructureSetSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.3"
+    Public Shared ReadOnly MRImageSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.4"
+    Public Shared ReadOnly PetImageSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.128"
+    Public Shared ReadOnly SpatialRegistrationSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.66.1"
+    Public Shared ReadOnly DeformableSpatialRegistrationSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.66.3"
+    Public Shared ReadOnly RTPlanDosimetricSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.5"
+    Public Shared ReadOnly UnifiedProcedureStepPullSOPClassUID As String = "1.2.840.10008.5.1.4.34.4.3"
+    Public Shared ReadOnly UnifiedProcedureStepPushSOPClassUID As String = "1.2.840.10008.5.1.4.34.4.1"
+    Public Shared ReadOnly RTBeamsDeliveryInstructionSOPClassUID As String = "1.2.840.10008.5.1.4.34.1"
+    Public Shared ReadOnly RTImageSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.1"
+    Public Shared ReadOnly StudyRootQueryRetrieveMOVESOPClassUID As String = "1.2.840.10008.5.1.4.1.2.2.2"
+    Public Shared ReadOnly RTBeamsTreatmentRecordSTOREOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.4"
+
+#End Region
+
+#Region "Private Fields"
+
+    Private Shared ReadOnly m_IODtoSOPMapping As System.Collections.Generic.Dictionary(Of IODType, String) = New System.Collections.Generic.Dictionary(Of IODType, String)
+
+#End Region
+
+#Region "Static Ctor"
+
+    Shared Sub New()
+
+        m_IODtoSOPMapping.Add(IODType.CTImage, CTImageSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTDose, RTDoseSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTStructureSet, RTStructureSetSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.MRImage, MRImageSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.PETImage, PetImageSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.SpatialRegistration, SpatialRegistrationSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.DeformableSpatialRegistration, DeformableSpatialRegistrationSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTPlanDosimetric, RTPlanDosimetricSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.UnifiedProcedureStepPull, UnifiedProcedureStepPullSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.UnifiedProcedureStepPush, UnifiedProcedureStepPushSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTBeamsDeliveryInstruction, RTBeamsDeliveryInstructionSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTImage, RTImageSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.StudyRootQueryRetrieveMOVE, StudyRootQueryRetrieveMOVESOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTBeamsTreatmentRecordSTORE, RTBeamsTreatmentRecordSTOREOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.NAction, UnifiedProcedureStepPushSOPClassUID)
+    End Sub
+
+#End Region
+
+#Region "Public Methods"
+
+    Public Shared Function GetSOPClassUID(ByVal iod As IODType) As String
+
+        If m_IODtoSOPMapping.ContainsKey(iod) Then
+            Return m_IODtoSOPMapping(iod)
+        End If
+
+        Throw New ArgumentException("Cannot provide SOP class UID for unknown IODType " + iod.ToString(), "iod")
+
+    End Function
+
+    Public Shared Function GetIODType(ByVal sopClassUID As String) As IODType
+
+        If m_IODtoSOPMapping.ContainsValue(sopClassUID) Then
+            For Each kvp As System.Collections.Generic.KeyValuePair(Of IODType, String) In m_IODtoSOPMapping
+                If kvp.Value = sopClassUID Then
+                    Return kvp.Key
+                End If
+            Next
+        End If
+
+        Throw New ArgumentException("Cannot provide IODType for unknown SOP class UID " + sopClassUID, "sopClassUID")
+
+    End Function
+
+    Public Shared Function TryGetSOPClassUID(ByVal iod As IODType, ByRef outputValue As String) As Boolean
+
+        Dim success As Boolean = False
+
+        Try
+            outputValue = GetSOPClassUID(iod)
+            success = True
+        Catch ex As Exception
+            outputValue = String.Empty
+        End Try
+
+        Return success
+
+    End Function
+
+    Public Shared Function TryGetIODType(ByVal sopClassUID As String, ByRef outputValue As IODType) As Boolean
+
+        Dim success As Boolean = False
+
+        Try
+            outputValue = GetIODType(sopClassUID)
+            success = True
+        Catch ex As Exception
+            outputValue = IODType.CTImage 'todo: maybe use IODType.UNDEFINED here..
+        End Try
+
+        Return success
+
+    End Function
+
+#End Region
+
+End Class

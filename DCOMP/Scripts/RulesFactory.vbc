@@ -1,0 +1,119 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+
+' Contains the rules specific for DCOMP
+Public Class RulesFactory
+
+#Region "DCOMP transaction rules (extra rules on top of part of the general RO rules created by method CreateRTDoseIodCriticalAttributeRules)"
+
+    ' Supplied IODType must be RTDose or RTDoseComposite.
+    Public Shared Function Create_RO_DC2_TransactionRulesForRegisteredDoseCompositorScenario(ByVal refFileName1 As String, ByVal refFileName2 As String) As System.Collections.Generic.IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Dose Units attribute (already defined in CreateRTDoseIodCriticalAttributeRules)
+        ' -
+
+        ' Pixel Representation attribute (already defined in CreateRTDoseIodCriticalAttributeRules)
+        ' -
+
+        ' Dose Type attribute.
+        rules.Add(New IsRequiredRule(Tags.DoseType, IODType.RTDose, ErrorSeverity.RuleError))
+        rules.Add(New DoseTypeRule(IODType.RTDose, ErrorSeverity.RuleError, refFileName1, refFileName2))
+
+        ' Dose Summation Type attribute.
+        rules.Add(New IsRequiredRule(Tags.DoseSummationType, IODType.RTDose, ErrorSeverity.RuleError))
+        rules.Add(New ValueRule(Tags.DoseSummationType, "MULTI_PLAN", IODType.RTDose, ErrorSeverity.RuleError))
+
+        ' Referenced RT Plan Sequence attribute
+        ' Is RequiredRule is already defined in CreateRTDoseIodCriticalAttributeRules.
+        ' TODO:  make new rule for checking order of sequence items.
+
+        ' Tissue Heterogeneity Correction.
+        rules.Add(New IsRequiredRule(Tags.TissueHeterogeneityCorrection, IODType.RTDose, ErrorSeverity.RuleError))
+        rules.Add(New TissueHeterogeneityCorrectionRule(IODType.RTDose, ErrorSeverity.RuleError, refFileName1, refFileName2))
+
+        Return rules
+
+    End Function
+
+    ' Supplied IODType must be RTDose or RTDoseComposite.
+    Public Shared Function Create_RO_DC2_TransactionRulesForRegisteredCompositingPlannerScenario(ByVal refFileName1 As String) As System.Collections.Generic.IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Dose Units attribute (already defined in CreateRTDoseIodCriticalAttributeRules)
+        ' -
+
+        ' Pixel Representation attribute (already defined in CreateRTDoseIodCriticalAttributeRules)
+        ' -
+
+        ' Dose Type attribute.
+        rules.Add(New IsRequiredRule(Tags.DoseType, IODType.RTDoseComposite, ErrorSeverity.RuleError))
+        rules.Add(New DoseTypeRule(IODType.RTDose, ErrorSeverity.RuleError, refFileName1))
+
+        ' Dose Summation Type attribute.
+        ' As the value of the "Dose Summation Type" data element is used to differentiate between single plan dose and compositie dose in the Validator class, so the check if performed for IODType RTDose.
+        rules.Add(New IsRequiredRule(Tags.DoseSummationType, IODType.RTDoseComposite, ErrorSeverity.RuleError))
+        rules.Add(New ValueListRule(Tags.DoseSummationType, New String() {"PLAN", "MULTI_PLAN"}, IODType.RTDose, ErrorSeverity.RuleError))
+
+        ' Referenced RT Plan Sequence attribute
+        ' Is RequiredRule is already defined in CreateRTDoseIodCriticalAttributeRules.
+        ' TODO:  make new rule for checking order of sequence items.
+
+        ' Tissue Heterogeneity Correction.
+        rules.Add(New IsRequiredRule(Tags.TissueHeterogeneityCorrection, IODType.RTDoseComposite, ErrorSeverity.RuleError))
+        rules.Add(New TissueHeterogeneityCorrectionRule(IODType.RTDoseComposite, ErrorSeverity.RuleError, refFileName1))
+
+
+        Return rules
+
+    End Function
+
+    ' Supplied IODType must be RTDose or RTDoseSinglePlan
+    Public Shared Function Create_RO_DC3_TransactionRules(ByVal iodType As IODType) As System.Collections.Generic.IEnumerable(Of Rule)
+
+        Dim rules As List(Of Rule) = New List(Of Rule)
+
+        ' Dose Units attribute.
+        ' Already defined in CreateRTDoseIodCriticalAttributeRules.
+
+        ' Dose Type attribute.
+        rules.Add(New IsRequiredRule(Tags.DoseType, iodType, ErrorSeverity.RuleError))
+        rules.Add(New ValueListRule(Tags.DoseType, New String() {"PHYSICAL", "EFFECTIVE"}, iodType, ErrorSeverity.RuleError))
+
+        ' Dose Summation Type attribute.
+        ' As the value of the "Dose Summation Type" data element is used to differentiate between single plan dose and compositie dose in the Validator class, the if statement is needed.
+        rules.Add(New IsRequiredRule(Tags.DoseSummationType, iodType, ErrorSeverity.RuleError))
+        If (iodType = iodType.RTDoseSinglePlan) Then
+            rules.Add(New ValueListRule(Tags.DoseSummationType, New String() {"PLAN", "MULTI_PLAN"}, IODType.RTDose, ErrorSeverity.RuleError))
+
+        Else
+            rules.Add(New ValueRule(Tags.DoseSummationType, "PLAN", iodType.RTDose, ErrorSeverity.RuleError))
+
+        End If
+
+        ' Pixel Representation attribute.
+        ' Already defined in CreateRTDoseIodCriticalAttributeRules.
+
+        ' Referenced RT Plan Sequence attribute
+        ' According to DICOM, when Dose Summation Type is PLAN, only one single item shall be included.
+        ' Together with the requirement for this transaction that Dose Summation Type is PLAN, this implies that exactly one sequence item shall be present.
+        ' So extra requirement described in "Attribute Description" column is automatically satisfied.
+        ' Is RequiredRule is already defined in CreateRTDoseIodCriticalAttributeRules.
+
+        ' Tissue Heterogeneity Correction.
+        rules.Add(New IsRequiredRule(Tags.TissueHeterogeneityCorrection, iodType, ErrorSeverity.RuleError))
+
+        ' TODO!
+
+        Return rules
+
+    End Function
+
+#End Region
+
+
+End Class
