@@ -176,7 +176,7 @@ Public Class RORulesFactory
 
         ' PositionReferenceIndicator attribute.
         ' "Attribute Note" in table "Frame Of Reference Module" already covered by method CreateCriticalAttributeMappingRules.
-        rules.Add(New HasValueIfPresentRule(Tags.PositionReferenceIndicator, iodType, ErrorSeverity.RuleError))
+        'rules.Add(New HasValueIfPresentRule(Tags.PositionReferenceIndicator, iodType, ErrorSeverity.RuleError))
 
         Return rules
 
@@ -187,7 +187,8 @@ Public Class RORulesFactory
         Dim rules As List(Of Rule) = New List(Of Rule)
 
         '  Frame Increment Pointer attribute.
-        rules.Add(New EqualToRule(Tags.FrameIncrementPointer, IODType.RTDose, ErrorSeverity.RuleError, Tags.GridFrameOffsetVector))
+        rules.Add(New FrameIncrementPointerRule(IODType.RTDose, ErrorSeverity.RuleError))
+        'rules.Add(New EqualToRule(Tags.FrameIncrementPointer, IODType.RTDose, ErrorSeverity.RuleError, Tags.GridFrameOffsetVector))
 
         Return rules
 
@@ -232,7 +233,7 @@ Public Class RORulesFactory
         ' No rules specified as this interferes with DCOMP transaction rules.
 
         ' Dose Comment attribute.
-        rules.Add(New IsRequiredRule(Tags.DoseComment, iodType, ErrorSeverity.RuleError))
+        'rules.Add(New IsRequiredRule(Tags.DoseComment, iodType, ErrorSeverity.RuleError))
         rules.Add(New DoseCommentRule(iodType, ErrorSeverity.RuleError))
 
         ' Normalization Point attribute.
@@ -245,7 +246,8 @@ Public Class RORulesFactory
         rules.Add(New IsRequiredRule(Tags.ReferencedRTPlanSequence, iodType, ErrorSeverity.RuleError))
 
         ' Referenced Fraction Group Sequence attribute.
-        rules.Add(New SequenceLoopRule(Tags.ReferencedRTPlanSequence, New IsRequiredRule(Tags.ReferencedFractionGroupSequence, iodType, ErrorSeverity.RuleError), False))
+        'rules.Add(New SequenceLoopRule(Tags.ReferencedRTPlanSequence, New IsRequiredRule(Tags.ReferencedFractionGroupSequence, iodType, ErrorSeverity.RuleError), False))
+        rules.Add(New ReferencedFractionGroupSequenceRule(ErrorSeverity.RuleError, iodType.RTDose))
 
         ' Grid Frame Offset Vector attribute.
         rules.Add(New IsRequiredRule(Tags.GridFrameOffsetVector, iodType, ErrorSeverity.RuleError))

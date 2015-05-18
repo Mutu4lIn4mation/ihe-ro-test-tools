@@ -101,4 +101,5 @@
 #include"2013RegisteredDoseCompositorScenario.vbc"
 #include"2013RegisteredGeneralDoseViewerScenario.vbc"
 #include"2013SinglePlanDoseProducerScenario.vbc"
+#include"FrameIncrementPointerRule.vbc"
 #End If

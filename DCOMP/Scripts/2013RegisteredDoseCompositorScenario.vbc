@@ -42,7 +42,7 @@ Class RegisteredDoseCompositorScenario
 
         ' Validate scenario step
         Dim validateScenarioStep As ValidateScenarioStep = New ValidateScenarioStep(receiveScenarioStep)
-        validateScenarioStep.AddRules(RORulesFactory.CreateCriticalAttributeMappingRules(ReferenceDataSet.GetInstance().GetStorageSopInstance("CT11.dcm", IODType.CTImage), IODType.RTDose))
+        validateScenarioStep.AddRules(RORulesFactory.CreateCriticalAttributeMappingRules(ReferenceDataSet.GetInstance().GetStorageSopInstance("CT21.dcm", IODType.CTImage), IODType.RTDose))
         validateScenarioStep.AddRules(RORulesFactory.CreateRTDoseIodCriticalModuleRules())
         validateScenarioStep.AddRules(RORulesFactory.CreateRTDoseIodCriticalAttributeRules())
         validateScenarioStep.AddRules(RulesFactory.Create_RO_DC2_TransactionRulesForRegisteredDoseCompositorScenario("RD1MP.dcm", "RD2P.dcm"))
