@@ -1,4 +1,5 @@
-﻿Public Class ConceptNames
+﻿
+Public Class ConceptNames
 
     Public Shared ReadOnly CriticalIssuesFoundOptionYes As New CodedConcept("R-0038D", "SRT", "YES")
     Public Shared ReadOnly CriticalIssuesFoundOptionNo As New CodedConcept("R-00339", "SRT", "NO")
@@ -8,6 +9,7 @@
     Public Shared ReadOnly Range As New CodedConcept("113918", "DCM", "Range")
     Public Shared ReadOnly AttributeInconsistency As New CodedConcept("113919", "DCM", "Attribute Inconsistency")
     Public Shared ReadOnly Equality As New CodedConcept("113920", "DCM", "Equality")
+    Public Shared ReadOnly NumericEquality As New CodedConcept("XXY005", "DCM", "Numeric Equality")
     Public Shared ReadOnly NonSpecific As New CodedConcept("113922", "DCM", "Non Specific")
 
 
@@ -27,14 +29,17 @@
 
     Public Shared ReadOnly CandidateSOPInstanceUID As New CodedConcept("XYZ003", "DCM", "Candidate SOP Instance UID")
     Public Shared ReadOnly AssessedSOPInstanceUID As New CodedConcept("XYZ008", "DCM", "Assessed SOP Instance UID")
-    Public Shared ReadOnly CheckResults As New CodedConcept("XYZ004", "DCM", "Check Results")
+    Public Shared ReadOnly NumberOfCheckResults As New CodedConcept("XYZ004", "DCM", "Number Of Check Results")
     Public Shared ReadOnly RTCheckRequestResultDetail As New CodedConcept("XYZ100", "DCM", "RT Check Request Result Detail")
     Public Shared ReadOnly CriticalIssuesFoundTID2310 As New CodedConcept("XYZ101", "DCM", "Critical Issues Found")
     Public Shared ReadOnly InformationalIssueFound As New CodedConcept("XYZ106", "DCM", "Informational Issue Found")
     Public Shared ReadOnly AssessmentCode As New CodedConcept("XYZ102", "DCM", "Assessment Code")
     Public Shared ReadOnly AssessmentReportingType As New CodedConcept("XYZ103", "DCM", "Assessment Reporting Type")
     Public Shared ReadOnly SpecificAssessmentSequence As New CodedConcept("XYZ104", "DCM", "Specific Assessment Sequence")
-    Public Shared ReadOnly ValueUnits As New CodedConcept("XYZ111", "DCM", "Value Units")
+
+    Public Shared ReadOnly SpecificNumericAssessmentSequence As New CodedConcept("XYZ104", "DCM", "Specific Numeric Assessment Sequence")
+
+    Public Shared ReadOnly ExpectedValue As New CodedConcept("XYZ111", "DCM", "Expected Value")
     Public Shared ReadOnly UpperBoundValue As New CodedConcept("XYZ112", "DCM", "Upper Bound Value")
     Public Shared ReadOnly LowerBoundValue As New CodedConcept("XYZ113", "DCM", "Lower Bound Value")
     Public Shared ReadOnly SuppliedAttributeName As New CodedConcept("XYZ114", "DCM", "Supplied Attribute Name")

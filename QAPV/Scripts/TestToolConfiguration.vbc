@@ -103,6 +103,9 @@ Class TestToolConfiguration
                 Return "Study Root Query Retrieve - MOVE.def"
             Case iodType.BasicTextSR
                 Return "Basic Text SR.def"
+            Case iodType.EnhancedSR
+                Return "Enhanced SR.def"
+
         End Select
 
         Return Nothing
@@ -370,6 +373,9 @@ Class TestToolConfiguration
         'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTImage))
         thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.StudyRootQueryRetrieveMOVE))
         thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.BasicTextSR))
+
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.EnhancedSR))
+
         'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTBeamsTreatmentRecordSTORE))
         'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTBeamsDeliveryInstruction))
 

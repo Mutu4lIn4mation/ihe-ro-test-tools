@@ -21,6 +21,17 @@ Public Class ValueMultiplicity
         End Set
     End Property
 
+    Private m_CountOfContentItemCount As SpecificationContentItem = Nothing
+    Public Property CountOfContentItemCount() As SpecificationContentItem
+        Get
+            Return m_CountOfContentItemCount
+        End Get
+        Set(ByVal value As SpecificationContentItem)
+            m_CountOfContentItemCount = value
+        End Set
+    End Property
+
+
 End Class
 
 

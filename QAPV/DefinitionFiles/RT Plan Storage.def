@@ -6638,9 +6638,9 @@ MODULE "RT Beams Module" C
    >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced Dose Sequence" 
  >(0x30020050,3R,SQ,1,
-   >(0x30020051,1,CS,1,E,"NON STANDARD"
+   >(0x30020051,1,CS,1,E,"NON_STANDARD"
                       |"STANDARD") "Fluence Mode" 
-   >(0x30020052,1C,SH,1) "Fluence Mode ID"  : VALUE 0x30020051 ="NON STANDARD"
+   >(0x30020052,1C,SH,1) "Fluence Mode ID"
  ) "Primary Fluence Mode Sequence" 
  >(0x300A0107,3R,SQ,1,
    >(0x300A0108,1C,SH,1) "Applicator ID"  : PRESENT ../0x300A0107

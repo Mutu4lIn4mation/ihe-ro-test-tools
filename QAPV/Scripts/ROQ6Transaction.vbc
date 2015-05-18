@@ -139,7 +139,7 @@ Class ROQ6Transaction
             m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceStudyInstanceUID, ROQ6IODType, ErrorSeverity.RuleError))
             m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceSerieInstanceUID, ROQ6IODType, ErrorSeverity.RuleError))
             m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPClassUID, ROQ6IODType, ErrorSeverity.RuleError))
-            m_rules.Add(New ValueRule(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPClassUID, SOPclass.BasicTextSRSOPClassUID, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New ValueRule(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPClassUID, SOPclass.EnhancedSRSOPClassUID, ROQ6IODType, ErrorSeverity.RuleError))
             m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPInstanceUID, ROQ6IODType, ErrorSeverity.RuleError))
             m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequenceAETitle, ROQ6IODType, ErrorSeverity.RuleError))
 

@@ -147,16 +147,14 @@ Public Class QAPVtemplate
 
 
 
-        'Check Results
-        Dim CheckResults As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(RootContentItem)
-        CheckResults.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
-        CheckResults.RequirementType = RequirementTypeEnum.MC
-        CheckResults.ValueMultiplicity.Min = "0" 'Required if critical issues found is YES
-        CheckResults.ValueMultiplicity.Max = "1"
-        CheckResults.ConceptName = ConceptNames.CheckResults
-        CheckResults.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
-
-
+        'Number Of Check Results
+        Dim NumberOfCheckResults As SpecificationContentItemWithValueTypeNum = New SpecificationContentItemWithValueTypeNum(RootContentItem)
+        NumberOfCheckResults.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
+        NumberOfCheckResults.RequirementType = RequirementTypeEnum.MC
+        NumberOfCheckResults.ValueMultiplicity.Min = "0" 'Required if critical issues found is YES
+        NumberOfCheckResults.ValueMultiplicity.Max = "1"
+        NumberOfCheckResults.ConceptName = ConceptNames.NumberOfCheckResults
+        NumberOfCheckResults.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
 
         'TID(2310) Radiotherapy Treatment Plan Check Request Result Detail
 
@@ -165,6 +163,7 @@ Public Class QAPVtemplate
         RTPlanCheckRequestResultDetail.RequirementType = RequirementTypeEnum.MC
         RTPlanCheckRequestResultDetail.ValueMultiplicity.Min = "0"
         RTPlanCheckRequestResultDetail.ValueMultiplicity.Max = "n"
+        RTPlanCheckRequestResultDetail.ValueMultiplicity.CountOfContentItemCount = NumberOfCheckResults
         RTPlanCheckRequestResultDetail.ConceptName = ConceptNames.RTCheckRequestResultDetail
         RTPlanCheckRequestResultDetail.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
 
@@ -174,8 +173,8 @@ Public Class QAPVtemplate
         CriticalIssuesFoundTID2310.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         CriticalIssuesFoundTID2310.RequirementType = RequirementTypeEnum.MC
         CriticalIssuesFoundTID2310.ValueMultiplicity.Min = "0"
-        CriticalIssuesFoundTID2310.ValueMultiplicity.Max = "1"
-
+        CriticalIssuesFoundTID2310.ValueMultiplicity.Max = "n"
+        CriticalIssuesFoundTID2310.ValueMultiplicity.CountOfContentItemCount = RTPlanCheckRequestResultDetail
         CriticalIssuesFoundTID2310.ConceptName = ConceptNames.CriticalIssuesFoundTID2310
         CriticalIssuesFoundTID2310.ValueSetConstraint.Add(ConceptNames.CriticalIssuesFoundOptionYes)
         CriticalIssuesFoundTID2310.ValueSetConstraint.Add(ConceptNames.CriticalIssuesFoundOptionNo)
@@ -186,8 +185,8 @@ Public Class QAPVtemplate
         InformationalIssueFound.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         InformationalIssueFound.RequirementType = RequirementTypeEnum.MC
         InformationalIssueFound.ValueMultiplicity.Min = "0"
-        InformationalIssueFound.ValueMultiplicity.Max = "1"
-
+        InformationalIssueFound.ValueMultiplicity.Max = "n"
+        InformationalIssueFound.ValueMultiplicity.CountOfContentItemCount = RTPlanCheckRequestResultDetail
         InformationalIssueFound.ConceptName = ConceptNames.InformationalIssueFound
         InformationalIssueFound.ValueSetConstraint.Add(ConceptNames.CriticalIssuesFoundOptionYes)
         InformationalIssueFound.ValueSetConstraint.Add(ConceptNames.CriticalIssuesFoundOptionNo)
@@ -198,7 +197,8 @@ Public Class QAPVtemplate
         AssessmentCode.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         AssessmentCode.RequirementType = RequirementTypeEnum.MC
         AssessmentCode.ValueMultiplicity.Min = "0"
-        AssessmentCode.ValueMultiplicity.Max = "1"
+        AssessmentCode.ValueMultiplicity.Max = "n"
+        AssessmentCode.ValueMultiplicity.CountOfContentItemCount = RTPlanCheckRequestResultDetail
         AssessmentCode.ConceptName = ConceptNames.AssessmentCode
         AssessmentCode.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
 
@@ -207,9 +207,9 @@ Public Class QAPVtemplate
         AssessmentReportingType.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         AssessmentReportingType.RequirementType = RequirementTypeEnum.MC
         AssessmentReportingType.ValueMultiplicity.Min = "0"
-        AssessmentReportingType.ValueMultiplicity.Max = "1"
+        AssessmentReportingType.ValueMultiplicity.Max = "n"
+        AssessmentReportingType.ValueMultiplicity.CountOfContentItemCount = RTPlanCheckRequestResultDetail
         AssessmentReportingType.ConceptName = ConceptNames.AssessmentReportingType
-
         AssessmentReportingType.ValueSetConstraint.Add(ConceptNames.UpperBound)
         AssessmentReportingType.ValueSetConstraint.Add(ConceptNames.LowerBound)
         AssessmentReportingType.ValueSetConstraint.Add(ConceptNames.Range)
@@ -218,54 +218,42 @@ Public Class QAPVtemplate
         AssessmentReportingType.ValueSetConstraint.Add(ConceptNames.NonSpecific)
         AssessmentReportingType.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
 
-
-        'Specific Assessment Sequence
-        Dim SpecificAssessmentSequence As SpecificationContentItemWithValueTypeContainer = New SpecificationContentItemWithValueTypeContainer(RTPlanCheckRequestResultDetail)
-        SpecificAssessmentSequence.RequirementType = RequirementTypeEnum.MC
-        SpecificAssessmentSequence.ValueMultiplicity.Min = "0"
-        SpecificAssessmentSequence.ValueMultiplicity.Max = "1"
-        SpecificAssessmentSequence.ConceptName = ConceptNames.SpecificAssessmentSequence
+        'Specific Numeric Assessment Sequence
+        Dim SpecificNumericAssessmentSequence As SpecificationContentItemWithValueTypeContainer = New SpecificationContentItemWithValueTypeContainer(RTPlanCheckRequestResultDetail)
+        SpecificNumericAssessmentSequence.RequirementType = RequirementTypeEnum.MC
+        SpecificNumericAssessmentSequence.ValueMultiplicity.Min = "0"
+        SpecificNumericAssessmentSequence.ValueMultiplicity.Max = "n"
+        SpecificNumericAssessmentSequence.ConceptName = ConceptNames.SpecificAssessmentSequence
         Dim listOfPossibleValues As New List(Of CodedConcept)
 
         listOfPossibleValues.Add(ConceptNames.UpperBound)
         listOfPossibleValues.Add(ConceptNames.LowerBound)
         listOfPossibleValues.Add(ConceptNames.Range)
-        listOfPossibleValues.Add(ConceptNames.AttributeInconsistency)
-        listOfPossibleValues.Add(ConceptNames.Equality)
-        listOfPossibleValues.Add(ConceptNames.NonSpecific)
-        SpecificAssessmentSequence.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
-        SpecificAssessmentSequence.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
-
-        'Value Units
-        Dim ValueUnits As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificAssessmentSequence)
-        ValueUnits.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
-        ValueUnits.RequirementType = RequirementTypeEnum.MC
-        ValueUnits.ValueMultiplicity.Min = "0"
-        ValueUnits.ValueMultiplicity.Max = "1"
-        ValueUnits.ConceptName = ConceptNames.ValueUnits
-        ValueUnits.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        listOfPossibleValues.Add(ConceptNames.NumericEquality)
+        SpecificNumericAssessmentSequence.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        SpecificNumericAssessmentSequence.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
 
         'Upper Bound Value
-        Dim UpperBoundValue As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificAssessmentSequence)
+        Dim UpperBoundValue As SpecificationContentItemWithValueTypeNum = New SpecificationContentItemWithValueTypeNum(SpecificNumericAssessmentSequence)
         UpperBoundValue.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         UpperBoundValue.RequirementType = RequirementTypeEnum.MC
         UpperBoundValue.ValueMultiplicity.Min = "0"
-        UpperBoundValue.ValueMultiplicity.Max = "1"
+        UpperBoundValue.ValueMultiplicity.Max = "n"
         UpperBoundValue.ConceptName = ConceptNames.UpperBoundValue
 
         listOfPossibleValues = New List(Of CodedConcept)
         listOfPossibleValues.Add(ConceptNames.UpperBound)
         listOfPossibleValues.Add(ConceptNames.Range)
-        listOfPossibleValues.Add(ConceptNames.Equality)
+        listOfPossibleValues.Add(ConceptNames.NumericEquality)
         UpperBoundValue.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
         UpperBoundValue.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
 
         'Lower Bound Value
-        Dim LowerBoundValue As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificAssessmentSequence)
+        Dim LowerBoundValue As SpecificationContentItemWithValueTypeNum = New SpecificationContentItemWithValueTypeNum(SpecificNumericAssessmentSequence)
         LowerBoundValue.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         LowerBoundValue.RequirementType = RequirementTypeEnum.MC
         LowerBoundValue.ValueMultiplicity.Min = "0"
-        LowerBoundValue.ValueMultiplicity.Max = "1"
+        LowerBoundValue.ValueMultiplicity.Max = "n"
         LowerBoundValue.ConceptName = ConceptNames.LowerBoundValue
 
         listOfPossibleValues = New List(Of CodedConcept)
@@ -274,40 +262,109 @@ Public Class QAPVtemplate
         LowerBoundValue.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
         LowerBoundValue.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
 
+
+        listOfPossibleValues.Add(ConceptNames.UpperBound)
+        listOfPossibleValues.Add(ConceptNames.NumericEquality)
+
+        'Supplied Attribute Name
+        Dim NumericSuppliedAttributeName As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificNumericAssessmentSequence)
+        NumericSuppliedAttributeName.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
+        NumericSuppliedAttributeName.RequirementType = RequirementTypeEnum.MC
+        NumericSuppliedAttributeName.ValueMultiplicity.Min = "0"
+        NumericSuppliedAttributeName.ValueMultiplicity.Max = "n"
+        NumericSuppliedAttributeName.ValueMultiplicity.CountOfContentItemCount = SpecificNumericAssessmentSequence
+        NumericSuppliedAttributeName.ConceptName = ConceptNames.SuppliedAttributeName
+        NumericSuppliedAttributeName.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        NumericSuppliedAttributeName.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
+
+        'Supplied Attribute Tag
+        Dim NumericSuppliedAttributeTag As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificNumericAssessmentSequence)
+        NumericSuppliedAttributeTag.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
+        NumericSuppliedAttributeTag.RequirementType = RequirementTypeEnum.MC
+        NumericSuppliedAttributeTag.ValueMultiplicity.Min = "0"
+        NumericSuppliedAttributeTag.ValueMultiplicity.Max = "n"
+        NumericSuppliedAttributeTag.ValueMultiplicity.CountOfContentItemCount = SpecificNumericAssessmentSequence
+        NumericSuppliedAttributeTag.ConceptName = ConceptNames.SuppliedAttributeTag
+        NumericSuppliedAttributeTag.ValueSetConstraintAsRegularExpression = "^[(]?[A-Za-z0-9]{4},[A-Za-z0-9]{4}[)]?$"
+        NumericSuppliedAttributeTag.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        NumericSuppliedAttributeTag.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
+
+        'Supplied Attribute Value
+        Dim NumericSuppliedAttributeValue As SpecificationContentItemWithValueTypeNum = New SpecificationContentItemWithValueTypeNum(SpecificNumericAssessmentSequence)
+        NumericSuppliedAttributeValue.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
+        NumericSuppliedAttributeValue.RequirementType = RequirementTypeEnum.MC
+        NumericSuppliedAttributeValue.ValueMultiplicity.Min = "0"
+        NumericSuppliedAttributeValue.ValueMultiplicity.Max = "n"
+        NumericSuppliedAttributeValue.ValueMultiplicity.CountOfContentItemCount = SpecificNumericAssessmentSequence
+        NumericSuppliedAttributeValue.ConceptName = ConceptNames.SuppliedAttributeValue
+        NumericSuppliedAttributeValue.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        NumericSuppliedAttributeValue.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
+
+        'Specific Assessment Sequence
+        Dim SpecificAssessmentSequence As SpecificationContentItemWithValueTypeContainer = New SpecificationContentItemWithValueTypeContainer(RTPlanCheckRequestResultDetail)
+        SpecificAssessmentSequence.RequirementType = RequirementTypeEnum.MC
+        SpecificAssessmentSequence.ValueMultiplicity.Min = "0"
+        SpecificAssessmentSequence.ValueMultiplicity.Max = "n"
+        SpecificAssessmentSequence.ConceptName = ConceptNames.GeneralAssessmentSequence
+        listOfPossibleValues = New List(Of CodedConcept)
+
+        listOfPossibleValues.Add(ConceptNames.AttributeInconsistency)
+        listOfPossibleValues.Add(ConceptNames.Equality)
+        SpecificAssessmentSequence.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        SpecificAssessmentSequence.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
+
+        'Expected Value
+        Dim ExpectedValue As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificAssessmentSequence)
+        ExpectedValue.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
+        ExpectedValue.RequirementType = RequirementTypeEnum.MC
+        ExpectedValue.ValueMultiplicity.Min = "0"
+        ExpectedValue.ValueMultiplicity.Max = "n"
+        ExpectedValue.ValueMultiplicity.CountOfContentItemCount = SpecificAssessmentSequence
+        ExpectedValue.ConceptName = ConceptNames.ExpectedValue
+        ExpectedValue.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        ExpectedValue.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
+
+
         'Supplied Attribute Name
         Dim SuppliedAttributeName As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificAssessmentSequence)
         SuppliedAttributeName.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         SuppliedAttributeName.RequirementType = RequirementTypeEnum.MC
         SuppliedAttributeName.ValueMultiplicity.Min = "0"
-        SuppliedAttributeName.ValueMultiplicity.Max = "1"
+        SuppliedAttributeName.ValueMultiplicity.Max = "n"
+        SuppliedAttributeName.ValueMultiplicity.CountOfContentItemCount = SpecificAssessmentSequence
         SuppliedAttributeName.ConceptName = ConceptNames.SuppliedAttributeName
         SuppliedAttributeName.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        SuppliedAttributeName.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
 
         'Supplied Attribute Tag
         Dim SuppliedAttributeTag As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificAssessmentSequence)
         SuppliedAttributeTag.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         SuppliedAttributeTag.RequirementType = RequirementTypeEnum.MC
         SuppliedAttributeTag.ValueMultiplicity.Min = "0"
-        SuppliedAttributeTag.ValueMultiplicity.Max = "1"
+        SuppliedAttributeTag.ValueMultiplicity.Max = "n"
+        SuppliedAttributeTag.ValueMultiplicity.CountOfContentItemCount = SpecificAssessmentSequence
         SuppliedAttributeTag.ConceptName = ConceptNames.SuppliedAttributeTag
         SuppliedAttributeTag.ValueSetConstraintAsRegularExpression = "^[(]?[A-Za-z0-9]{4},[A-Za-z0-9]{4}[)]?$"
         SuppliedAttributeTag.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        SuppliedAttributeTag.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
 
         'Supplied Attribute Value
         Dim SuppliedAttributeValue As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(SpecificAssessmentSequence)
         SuppliedAttributeValue.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         SuppliedAttributeValue.RequirementType = RequirementTypeEnum.MC
         SuppliedAttributeValue.ValueMultiplicity.Min = "0"
-        SuppliedAttributeValue.ValueMultiplicity.Max = "1"
+        SuppliedAttributeValue.ValueMultiplicity.Max = "n"
+        SuppliedAttributeValue.ValueMultiplicity.CountOfContentItemCount = SpecificAssessmentSequence
         SuppliedAttributeValue.ConceptName = ConceptNames.SuppliedAttributeValue
         SuppliedAttributeValue.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        SuppliedAttributeValue.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
 
         'General Assessment Sequence
         Dim GeneralAssessmentSequence As SpecificationContentItemWithValueTypeContainer = New SpecificationContentItemWithValueTypeContainer(SpecificAssessmentSequence)
         GeneralAssessmentSequence.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         GeneralAssessmentSequence.RequirementType = RequirementTypeEnum.MC
         GeneralAssessmentSequence.ValueMultiplicity.Min = "0"
-        GeneralAssessmentSequence.ValueMultiplicity.Max = "1"
+        GeneralAssessmentSequence.ValueMultiplicity.Max = "n"
         GeneralAssessmentSequence.ConceptName = ConceptNames.GeneralAssessmentSequence
 
         listOfPossibleValues = New List(Of CodedConcept)
@@ -320,18 +377,19 @@ Public Class QAPVtemplate
         CheckDescription.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
         CheckDescription.RequirementType = RequirementTypeEnum.MC
         CheckDescription.ValueMultiplicity.Min = "0"
-        CheckDescription.ValueMultiplicity.Max = "1"
+        CheckDescription.ValueMultiplicity.Max = "n"
+        CheckDescription.ValueMultiplicity.CountOfContentItemCount = GeneralAssessmentSequence
         CheckDescription.ConceptName = ConceptNames.CheckDescription
         CheckDescription.Conditions.Add(New CheckResultsCondition(CriticalIssuesFound))
+        CheckDescription.Conditions.Add(New AssessmentReportingTypeCondition(AssessmentReportingType, listOfPossibleValues))
 
-
-        'Performed Procedure Step SOP Instance UID
-        Dim PerformedProcedureStepSOPInstanceUID As SpecificationContentItemWithValueTypeUIDRef = New SpecificationContentItemWithValueTypeUIDRef(RootContentItem)
-        PerformedProcedureStepSOPInstanceUID.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
-        PerformedProcedureStepSOPInstanceUID.RequirementType = RequirementTypeEnum.M
-        PerformedProcedureStepSOPInstanceUID.ValueMultiplicity.Min = "1"
-        PerformedProcedureStepSOPInstanceUID.ValueMultiplicity.Max = "1"
-        PerformedProcedureStepSOPInstanceUID.ConceptName = ConceptNames.PerformedProcedureStepSOPInstanceUID
+        ''Performed Procedure Step SOP Instance UID
+        'Dim PerformedProcedureStepSOPInstanceUID As SpecificationContentItemWithValueTypeUIDRef = New SpecificationContentItemWithValueTypeUIDRef(RootContentItem)
+        'PerformedProcedureStepSOPInstanceUID.RelationshipWithParent = RelationshipWithParentEnum.CONTAINS
+        'PerformedProcedureStepSOPInstanceUID.RequirementType = RequirementTypeEnum.M
+        'PerformedProcedureStepSOPInstanceUID.ValueMultiplicity.Min = "1"
+        'PerformedProcedureStepSOPInstanceUID.ValueMultiplicity.Max = "1"
+        'PerformedProcedureStepSOPInstanceUID.ConceptName = ConceptNames.PerformedProcedureStepSOPInstanceUID
 
         'Requester AE Title
         Dim RequesterAETitle As SpecificationContentItemWithValueTypeText = New SpecificationContentItemWithValueTypeText(RootContentItem)

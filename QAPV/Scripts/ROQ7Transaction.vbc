@@ -59,7 +59,7 @@ Class ROQ7Transaction
         Dim m_rules As List(Of Rule) = New List(Of Rule)
         'Atleast one Structured Report should be received. Rule is performed on the messagecollection, not on every C-Store operation, so only once.
         'todo change IODReceivedrule to check on structured report also
-        m_rules.Add(New IODReceivedRule(IODType.BasicTextSR, ErrorSeverity.RuleError))
+        m_rules.Add(New IODReceivedRule(IODType.EnhancedSR, ErrorSeverity.RuleError))
         m_rules.Add(New IsRequiredRule(Tags.AffectedSOPClassUID, IODType.CStoreRequest, ErrorSeverity.RuleError))
         Return m_rules
 

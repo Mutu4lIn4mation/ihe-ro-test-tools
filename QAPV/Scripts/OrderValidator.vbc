@@ -21,19 +21,34 @@ Public Class OrderValidator
                 If (mappedDatasetContentItemChilds.Count > 0) Then
 
                     Dim indexMin As Integer = datasetContentItemChilds.IndexOf(mappedDatasetContentItemChilds.Item(0))
-                    Dim indexMax As Integer = datasetContentItemChilds.IndexOf(mappedDatasetContentItemChilds.Item(mappedDatasetContentItemChilds.Count - 1))
+                    'Dim indexMax As Integer = datasetContentItemChilds.IndexOf(mappedDatasetContentItemChilds.Item(mappedDatasetContentItemChilds.Count - 1))
+                    Dim count As Integer = 0
+                    For Each datasetContentItemloop As DataSetContentItem In mappedDatasetContentItemChilds
+                        If (indexMin = -1) Then
+                            indexMin = datasetContentItemChilds.IndexOf(mappedDatasetContentItemChilds.Item(count))
+                            'indexMax = datasetContentItemChilds.IndexOf(mappedDatasetContentItemChilds.Item(mappedDatasetContentItemChilds.Count - 1))
+                        Else
+                            Exit For
+                        End If
+                        If (indexMin = -1) Then
+                            count = count + 1
+                        End If
+
+                    Next
+
+                    
 
                     If (indexMin <= previousIndexMax) Then
                         logError(specificationContentItemChild, previousSpecificationContentItemChild, mappedDatasetContentItemChilds, previousMappedDatasetContentItemChilds)
                     Else
                         'log goed
                         'If Not (previousIndexMax = -1) Then
-                        Reporter.GetInstance.Report(mappedDatasetContentItemChilds.Item(0).ToString() + " is on correct place in dataset", ErrorSeverity.RuleInfo)
+                        Reporter.GetInstance.Report(mappedDatasetContentItemChilds.Item(count).ToString() + " is on correct place in dataset", ErrorSeverity.RuleInfo)
                         'End If
 
                     End If
 
-                    previousIndexMax = indexMax
+                    previousIndexMax = indexMin
                     previousSpecificationContentItemChild = specificationContentItemChild
                     previousMappedDatasetContentItemChilds = mappedDatasetContentItemChilds
                 End If

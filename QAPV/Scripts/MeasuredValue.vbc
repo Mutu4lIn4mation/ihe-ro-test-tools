@@ -31,10 +31,6 @@ Public Class MeasuredValue
     ' - Constants -
     '
 
-    ''' <summary>
-    ''' A description of the context of an instance of this class.
-    ''' </summary>
-    Private Const context As String = "DICOM - Structured Reporting - Content Item - Measured Value"
 
     ''' <summary>
     ''' A description of the context of the measurementUnits field of this class.
@@ -58,6 +54,7 @@ Public Class MeasuredValue
     ''' </summary>
     Private sequenceItem As SequenceItem = Nothing
 
+    Private context As String = Nothing
     '
     ' - Constructors -
     '
@@ -73,14 +70,28 @@ Public Class MeasuredValue
     ''' Constructor.
     ''' </summary>
     ''' <param name="sequenceItem">The single sequence item that encodes this Measured Value.</param>
-    Public Sub New(sequenceItem As SequenceItem)
+    Public Sub New(sequenceItem As SequenceItem, context As String)
         Me.sequenceItem = sequenceItem
-
-        Me.m_measurementUnits = ConceptCode.CreateConceptCode(sequenceItem, "0x004008EA", measurementUnitsContext)
-
+        Me.NumericValue = NumericValue
+        Me.m_measurementUnits = ConceptCode.CreateConceptCode(sequenceItem, "0x004008EA", "")
+        Me.context = context
     End Sub
 
+    Friend Shared Function CreateMeasuredValue(attributeSet As AttributeSet, tag As [String], context As String) As MeasuredValue
+        Dim measuredValue As MeasuredValue = Nothing
 
+        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = attributeSet(tag)
+
+        If attribute.Exists Then
+            If attribute.VR = DvtkData.Dimse.VR.SQ Then
+                If attribute.ItemCount > 0 Then
+                    measuredValue = New MeasuredValue(attribute.GetItem(1), context)
+                End If
+            End If
+        End If
+
+        Return (measuredValue)
+    End Function
 
     '
     ' - Properties -
@@ -91,17 +102,35 @@ Public Class MeasuredValue
     ''' </summary>
     Public ReadOnly Property MeasurementUnits() As ConceptCode
         Get
+            'Return Me.m_measurementUnits
+
+            If (Not Me.sequenceItem.Exists("0x004008EA")) Then
+                Me.sequenceItem.Set("0x004008EA", DvtkData.Dimse.VR.SQ)
+                Dim sequenceItem As New SequenceItem
+                Me.sequenceItem.Item("0x004008EA").AddItem(sequenceItem)
+
+            End If
+
+            Return ConceptCode.CreateConceptCode(sequenceItem, "0x004008EA", "")
+
+
             Return Me.m_measurementUnits
         End Get
+
     End Property
 
     ''' <summary>
     ''' Gets the Numeric Value for this instance.
     ''' </summary>
-    Public ReadOnly Property NumericValue() As [String]
+    Public Property NumericValue() As [String]
         Get
             Return (Convert.FirstAttributeValueToString(Me.sequenceItem, "0x0040A30A"))
         End Get
+
+        Set(value As [String])
+            Me.sequenceItem.Set("0x0040A30A", DvtkData.Dimse.VR.DS, value)
+
+        End Set
     End Property
 
 

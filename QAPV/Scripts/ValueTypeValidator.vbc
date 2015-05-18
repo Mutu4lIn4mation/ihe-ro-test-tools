@@ -7,7 +7,16 @@ Public Class ValueTypeValidator
 
         For Each specificationContentItem As SpecificationContentItem In specificationContentItems
 
-            If Not (specificationContentItem.ValueType.ToString() = datasetContentItem.ValueType) Then
+            If (datasetContentItem.ConceptName.CodeValue = ConceptNames.SuppliedAttributeValue.CodeValue And datasetContentItem.ConceptName.CodingSchemeDesignator = ConceptNames.SuppliedAttributeValue.CodingSchemeDesignator) Then
+
+                If (datasetContentItem.ValueType = ValueTypeEnum.NUM.ToString() Or datasetContentItem.ValueType = ValueTypeEnum.TEXT.ToString()) Then
+                    Reporter.GetInstance.Report("Dataset content item " + datasetContentItem.ToString() + " has correct value type: " + datasetContentItem.ValueType, ErrorSeverity.RuleInfo)
+                Else
+                    Reporter.GetInstance.Report("Dataset content item " + datasetContentItem.ToString() + " has incorrect value type: " + datasetContentItem.ValueType, ErrorSeverity.RuleError)
+                End If
+
+
+            ElseIf Not (specificationContentItem.ValueType.ToString() = datasetContentItem.ValueType) Then
                 'loggen error
                 Reporter.GetInstance.Report("Dataset content item " + datasetContentItem.ToString() + " has incorrect value type: " + datasetContentItem.ValueType, ErrorSeverity.RuleError)
             Else

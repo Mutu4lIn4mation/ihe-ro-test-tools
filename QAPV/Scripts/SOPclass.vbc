@@ -21,6 +21,7 @@ Class SOPclass
     Public Shared ReadOnly StudyRootQueryRetrieveMOVESOPClassUID As String = "1.2.840.10008.5.1.4.1.2.2.2"
     Public Shared ReadOnly RTBeamsTreatmentRecordSTOREOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.4"
     Public Shared ReadOnly BasicTextSRSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.88.11"
+    Public Shared ReadOnly EnhancedSRSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.88.22"
 
 #End Region
 
@@ -50,6 +51,7 @@ Class SOPclass
         m_IODtoSOPMapping.Add(IODType.RTBeamsTreatmentRecordSTORE, RTBeamsTreatmentRecordSTOREOPClassUID)
         m_IODtoSOPMapping.Add(IODType.NAction, UnifiedProcedureStepPushSOPClassUID)
         m_IODtoSOPMapping.Add(IODType.BasicTextSR, BasicTextSRSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.EnhancedSR, EnhancedSRSOPClassUID)
     End Sub
 
 #End Region

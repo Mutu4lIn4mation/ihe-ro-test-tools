@@ -78,19 +78,21 @@ Public Class DataSetContentItemWithValueTypeNum
     ''' <param name="position">The ordinal position of the associated Sequence Item in it's contained Content Sequence Item.</param>
     Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem, position As UInteger)
         MyBase.New(attributeSet, parentContentItem, position)
-        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = attributeSet("0x0040A300")
 
-        ValueType = "NUM"
+        'Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Me.AttributeSet("0x0040A300")
 
-        If attribute.Exists Then
-            If attribute.VR = DvtkData.Dimse.VR.SQ Then
-                If attribute.ItemCount > 0 Then
-                    Me.m_measuredValue = New MeasuredValue(attribute.GetItem(1))
-                End If
-            End If
-        End If
+        ValueType = ValueTypeEnum.NUM.ToString
 
-        Me.m_numericValueQualifier = ConceptCode.CreateConceptCode(attributeSet, "0x0040A301", numericValueQualifierContext)
+        'If attribute.Exists Then
+        '    If attribute.VR = VR.SQ Then
+        '        If attribute.ItemCount > 0 Then
+        '            Me.m_measuredValue = New MeasuredValue(attribute.GetItem(1))
+        '        End If
+        '    End If
+        'End If
+        'Me.m_measuredValue = MeasuredValue.CreateMeasuredValue(Me.AttributeSet, "0x0040A300", "")
+        Me.m_measuredValue = MeasuredValue
+        Me.m_numericValueQualifier = ConceptCode.CreateConceptCode(Me.AttributeSet, "0x0040A301", "")
     End Sub
 
     Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem)
@@ -106,7 +108,14 @@ Public Class DataSetContentItemWithValueTypeNum
     ''' </summary>
     Public ReadOnly Property MeasuredValue() As MeasuredValue
         Get
-            Return Me.m_measuredValue
+            If (Not Me.AttributeSet.Exists("0x0040A300")) Then
+                Me.AttributeSet.Set("0x0040A300", DvtkData.Dimse.VR.SQ)
+                Dim sequenceItem As New SequenceItem
+                Me.AttributeSet.Item("0x0040A300").AddItem(sequenceItem)
+                'Me.m_measuredValue = New MeasuredValue(sequenceItem)
+            End If
+
+            Return MeasuredValue.CreateMeasuredValue(Me.AttributeSet, "0x0040A300", "")
         End Get
     End Property
 

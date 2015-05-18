@@ -519,7 +519,7 @@ Public Class DataSetHandler
         differenceGoodInfoList = DataSetHandler.LoadUpsDataSetInfo(differenceGoodPath)
 
         For Each dataSetInfo In differenceGoodInfoList
-            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.EnhancedSRSOPClassUID) Then
                 SRDifferenceGoodCount = SRDifferenceGoodCount + 1
                 If SRDifferenceGoodCount > 1 Then
                     Dim message As String = String.Format("More than one SR for difference good scenario found!! Please use the testool configuration editor to add your dataset")
@@ -532,7 +532,7 @@ Public Class DataSetHandler
         differenceIssuesFoundInfoList = DataSetHandler.LoadUpsDataSetInfo(differenceIssuesFoundPath)
 
         For Each dataSetInfo In differenceIssuesFoundInfoList
-            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.EnhancedSRSOPClassUID) Then
                 SRDifferenceIssuesFoundCount = SRDifferenceIssuesFoundCount + 1
                 If SRDifferenceIssuesFoundCount > 1 Then
                     Dim message As String = String.Format("More than one SR for difference with issues scenario found!! Please use the testool configuration editor to add your dataset")
@@ -572,7 +572,7 @@ Public Class DataSetHandler
         doseGoodInfoList = DataSetHandler.LoadUpsDataSetInfo(doseGoodPath)
 
         For Each dataSetInfo In doseGoodInfoList
-            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.EnhancedSRSOPClassUID) Then
                 SRDoseGoodCount = SRDoseGoodCount + 1
                 If SRDoseGoodCount > 1 Then
                     Dim message As String = String.Format("More than one SR for dose good scenario found!! Please use the testool configuration editor to add your dataset")
@@ -585,7 +585,7 @@ Public Class DataSetHandler
         doseIssuesFoundInfoList = DataSetHandler.LoadUpsDataSetInfo(doseIssuesFoundPath)
 
         For Each dataSetInfo In doseIssuesFoundInfoList
-            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.EnhancedSRSOPClassUID) Then
                 SRDoseIssuesFoundCount = SRDoseIssuesFoundCount + 1
                 If SRDoseIssuesFoundCount > 1 Then
                     Dim message As String = String.Format("More than one SR for dose with issues scenario found!! Please use the testool configuration editor to add your dataset")

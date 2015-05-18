@@ -142,5 +142,6 @@
 #include"UIDRefValidator.vbc"
 #include"ValueTypeValidator.vbc"
 #include"ConceptNames.vbc"
+#include"SpecificationContentItemWithValueTypeNum.vbc"
 
 #End If

@@ -12,6 +12,6 @@
     IMAGE = 9
     WAVEFORM = 10
     CONTAINER = 11
-
+    NUM = 12
 End Enum
 

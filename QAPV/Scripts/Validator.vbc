@@ -44,7 +44,7 @@ Class Validator
                 ApplyMappingRules(message)
 
                 Dim messageSOPClassUID = message.CommandSet.GetSopClassUid()
-                If (messageSOPClassUID = SOPclass.BasicTextSRSOPClassUID) Then
+                If (messageSOPClassUID = SOPclass.EnhancedSRSOPClassUID) Then
 
                     Dim template As New QAPVtemplate(m_isDifferenceCheck)
 

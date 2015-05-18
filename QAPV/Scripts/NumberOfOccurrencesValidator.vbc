@@ -50,6 +50,21 @@ Public Class NumberOfOccurrencesValidator
                 End If
             Next
 
+            If Not (specificationContentItem.ValueMultiplicity.CountOfContentItemCount Is Nothing) Then
+
+                Dim listOfDatasetContentItems As List(Of DataSetContentItem) = mapping.GetDatasetContentItems(specificationContentItem.ValueMultiplicity.CountOfContentItemCount)
+
+                If (specificationContentItem.ValueMultiplicity.CountOfContentItemCount.ConceptName Is ConceptNames.NumberOfCheckResults) Then
+                    Dim NumRefDatasetContentItem As DataSetContentItemWithValueTypeNum = listOfDatasetContentItems(0)
+                    specificationContentItem.ValueMultiplicity.Max = NumRefDatasetContentItem.MeasuredValue.NumericValue
+
+                Else
+
+
+                    specificationContentItem.ValueMultiplicity.Max = listOfDatasetContentItems.Count.ToString()
+                End If
+            End If
+
 
             If (isConditionCorrect) Then
                 If Not (specificationContentItem.ValueMultiplicity.Max = "n") Then
@@ -57,6 +72,7 @@ Public Class NumberOfOccurrencesValidator
                         isValid = True
                     End If
                 Else
+
                     If (numberOfdatasetContentItems >= System.Convert.ToInt32(specificationContentItem.ValueMultiplicity.Min)) Then
                         isValid = True
                     End If
