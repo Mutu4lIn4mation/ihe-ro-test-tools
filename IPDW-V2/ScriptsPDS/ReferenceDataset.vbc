@@ -490,6 +490,10 @@ Class ReferenceDataSet
                         End If
                     Next
 
+                    'responseMessage.DataSet.Delete("0x00404021[1]/0x00080000")
+                    'responseMessage.DataSet.Delete("0x00404021[1]/0x00200000")
+                    'responseMessage.DataSet.Delete("0x00404021[1]/0x00400000")
+                    'responseMessage.DataSet.Delete(Tags.IisTypeOfInstances)
                     responseMessages.Add(responseMessage)
                     'responseMessage.DataSet.Write(m_datasetPath + "\..\Cache\PDS\C-FIND-RSP" + CFindRspCount.ToString() + ".dcm")
 
