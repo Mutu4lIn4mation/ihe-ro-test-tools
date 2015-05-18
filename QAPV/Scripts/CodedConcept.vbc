@@ -1,0 +1,50 @@
+﻿
+Public Class CodedConcept
+
+    Private m_CodingSchemeDesignator As String
+    Public Property CodingSchemeDesignator() As String
+        Get
+            Return m_CodingSchemeDesignator
+        End Get
+        Set(ByVal value As String)
+            m_CodingSchemeDesignator = value
+        End Set
+    End Property
+
+    Private m_CodeValue As String
+    Public Property CodeValue() As String
+        Get
+            Return m_CodeValue
+        End Get
+        Set(ByVal value As String)
+            m_CodeValue = value
+        End Set
+    End Property
+
+    Private m_CodeMeaning As String
+    Public Property CodeMeaning() As String
+        Get
+            Return m_CodeMeaning
+        End Get
+        Set(ByVal value As String)
+            m_CodeMeaning = value
+        End Set
+    End Property
+
+    Public Overrides Function ToString() As String
+        Return "(" + m_CodeValue + ", " + m_CodingSchemeDesignator + ", " + m_CodeMeaning + ")"
+    End Function
+
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(m_CodeValue As String, m_CodingSchemeDesignator As String, m_CodeMeaning As String)
+        CodingSchemeDesignator = m_CodingSchemeDesignator
+        CodeValue = m_CodeValue
+        CodeMeaning = m_CodeMeaning
+    End Sub
+
+End Class
+
+

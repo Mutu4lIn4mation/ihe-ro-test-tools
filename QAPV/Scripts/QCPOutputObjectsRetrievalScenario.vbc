@@ -1,0 +1,64 @@
+Class QCPOutputObjectsRetrievalScenario
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim qcpActor As QCPActor = New QCPActor()
+        Dim qcrActor As QCRActor = New QCRActor()
+
+        Dim kindOfCheckDialog As ChooseKindOfCheckDialog = New ChooseKindOfCheckDialog(True)
+        Dim errorDialog As ErrorDialog = New ErrorDialog()
+        Dim issuesFoundDialog As IssuesFoundDialog = New IssuesFoundDialog(True)
+
+        Try
+
+            Dim checkOutputSequence As Boolean
+            'Check if the N-Get-rsp that is created by the QCR dose or difference success – testscenario contains a outputsequence, if not then stop execution and inform the user (in the validation results)
+            Try
+                checkOutputSequence = DataSetHandler.CheckNGetHasOutputSequence(DataSetHandler.UPSCacheXMLFileName, "N-GET-RSP")
+            Catch ex As Exception
+                Dim errorMessage As String = "First run the QCP Difference check success or Dose check success scenario, at least once."
+                errorDialog.SetMessage(errorMessage)
+                errorDialog.ShowDialog()
+                Throw ex
+            End Try
+
+            If Not checkOutputSequence Then
+                Dim errorMessage As String = "First run the QCP Difference check success or Dose check success scenario, at least once."
+                errorDialog.SetMessage(errorMessage)
+                errorDialog.ShowDialog()
+            Else
+
+                issuesFoundDialog.ShowDialog()
+
+                Dim roq7transaction As ROQ7Transaction = New ROQ7Transaction(qcpActor, qcrActor, issuesFoundDialog.Yes)
+                Dim roq8transaction As ROQ8Transaction = New ROQ8Transaction()
+
+                Dim send As SendScenarioStep = New SendScenarioStep(qcrActor, qcpActor, True)
+
+                send.AddTransaction(roq7transaction)
+                send.AddTransaction(roq8transaction)
+
+                'Configure the validate step
+
+                Dim validateROQ7 As ValidateScenarioStep = New ValidateScenarioStep(send, 2)
+                validateROQ7.AddRules(roq7transaction.GetCommonTransactionRulesForResponse())
+
+                Dim validateROQ8 As ValidateScenarioStep = New ValidateScenarioStep(send, 3)
+                validateROQ8.AddRules(roq8transaction.GetCommonTransactionRulesForResponse())
+
+                'Add the steps to the list
+                m_scenarioSteps.Add(send)
+                m_scenarioSteps.Add(validateROQ7)
+                m_scenarioSteps.Add(validateROQ8)
+
+            End If
+
+        Catch ex As Exception
+            errorDialog.SetMessage(ex.Message)
+            errorDialog.ShowDialog()
+            Throw ex
+        End Try
+
+    End Sub
+End Class

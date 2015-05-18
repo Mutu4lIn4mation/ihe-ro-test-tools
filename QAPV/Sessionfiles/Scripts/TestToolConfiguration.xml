@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<TesttoolConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SoftwareVersion>
+    <Major>3</Major>
+    <Minor>4</Minor>
+  </SoftwareVersion>
+  <Debugging>
+    <ReportDebugMessages>true</ReportDebugMessages>
+    <DoCleanUp>true</DoCleanUp>
+    <ReportTBDRule>true</ReportTBDRule>
+  </Debugging>
+  <SupportedTransferSyntaxes>
+    <Sender>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.1</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+    </Sender>
+    <Receiver>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.1</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+    </Receiver>
+  </SupportedTransferSyntaxes>
+  <ApplicationEntityConfiguration>
+    <DVTKAEConfiguration Actor="QCR">
+      <SUTAESetting Command="UPS">
+        <AETitle>NEVENTS</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CMOVE">
+        <AETitle>GETPLAN</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CSTORE">
+        <AETitle>STORESR</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+    </DVTKAEConfiguration>
+    <DVTKAEConfiguration Actor="QCP">
+      <SUTAESetting Command="UPS">
+        <AETitle>N-CREATE</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CMOVE">
+        <AETitle>GETSR</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CSTORE">
+        <AETitle>STOREPLAN</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+    </DVTKAEConfiguration>
+    <SUTAEConfiguration Actor="QCR">
+      <IPAddress>127.0.0.1</IPAddress>
+      <SUTAESetting Command="UPS">
+        <AETitle>QCRUPS</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CMOVE">
+        <AETitle>QCRCMOVE</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CSTORE">
+        <AETitle>OCRSTORE</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+    </SUTAEConfiguration>
+    <SUTAEConfiguration Actor="QCP">
+      <IPAddress>127.0.0.1</IPAddress>
+      <SUTAESetting Command="UPS">
+        <AETitle>QCPUPS</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CMOVE">
+        <AETitle>QCPCMOVE</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+      <SUTAESetting Command="CSTORE">
+        <AETitle>QCPSTORE</AETitle>
+        <Port>109</Port>
+      </SUTAESetting>
+    </SUTAEConfiguration>
+  </ApplicationEntityConfiguration>
+</TesttoolConfig>

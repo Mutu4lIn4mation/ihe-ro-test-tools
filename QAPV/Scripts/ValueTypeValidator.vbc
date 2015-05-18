@@ -1,0 +1,25 @@
+﻿
+Public Class ValueTypeValidator
+
+    Public Sub Validate(datasetContentItem As DataSetContentItem, mapping As Mapping)
+
+        Dim specificationContentItems As List(Of SpecificationContentItem) = mapping.GetSpecificationContentItems(datasetContentItem)
+
+        For Each specificationContentItem As SpecificationContentItem In specificationContentItems
+
+            If Not (specificationContentItem.ValueType.ToString() = datasetContentItem.ValueType) Then
+                'loggen error
+                Reporter.GetInstance.Report("Dataset content item " + datasetContentItem.ToString() + " has incorrect value type: " + datasetContentItem.ValueType, ErrorSeverity.RuleError)
+            Else
+                Reporter.GetInstance.Report("Dataset content item " + datasetContentItem.ToString() + " has correct value type: " + datasetContentItem.ValueType, ErrorSeverity.RuleInfo)
+            End If
+
+        Next
+
+        For Each childDataSetContentItem As DataSetContentItem In datasetContentItem.ChildContentItems
+            Validate(childDataSetContentItem, mapping)
+        Next
+
+    End Sub
+
+End Class

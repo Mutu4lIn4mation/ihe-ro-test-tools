@@ -1,0 +1,68 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class ROQ7Transaction
+    Inherits Transaction
+
+    Private IssuesFound As Boolean
+
+    'Constructor
+    Public Sub New(ByVal SUTActor As Actor, ByVal storeActor As Actor, ByVal issuesFound As Boolean)
+
+        MyBase.New("RO-Q7", "Quality Report Check retrieval", IODType.StudyRootQueryRetrieveMOVE, True)
+        issuesFound = issuesFound
+        m_sutActorId = SUTActor.Id 'for QAPV: QCR
+        m_storeActorId = storeActor.Id 'for QAPV: QCP
+    End Sub
+
+    Private m_sutActorId As String
+    Private m_storeActorId As String
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        Dim messages As DicomMessageCollection = ReferenceDataSet.createCMoveRqStatic(DataSetHandler.UPSCacheXMLFileName, m_sutActorId, m_storeActorId, "N-GET-RSP")
+        If messages.Count = 0 Then
+            'NO messages found in the N-CREATE repsonses to retrieve from the SCP
+            Dim log As String = "The respons of RO-Q6 should have at least a reference to the Structured report file (it could be that the AeTitle in the N-GET-RSP is not the same as the QCR ae title in the configuration file."
+            Logger.GetInstance().LogErrorMessage(log)
+            Return Nothing
+        Else
+            'add the structure set message to the arraylist
+            For Each message As DicomMessage In messages
+                datasetMessages.Add(message)
+            Next
+        End If
+        'return the array with dataset(s)
+        Return datasetMessages
+    End Function
+
+    ' This function returns all common rules that apply on a request of this transaction
+    Public Function GetCommonTransactionRulesForRequest() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        '(0x00080052)  Query/Retrieve Level
+        m_rules.Add(New ValueRule(Tags.QueryRetrieveLevel, "IMAGE", IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        'm_rules.Add(New RequestedCMoveSopInstanceUIDsRule(DataSetHandler.LoadDatasetFromFile(DataSetHandler.UPSCacheXMLFileName, "N-GET-REQ"), IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        ' C-Move-Req bevat geen SOPCLASSUID alleen SopInstanceUID
+        'm_rules.Add(New RequestedCMoveSopClassUIDNotRTBDIRule(IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.AffectedSOPClassUID, IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.AffectedSOPClassUID, SOPclass.StudyRootQueryRetrieveMOVESOPClassUID, IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        'Atleast one Structured Report should be received. Rule is performed on the messagecollection, not on every C-Store operation, so only once.
+        'todo change IODReceivedrule to check on structured report also
+        m_rules.Add(New IODReceivedRule(IODType.BasicTextSR, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.AffectedSOPClassUID, IODType.CStoreRequest, ErrorSeverity.RuleError))
+        Return m_rules
+
+    End Function
+
+End Class

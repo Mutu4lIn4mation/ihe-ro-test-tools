@@ -1,0 +1,29 @@
+﻿
+Public Class RelationshipWithParentValidator
+
+    Public Sub Validate(datasetContentItem As DataSetContentItem, mapping As Mapping)
+
+        Dim specificationContentItems As List(Of SpecificationContentItem) = mapping.GetSpecificationContentItems(datasetContentItem)
+
+        For Each specificationContentItem As SpecificationContentItem In specificationContentItems
+
+            If Not specificationContentItem.RelationshipWithParent = RelationshipWithParentEnum.UNDEFINED Then
+
+                If Not (specificationContentItem.RelationshipWithParent.ToString() = datasetContentItem.RelationshipType) Then
+                    'loggen error
+                    Reporter.GetInstance.Report("Dataset content item " + datasetContentItem.ToString() + " has incorrect relationshiptype: " + datasetContentItem.RelationshipType, ErrorSeverity.RuleError)
+                Else
+                    Reporter.GetInstance.Report("Dataset content item " + datasetContentItem.ToString() + " has correct relationshiptype: " + datasetContentItem.RelationshipType, ErrorSeverity.RuleInfo)
+                End If
+            End If
+
+        Next
+
+        For Each childDataSetContentItem As DataSetContentItem In datasetContentItem.ChildContentItems
+            Validate(childDataSetContentItem, mapping)
+        Next
+
+    End Sub
+
+End Class
+

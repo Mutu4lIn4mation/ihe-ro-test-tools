@@ -1,0 +1,269 @@
+﻿
+' ------------------------------------------------------
+' DVTk - The Healthcare Validation Toolkit (www.dvtk.org)
+' Copyright © 2010 DVTk
+' ------------------------------------------------------
+' This file is part of DVTk.
+'
+' DVTk is free software; you can redistribute it and/or modify it under the terms of the GNU
+' Lesser General Public License as published by the Free Software Foundation; either version 3.0
+' of the License, or (at your option) any later version. 
+' 
+' DVTk is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+' the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+' General Public License for more details. 
+' 
+' You should have received a copy of the GNU Lesser General Public License along with this
+' library; if not, see <http://www.gnu.org/licenses/>
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports System.Text
+Imports System.Xml
+
+Imports VR = DvtkData.Dimse.VR
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+''' <summary>
+''' This class represents a Code in a Structured Report object that refers to a coded concept. 
+''' An instance of this class is associated with a single Sequence Item that contains DICOM 
+''' attributes that are defined in the “Code Sequence Macro”.
+''' </summary>
+Public Class ConceptCode
+    '
+    ' - Fields -
+    '
+
+    ''' <summary>
+    ''' A description of the context of an instance of this class.
+    ''' E.g. "DICOM - Structured Reporting - Content Item - Concept Name"
+    ''' </summary>
+    Private context As String = Nothing
+
+    ''' <summary>
+    ''' Sequence Item that contains the "Code Sequence Macro" DICOM attributes that encode the
+    ''' Concept Code.
+    ''' </summary>
+    Private sequenceItem As SequenceItem = Nothing
+
+    '
+    ' - Constructors -
+    '
+
+    ''' <summary>
+    ''' Hide default constructor.
+    ''' </summary>
+    ' Do nothing.
+    Private Sub New()
+    End Sub
+
+
+
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="sequenceItem">
+    ''' Sequence Item that contains the "Code Sequence Macro" DICOM attributes that encode the
+    ''' Concept Code.
+    ''' </param>
+    ''' <param name="context">A description of the context of an instance of this class.</param>
+    Public Sub New(sequenceItem As SequenceItem, context As String)
+        Me.sequenceItem = sequenceItem
+        Me.context = context
+    End Sub
+
+
+
+    '
+    ' - Properties -
+    '
+
+    ''' <summary>
+    ''' Gets the Code Meaning of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If the associated DICOM attribute is not present, null is returned.
+    ''' If the associated DICOM attribute is present and has no values, "" is returned.
+    ''' If the associated DICOM attribute is present and has values, the first value is returned.
+    ''' </remarks>
+    Public Property CodeMeaning() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.sequenceItem, "0x00080104"))
+        End Get
+
+        Set(value As [String])
+            Me.sequenceItem.Set("0x00080104", DvtkData.Dimse.VR.LO, value)
+
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Gets the Coding Scheme Designator of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If the associated DICOM attribute is not present, null is returned.
+    ''' If the associated DICOM attribute is present and has no values, "" is returned.
+    ''' If the associated DICOM attribute is present and has values, the first value is returned.
+    ''' </remarks>
+    Public Property CodingSchemeDesignator() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.sequenceItem, "0x00080102"))
+        End Get
+
+        Set(value As [String])
+            Me.sequenceItem.Set("0x00080102", DvtkData.Dimse.VR.SH, value)
+
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Gets the Coding Scheme Version of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If the associated DICOM attribute is not present, null is returned.
+    ''' If the associated DICOM attribute is present and has no values, "" is returned.
+    ''' If the associated DICOM attribute is present and has values, the first value is returned.
+    ''' </remarks>
+    Public Property CodingSchemeVersion() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.sequenceItem, "0x00080103"))
+        End Get
+
+        Set(value As [String])
+            Me.sequenceItem.Set("0x00080103", DvtkData.Dimse.VR.SH, value)
+
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Gets the Code Value of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If the associated DICOM attribute is not present, null is returned.
+    ''' If the associated DICOM attribute is present and has no values, "" is returned.
+    ''' If the associated DICOM attribute is present and has values, the first value is returned.
+    ''' </remarks>
+    Public Property CodeValue() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.sequenceItem, "0x00080100"))
+        End Get
+
+        Set(value As [String])
+            Me.sequenceItem.Set("0x00080100", DvtkData.Dimse.VR.SH, value)
+
+        End Set
+    End Property
+
+    '
+    ' - Methods -
+    '
+
+    ''' <summary>
+    ''' Create a ConceptCode instance, if the specified Sequence Attribute is present in the
+    ''' supplied Attribute Set and the Sequence Attribute contains at least one Sequence Item.
+    ''' </summary>
+    ''' <param name="attributeSet">
+    ''' The Attribute Set in which the Sequence Attribute may be present.
+    ''' </param>
+    ''' <param name="tag">The Tag of the Sequence Attribute.</param>
+    ''' <returns>
+    ''' The created ConceptCode instance if the first Sequence Item exists.
+    ''' Null otherwise.
+    ''' </returns>
+    Friend Shared Function CreateConceptCode(attributeSet As AttributeSet, tag As [String], context As String) As ConceptCode
+        Dim conceptCode As ConceptCode = Nothing
+
+        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = attributeSet(tag)
+
+        If attribute.Exists Then
+            If attribute.VR = DvtkData.Dimse.VR.SQ Then
+                If attribute.ItemCount > 0 Then
+                    conceptCode = New ConceptCode(attribute.GetItem(1), context)
+                End If
+            End If
+        End If
+
+        Return (conceptCode)
+    End Function
+
+    ''' <summary>
+    ''' Method used by the library to serialize this instance to xml.
+    ''' </summary>
+    ''' <param name="xmlTextWriter">The xml text writer.</param>
+    ''' <param name="serializationContext">The serialization context.</param>
+    Friend Sub ToXml(xmlTextWriter As XmlTextWriter, serializationContext As SerializationContext)
+        '
+        ' Start of Concept Code.
+        '
+
+        xmlTextWriter.WriteStartElement("conceptCode")
+
+
+        '
+        ' Code Value.
+        '
+
+        Dim codeValue__1 As [String] = CodeValue
+
+        If codeValue__1 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("codeValue")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(codeValue__1)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+
+        '
+        ' Coding Scheme Designator.
+        '
+
+        Dim codingSchemeDesignator__2 As [String] = CodingSchemeDesignator
+
+        If codingSchemeDesignator__2 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("codingSchemeDesignator")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(codingSchemeDesignator__2)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+
+        '
+        ' Coding Scheme Version.
+        '
+
+        Dim codingSchemeVersion__3 As [String] = CodingSchemeVersion
+
+        If codingSchemeVersion__3 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("codingSchemeVersion")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(codingSchemeVersion__3)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+
+        '
+        ' Code Meaning.
+        '
+
+        Dim codeMeaning__4 As [String] = CodeMeaning
+
+        If codeMeaning__4 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("codeMeaning")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(codeMeaning__4)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+        '
+        ' Start of Concept Code.
+        '
+
+        xmlTextWriter.WriteEndElement()
+    End Sub
+End Class
+
+

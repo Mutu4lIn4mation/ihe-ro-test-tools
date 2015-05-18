@@ -1,0 +1,48 @@
+﻿
+Public Class CodeValueValidator
+
+    Public Sub Validate(datasetContentItem As DataSetContentItem, mapping As Mapping)
+
+        Dim specificationContentItems As List(Of SpecificationContentItem) = mapping.GetSpecificationContentItems(datasetContentItem)
+
+        For Each specificationContentItem As SpecificationContentItem In specificationContentItems
+
+            If (specificationContentItem.ValueType = ValueTypeEnum.CODE And datasetContentItem.ValueType = ValueTypeEnum.CODE.ToString()) Then
+
+                Dim codeValueSpecificationContentItem As SpecificationContentItemWithValueTypeCode = specificationContentItem
+                Dim codeValueDatasetContentItem As DataSetContentItemWithValueTypeCode = datasetContentItem
+
+                validateConceptCode(codeValueSpecificationContentItem.ValueSetConstraint, datasetContentItem)
+            End If
+
+        Next
+
+        For Each childDataSetContentItem As DataSetContentItem In datasetContentItem.ChildContentItems
+            Validate(childDataSetContentItem, mapping)
+        Next
+
+    End Sub
+
+    Private Sub validateConceptCode(ByVal codeValuesSpecificationContentItem As List(Of CodedConcept), ByVal codeValueDatasetContentItem As DataSetContentItemWithValueTypeCode)
+        Dim isValid As Boolean = False
+
+        If (codeValuesSpecificationContentItem.Count = 0) Then
+            isValid = True
+        Else
+
+            For Each codedConcept As CodedConcept In codeValuesSpecificationContentItem
+                If (codedConcept.CodeValue = codeValueDatasetContentItem.ConceptCode.CodeValue) Then
+                    isValid = True
+                End If
+            Next
+        End If
+
+        If Not (isValid) Then
+            Reporter.GetInstance.Report("Dataset content item " + codeValueDatasetContentItem.ToString() + " has incorrect codevalue: " + codeValueDatasetContentItem.ConceptCode.CodeValue, ErrorSeverity.RuleError)
+        Else
+            Reporter.GetInstance.Report("Dataset content item " + codeValueDatasetContentItem.ToString() + " has correct codevalue: " + codeValueDatasetContentItem.ConceptCode.CodeValue, ErrorSeverity.RuleInfo)
+        End If
+
+    End Sub
+End Class
+

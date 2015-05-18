@@ -1,0 +1,428 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System
+Imports System.Xml.Serialization
+Imports System.Collections.Generic
+#End If
+
+Class TestToolConfiguration
+
+#Region "Private Constants and Readonly Fields"
+
+    Private Const ConfigFileName As String = "TestToolConfiguration.xml"
+
+#End Region
+
+#Region "Private Fields"
+
+    'the actual instance of the ReferenceDataSet class
+    Private Shared m_instance As TestToolConfiguration
+
+    Private m_threadManager As DvtkHighLevelInterface.Common.Threads.ThreadManager = Nothing
+    Private m_session As Dvtk.Sessions.ScriptSession = Nothing
+    Private m_mainThread As DvtkHighLevelInterface.Dicom.Threads.DicomThread = Nothing
+    Private m_currentScenario As Scenario = Nothing
+
+    Private m_scriptPath As String
+    Private m_sessionPath As String
+    Private m_Configuration As TesttoolConfig
+
+#End Region
+
+#Region "Ctor and singleton pattern"
+
+    Private Sub New()
+    End Sub
+
+    Public Shared Function GetInstance() As TestToolConfiguration
+        If m_instance Is Nothing Then
+            m_instance = New TestToolConfiguration
+        End If
+        Return m_instance
+    End Function
+
+#End Region
+
+#Region "Public methods (other)"
+
+    Public Sub Initialise(ByVal sessionPath As String)
+
+        m_sessionPath = sessionPath
+        m_scriptPath = sessionPath + "\Scripts\"
+        Dim configFilePath As String = Path.Combine(m_scriptPath, ConfigFileName)
+
+        Try
+
+            Logger.GetInstance.LogDebugMessages = True
+
+            m_Configuration = LoadConfigurationFile(configFilePath)
+
+            Logger.GetInstance.LogDebugMessages = m_Configuration.Debugging.ReportDebugMessages()
+
+        Catch ex As System.Exception
+            Throw New System.Exception("An error occured while initialising the test tool configuration.", ex)
+        End Try
+    End Sub
+
+    'todo: relocate this method
+    Public Function GetDefinitionFileName(ByVal iodType As IODType) As String
+
+        Select Case iodType
+            Case iodType.CTImage
+                Return "CT Image Storage.def"
+            Case iodType.RTDose
+                Return "RT Dose Storage.def"
+            Case iodType.RTStructureSet
+                Return "RT Structure Set Storage.def"
+            Case iodType.MRImage
+                Return "MR Image Storage.def"
+            Case iodType.PETImage
+                Return "PET Image Storage.def"
+            Case iodType.SpatialRegistration
+                Return "Spatial Registration Storage.def"
+            Case iodType.DeformableSpatialRegistration
+                Return "DeformableSpatialRegistrationStorage.def"
+            Case iodType.RTPlanDosimetric
+                Return "RT Plan Storage.def"
+            Case iodType.RTPlanGeometric
+                Return "RTPlanStorage(geometric).def"
+            Case iodType.RTBeamsTreatmentRecordSTORE
+                Return "RTBeamsTreatmentRecordStorage.def"
+
+            Case iodType.UnifiedProcedureStepPull
+                Return "Unified Procedure Step - Pull.def"
+
+            Case iodType.UnifiedProcedureStepPush
+                Return "Unified Procedure Step - Push.def"
+
+            Case iodType.RTImage
+                Return "RTImageStorage.def"
+            Case iodType.RTBeamsDeliveryInstruction
+                Return "RTBeamsDeliveryInstructionStorage.def"
+
+            Case iodType.StudyRootQueryRetrieveMOVE
+                Return "Study Root Query Retrieve - MOVE.def"
+            Case iodType.BasicTextSR
+                Return "Basic Text SR.def"
+        End Select
+
+        Return Nothing
+    End Function
+
+#End Region
+
+#Region "Private Methods: Loading the Configuration"
+
+    Private Function LoadConfigurationFile(ByVal filePath As String) As TesttoolConfig
+        Try
+
+            Dim config As TesttoolConfig
+            Dim serializer As New XmlSerializer(GetType(TesttoolConfig))
+            Using fs As FileStream = New FileStream(filePath, FileMode.Open)
+                config = DirectCast(serializer.Deserialize(fs), TesttoolConfig)
+            End Using
+
+            Return config
+
+        Catch ex As Exception
+            Dim innerMessage As String = String.Empty
+
+            If Not (ex.InnerException Is Nothing) Then
+                innerMessage = ex.InnerException.Message
+            End If
+
+            Throw New System.Exception(String.Format("An error occured while reading the configuration file '{0}': {1};{2}", _
+                                        filePath, ex.Message, innerMessage))
+
+        End Try
+
+    End Function
+
+#End Region
+
+#Region "Public Properties / Public Get and Set methods"
+
+    Public ReadOnly Property SoftwareVersion() As String
+        Get
+            Return String.Format("{0}.{1}", m_Configuration.SoftwareVersion.Major, m_Configuration.SoftwareVersion.Minor)
+        End Get
+    End Property
+
+
+    'ReadOnly Property RTPlanFileName() As String
+    '    Get
+    '        Return m_Configuration.ApplicationEntityConfiguration.RTPlanFileName
+    '    End Get
+    'End Property
+
+    ReadOnly Property SessionPath() As String
+        Get
+            Return m_sessionPath
+        End Get
+    End Property
+
+    ReadOnly Property DoCleanUp() As Boolean
+        Get
+            Return m_Configuration.Debugging.DoCleanUp
+        End Get
+    End Property
+
+    ReadOnly Property ReportTBDRule() As Boolean
+        Get
+            Return m_Configuration.Debugging.ReportTBDRule
+        End Get
+    End Property
+
+    ReadOnly Property SupportedTransferSyntaxesSender() As System.Collections.Specialized.StringCollection
+        Get
+
+            Dim syntaxes As System.Collections.Specialized.StringCollection = New System.Collections.Specialized.StringCollection()
+            For Each transferSyntax As TransferSyntax In m_Configuration.SupportedTransferSyntaxes.Sender
+
+                If transferSyntax.Used Then
+                    syntaxes.Add(transferSyntax.Value)
+                End If
+
+            Next
+
+            Return syntaxes
+
+        End Get
+    End Property
+
+    ReadOnly Property SupportedTransferSyntaxesReceiver() As System.Collections.Specialized.StringCollection
+        Get
+
+            Dim syntaxes As System.Collections.Specialized.StringCollection = New System.Collections.Specialized.StringCollection()
+            For Each transferSyntax As TransferSyntax In m_Configuration.SupportedTransferSyntaxes.Receiver
+
+                If transferSyntax.Used Then
+                    syntaxes.Add(transferSyntax.Value)
+                End If
+
+            Next
+
+            Return syntaxes
+
+        End Get
+    End Property
+
+    Public Sub SetSession(ByVal session As Dvtk.Sessions.ScriptSession)
+        m_session = session
+    End Sub
+
+    Public Function GetSession() As Dvtk.Sessions.ScriptSession
+        Return m_session
+    End Function
+
+    Public Sub SetThreadManager(ByVal threatManager As DvtkHighLevelInterface.Common.Threads.ThreadManager)
+        m_threadManager = threatManager
+    End Sub
+
+    Public Function GetThreadManager() As DvtkHighLevelInterface.Common.Threads.ThreadManager
+        Return m_threadManager
+    End Function
+
+    Public Function GetMainThread() As DvtkHighLevelInterface.Dicom.Threads.DicomThread
+        Return m_mainThread
+    End Function
+
+    Public Sub SetMainThread(ByVal mainThread As DvtkHighLevelInterface.Dicom.Threads.DicomThread)
+        m_mainThread = mainThread
+    End Sub
+
+    Public Function GetCurrentScenario() As Scenario
+        Return m_currentScenario
+    End Function
+
+    Public Sub SetCurrentScenario(ByVal currentScenario As Scenario)
+        m_currentScenario = currentScenario
+    End Sub
+
+    Public Function GetScriptPath() As String
+        Return m_scriptPath
+    End Function
+
+    Public Function GetSUTAEConfiguration(ByVal actorId As String, ByVal command As DvtkData.Dimse.DimseCommand) As SUTAESettingWrapper
+
+        Dim sutActor As SUTActor = GetSUTActor(actorId)
+        Dim commandConfig As CommandConfig = GetCommandConfig(command)
+
+        For Each config As SUTAEConfiguration In m_Configuration.ApplicationEntityConfiguration.SUTAEConfiguration
+
+            If config.Actor = sutActor Then
+
+                For Each cmdConfig As SUTAESetting In config.SUTAESetting
+
+                    If cmdConfig.Command = commandConfig Then
+                        Return New SUTAESettingWrapper(cmdConfig, config.IPAddress)
+                    End If
+
+                Next
+
+                Throw New ArgumentException(String.Format("No SUT AE Setting present for command '{0}' for actor with id '{1}'", command, actorId), "commandId")
+            End If
+
+        Next
+        Throw New ArgumentException(String.Format("No SUT AE Configuration for actor with id '{0}' present in the configuration", actorId), "actorId")
+
+    End Function
+
+    Public Function GetDVTKAEConfiguration(ByVal actorId As String, ByVal command As DvtkData.Dimse.DimseCommand) As SUTAESettingWrapper
+
+        Dim dvtkActor As DVTKActor = GetDVTKActor(actorId)
+        Dim commandConfig As CommandConfig = GetCommandConfig(command)
+
+        For Each config As DVTKAEConfiguration In m_Configuration.ApplicationEntityConfiguration.DVTKAEConfiguration
+
+            If config.Actor = dvtkActor Then
+
+                For Each cmdConfig As SUTAESetting In config.SUTAESetting
+
+                    If cmdConfig.Command = commandConfig Then
+                        Return New SUTAESettingWrapper(cmdConfig, config.IPAddress)
+                    End If
+
+                Next
+
+                Throw New ArgumentException(String.Format("No SUT AE Setting present for command '{0}' for actor with id '{1}'", command, actorId), "commandId")
+            End If
+
+        Next
+        Throw New ArgumentException(String.Format("No SUT AE Configuration for actor with id '{0}' present in the configuration", actorId), "actorId")
+
+    End Function
+
+#End Region
+
+#Region "Private Methods: Mapping config types to DVTk types"
+
+    Private Shared Function GetDVTKActor(ByVal actorId As String) As DVTKActor
+
+        Select Case actorId.ToUpper()
+
+            Case "QCP"
+                Return DVTKActor.QCP
+            Case "QCR"
+                Return DVTKActor.QCR
+
+            Case Else
+                Throw New ArgumentException(String.Format("The actor id '{0}' is undefined in the testtool DVTK AE Configuration", actorId), "actorId")
+
+        End Select
+
+    End Function
+
+    Private Shared Function GetSUTActor(ByVal actorId As String) As SUTActor
+
+        Select Case actorId.ToUpper()
+
+            Case "QCP"
+                Return SUTActor.QCP
+            Case "QCR"
+                Return SUTActor.QCR
+
+            Case Else
+                Throw New ArgumentException(String.Format("The actor id '{0}' is undefined in the testtool SUT AE Configuration", actorId), "actorId")
+
+        End Select
+
+    End Function
+
+    Private Shared Function GetCommandConfig(ByVal command As DvtkData.Dimse.DimseCommand) As CommandConfig
+
+        Select Case command
+
+            Case NACTIONRQ, NSETRQ, NCREATERQ, NCREATERSP, NGETRQ, NEVENTREPORTRQ
+                Return CommandConfig.UPS
+            Case CMOVERQ
+                Return CommandConfig.CMOVE
+            Case CSTORERQ
+                Return CommandConfig.CSTORE
+            Case CFINDRQ
+                Return CommandConfig.CFIND
+
+            Case Else
+                Throw New ArgumentException(String.Format("The command '{0}' is undefined in the testtool configuration", command), "command")
+
+        End Select
+
+    End Function
+
+    Public Sub LoadDefinitionFiles(ByVal thread As DvtkHighLevelInterface.Dicom.Threads.DicomThread)
+
+        'unload previously loaded definition files
+        thread.Options.DvtkScriptSession.DefinitionManagement.UnLoadDefinitionFiles()
+
+        'load new definition files
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("Verification.def")
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("FileMeta.def")
+
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("RTTreatmentSummaryRecordStorage.def")
+
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.CTImage))
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTStructureSet))
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.SpatialRegistration))
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTDose))
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.DeformableSpatialRegistration))
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTPlanDosimetric))
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.UnifiedProcedureStepPull))
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.UnifiedProcedureStepPush))
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTImage))
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.StudyRootQueryRetrieveMOVE))
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.BasicTextSR))
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTBeamsTreatmentRecordSTORE))
+        'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(GetDefinitionFileName(IODType.RTBeamsDeliveryInstruction))
+
+        'config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.RTDose))
+        'config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.MRImage))
+        'config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.PETImage))
+        'config.GetMainThread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile(config.GetDefinitionFileName(IODType.RTPlanGeometric))
+    End Sub
+
+#End Region
+
+
+End Class
+
+
+''' <summary>
+''' Combines a sut setting with a sut's IP Address. Together, they are needed to
+''' initialize a DicomThread's Remote Options (IP, Port, AE Title).
+''' </summary>
+''' <remarks></remarks>
+Public Class SUTAESettingWrapper
+
+    Private m_IPAddress As String
+    Private m_SUTAESetting As SUTAESetting
+
+    Public Sub New(ByVal setting As SUTAESetting, ByVal ipaddress As String)
+        m_SUTAESetting = setting
+        m_IPAddress = ipaddress
+    End Sub
+
+    Public ReadOnly Property AETitle() As String
+        Get
+            Return m_SUTAESetting.AETitle
+        End Get
+    End Property
+
+    Public ReadOnly Property Port() As Integer
+        Get
+            Return m_SUTAESetting.Port
+        End Get
+    End Property
+
+    Public ReadOnly Property Command() As CommandConfig
+        Get
+            Return m_SUTAESetting.Command
+        End Get
+    End Property
+
+    Public ReadOnly Property IPAddress() As String
+        Get
+            Return m_IPAddress
+        End Get
+    End Property
+
+End Class
+

@@ -1,0 +1,37 @@
+Class MessageHandlerNEventReport
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    Private m_Status As String
+
+    Public Sub New(ByVal Status As String)
+        m_Status = Status
+    End Sub
+
+    'DimseCommand.NCREATE
+    Public Overrides Function HandleNEventReportRequest(ByVal theDicomMessage As DicomMessage) As Boolean
+
+        Dim affectedSOPClassUID As String = theDicomMessage.CommandSet.Item(Tags.AffectedSOPClassUID).Values(0)
+
+        'save the N-Create-REQ to cache directory
+        DataSetHandler.SaveDatasetToFile(theDicomMessage.DataSet, DataSetHandler.UPSCacheXMLFileName, "N-EVENTREPORT-REQ-RO-Q5")
+
+        If affectedSOPClassUID = SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString() Then
+
+            Dim responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NEVENTREPORTRSP)
+
+            responseMessage.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status = Success
+            'responseMessage.Set(Tags.CommandField, DvtkData.Dimse.VR.US, "8100H")
+            'responseMessage.Set(Tags.CommandDataSetType, DvtkData.Dimse.VR.US, "0101H")
+
+            ' send the response message
+            Send(responseMessage, theDicomMessage.EncodedPresentationContextID)
+
+            Return (True)
+
+        Else
+            Throw New Exception(String.Format("Handling N-Event-Report RQ of Affected SOP Class UID '{0}' not supported", affectedSOPClassUID))
+        End If
+
+    End Function
+
+End Class

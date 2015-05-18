@@ -1,0 +1,47 @@
+﻿Public Class Mapping
+
+    Private DatasetContentItemToSpecificationContentItems As New Dictionary(Of DataSetContentItem, List(Of SpecificationContentItem))
+    Private SpecificationContentItemToDatasetContentItems As New Dictionary(Of SpecificationContentItem, List(Of DataSetContentItem))
+
+    Public Sub Add(datasetContentItem As DataSetContentItem, specificationContentItem As SpecificationContentItem)
+        Dim listOfSpecificationContentItems As List(Of SpecificationContentItem) = Nothing
+
+        If Not (DatasetContentItemToSpecificationContentItems.TryGetValue(datasetContentItem, listOfSpecificationContentItems)) Then
+            listOfSpecificationContentItems = New List(Of SpecificationContentItem)
+            DatasetContentItemToSpecificationContentItems.Add(datasetContentItem, listOfSpecificationContentItems)
+        End If
+
+        listOfSpecificationContentItems.Add(specificationContentItem)
+
+        Dim listOfDatasetContentItems As List(Of DataSetContentItem) = Nothing
+
+        If Not (SpecificationContentItemToDatasetContentItems.TryGetValue(specificationContentItem, listOfDatasetContentItems)) Then
+            listOfDatasetContentItems = New List(Of DataSetContentItem)
+            SpecificationContentItemToDatasetContentItems.Add(specificationContentItem, listOfDatasetContentItems)
+        End If
+
+        listOfDatasetContentItems.Add(datasetContentItem)
+
+    End Sub
+
+    Public Function GetDatasetContentItems(specificationContentItem As SpecificationContentItem) As List(Of DataSetContentItem)
+        Dim listOfDatasetContentItems As List(Of DataSetContentItem) = Nothing
+
+        If Not (SpecificationContentItemToDatasetContentItems.TryGetValue(specificationContentItem, listOfDatasetContentItems)) Then
+            listOfDatasetContentItems = New List(Of DataSetContentItem)
+        End If
+
+        Return listOfDatasetContentItems
+    End Function
+
+    Public Function GetSpecificationContentItems(datasetContentItem As DataSetContentItem) As List(Of SpecificationContentItem)
+        Dim listOfSpecificationContentItems As List(Of SpecificationContentItem) = Nothing
+
+        If Not (DatasetContentItemToSpecificationContentItems.TryGetValue(datasetContentItem, listOfSpecificationContentItems)) Then
+            listOfSpecificationContentItems = New List(Of SpecificationContentItem)
+        End If
+
+        Return listOfSpecificationContentItems
+    End Function
+
+End Class

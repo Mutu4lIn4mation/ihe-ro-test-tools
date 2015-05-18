@@ -1,0 +1,127 @@
+﻿
+' ------------------------------------------------------
+' DVTk - The Healthcare Validation Toolkit (www.dvtk.org)
+' Copyright © 2010 DVTk
+' ------------------------------------------------------
+' This file is part of DVTk.
+'
+' DVTk is free software; you can redistribute it and/or modify it under the terms of the GNU
+' Lesser General Public License as published by the Free Software Foundation; either version 3.0
+' of the License, or (at your option) any later version. 
+' 
+' DVTk is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+' the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+' General Public License for more details. 
+' 
+' You should have received a copy of the GNU Lesser General Public License along with this
+' library; if not, see <http://www.gnu.org/licenses/>
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports System.Text
+Imports System.Xml
+
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+
+''' <summary>
+''' This class represents a Content Item with value type CODE that is present in a Structured Report Object.
+''' </summary>
+Public Class DataSetContentItemWithValueTypeComposite
+    Inherits DataSetContentItem
+    '
+    ' - Constants -
+    '
+
+    ''' <summary>
+    ''' A description of the context of the conceptCode field of this class.
+    ''' </summary>
+    Private Const conceptCompositeContext As String = "DICOM - Structured Reporting - Content Item - Composite"
+
+
+
+    '
+    ' - Fields -
+    '
+
+    ''' <summary>
+    ''' See property ConceptCode.
+    ''' </summary>
+    Private m_conceptCode As ConceptCode = Nothing
+
+
+
+    '
+    ' - Constructors -
+    '
+
+    ''' <summary>
+    ''' Hide default constructor.
+    ''' </summary>
+    Private Sub New()
+        ' Do nothing.
+        MyBase.New(Nothing, Nothing, 1)
+        ValueType = ValueTypeEnum.COMPOSITE
+    End Sub
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="sequenceItem">
+    ''' The AttributeSet instance containing the DICOM attributes to construct this instance with.
+    ''' </param>
+    ''' <param name="parentContentItem">The parent Content Item.</param>
+    ''' <param name="position">The ordinal position of the associated Sequence Item in it's contained Content Sequence Item.</param>
+    Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem, position As UInteger)
+        MyBase.New(attributeSet, parentContentItem, position)
+        Me.m_conceptCode = ConceptCode.CreateConceptCode(Me.AttributeSet, "0x00081199", "")
+        ValueType = ValueTypeEnum.COMPOSITE.ToString
+    End Sub
+
+    Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem)
+        Me.New(attributeSet, parentContentItem, 0)
+    End Sub
+
+    '
+    ' - Properties -
+    '
+
+    ''' <summary>
+    ''' Gets the Concept Code.
+    ''' </summary>
+    Public ReadOnly Property ConceptCode() As ConceptCode
+        Get
+            If (Not Me.AttributeSet.Exists("0x00081199")) Then
+                Me.AttributeSet.Set("0x00081199", DvtkData.Dimse.VR.SQ)
+                Dim sequenceItem As New SequenceItem
+                Me.AttributeSet.Item("0x00081199").AddItem(sequenceItem)
+
+            End If
+
+            Return ConceptCode.CreateConceptCode(AttributeSet, "0x00081199", "")
+
+
+            Return Me.m_conceptCode
+        End Get
+    End Property
+
+
+
+    '
+    ' - Methods -
+    '
+
+    ''' <summary>
+    ''' Method used by the library to serialize this instance to xml.
+    ''' </summary>
+    ''' <param name="xmlTextWriter">The xml text writer.</param>
+    ''' <param name="serializationContext">The serialization context.</param>
+    Friend Overrides Sub ValueToXml(xmlTextWriter As XmlTextWriter, serializationContext As SerializationContext)
+        If Me.m_conceptCode IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("code")
+            Me.m_conceptCode.ToXml(xmlTextWriter, serializationContext)
+            xmlTextWriter.WriteEndElement()
+        End If
+    End Sub
+End Class
+
+

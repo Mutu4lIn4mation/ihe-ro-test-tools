@@ -1,0 +1,67 @@
+Class IODNotReceivedRule
+    Inherits MessageCollectionRule
+
+    Private m_atLeastPresent As IODType
+
+    Public Sub New(ByVal AtLeastPresent As IODType, ByVal severity As ErrorSeverity)
+        MyBase.New("IODNotReceivedRule", IODType.NotSpecified, severity)
+        m_atLeastPresent = AtLeastPresent
+    End Sub
+
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection)
+
+        Dim errorEncountered As Boolean = False
+        Dim nrOffSoppClassUIDsFound As Integer = 0
+        Dim errorMessage As String
+
+        For Each dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage In dataSetCollection
+            If dicomMessage.Exists(Tags.SOPClassUID) Then
+                If m_atLeastPresent = IODType.RTBeamsDeliveryInstruction Then
+                    If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.RTBeamsDeliveryInstructionSOPClassUID Then
+                        nrOffSoppClassUIDsFound = nrOffSoppClassUIDsFound + 1
+                    End If
+                ElseIf m_atLeastPresent = IODType.RTPlanDosimetric Then
+                    If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.RTPlanDosimetricSOPClassUID Then
+                        nrOffSoppClassUIDsFound = nrOffSoppClassUIDsFound + 1
+                    End If
+                ElseIf m_atLeastPresent = IODType.RTBeamsTreatmentRecordSTORE Then
+                    If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.RTBeamsTreatmentRecordSTOREOPClassUID Then
+                        nrOffSoppClassUIDsFound = nrOffSoppClassUIDsFound + 1
+                    End If
+                Else
+                    errorMessage = "Wrong IOD requested for validation. Only RTPLan and BeamDeliveryInstructions can be validated"
+                    errorEncountered = True
+                End If
+            End If
+        Next
+
+        If nrOffSoppClassUIDsFound = 0 Then
+            If m_atLeastPresent = IODType.RTPlanDosimetric Then
+                errorMessage = "No RT Plan received"
+            ElseIf m_atLeastPresent = IODType.RTBeamsDeliveryInstruction Then
+                errorMessage = "No RT Beams Delivery Instruction received"
+            Else
+                errorMessage = "No RT Beams Treatement Record received"
+            End If
+        Else
+            If m_atLeastPresent = IODType.RTPlanDosimetric Then
+                errorMessage = nrOffSoppClassUIDsFound.ToString() + " RTPlan(s) is/are received"
+            ElseIf m_atLeastPresent = IODType.RTBeamsDeliveryInstruction Then
+                errorMessage = nrOffSoppClassUIDsFound.ToString() + " RT Beams Delivery Instruction(s) is/are received"
+            Else
+                errorMessage = nrOffSoppClassUIDsFound.ToString() + " RT Beams Treatment Record(s) is/are received"
+            End If
+            errorEncountered = True
+        End If
+
+        If errorEncountered = True Then
+            Me.SetError(errorMessage)
+        Else
+            Me.SetValid(errorMessage)
+        End If
+
+        Me.Report()
+    End Sub
+End Class
+

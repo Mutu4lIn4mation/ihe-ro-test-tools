@@ -1,0 +1,154 @@
+'Imports System.Collections.Specialized
+
+
+' This acts as a Storage SCP emulator
+' The MessageHandler1 handles C-STORE-RQ messages
+'====================
+' This acts as a Storage SCP emulator
+' The MessageHandler1 handles C-STORE-RQ messages
+'====================
+Class ReceiverThread
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageIterator
+
+    '!!!!!!!!!!!!!!!!!
+    Public m_inAssociation As Boolean = False
+    Private presentationContexts As DvtkHighLevelInterface.Dicom.Other.PresentationContextCollection = New DvtkHighLevelInterface.Dicom.Other.PresentationContextCollection()
+
+    Public Sub New(ByVal name As String)
+
+        Initialize(TestToolConfiguration.GetInstance.GetMainThread)
+
+        Options.CopyFrom(TestToolConfiguration.GetInstance.GetMainThread.Options)
+
+        Options.Name = name
+        Options.AutoValidate = False
+        Options.LogThreadStartingAndStoppingInParent = False
+        Options.StartAndStopResultsGatheringEnabled = True
+        ResultsGatheringStarted = False
+
+    End Sub
+
+    Public Sub New(ByVal name As String, ByVal DVTKAEConfiguration As SUTAESettingWrapper)
+
+        MyClass.New(name)
+
+        Options.LocalAeTitle = DVTKAEConfiguration.AETitle
+        Options.LocalPort = CUShort(DVTKAEConfiguration.Port)
+
+    End Sub
+
+    Public Overrides Sub AfterHandlingAssociateRequest(ByVal associateRq As DvtkHighLevelInterface.Dicom.Messages.AssociateRq)
+
+        m_inAssociation = True
+
+        If Not Me.IsMessageHandled Then
+            ' Set remote AE title.
+            'Me.Options.RemoteAeTitle = associateRq.CallingAETitle
+            Me.Options.LocalAeTitle = associateRq.CallingAETitle
+
+            ' Determine the presentation contexts for the A-ASSOCIATE-AC.
+            ' For RT Dose objects, only ILE will be accepted.
+            ' For all other SOP classes, ELE, EBE and ILE will be accepted (in this order).
+            Dim associateRequestPresentationContexts As DvtkHighLevelInterface.Dicom.Other.PresentationContextCollection = associateRq.PresentationContexts
+            Dim associateAcceptPresentationContexts As DvtkHighLevelInterface.Dicom.Other.PresentationContextCollection = New DvtkHighLevelInterface.Dicom.Other.PresentationContextCollection()
+
+            For index As Integer = 0 To associateRequestPresentationContexts.Count - 1
+                Dim associateRequestPresentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext = associateRequestPresentationContexts.Item(index)
+                Dim associateAcceptPresentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext = Nothing
+                Dim abstractSyntax As String = associateRequestPresentationContext.AbstractSyntax
+                Dim transferSyntaxes As StringCollection = associateRequestPresentationContext.TransferSyntaxes
+
+                If abstractSyntax = SOPclass.RTDoseSOPClassUID Then
+
+                    If associateRequestPresentationContext.TransferSyntaxes.Contains("1.2.840.10008.1.2") Then
+                        associateAcceptPresentationContext = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(abstractSyntax, 0, "1.2.840.10008.1.2")
+
+                    Else
+                        associateAcceptPresentationContext = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(abstractSyntax, 4, "")
+
+                    End If
+
+                Else
+
+                    If transferSyntaxes.Contains("1.2.840.10008.1.2.1") Then
+                        associateAcceptPresentationContext = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(abstractSyntax, 0, "1.2.840.10008.1.2.1")
+
+                    ElseIf transferSyntaxes.Contains("1.2.840.10008.1.2.2") Then
+                        associateAcceptPresentationContext = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(abstractSyntax, 0, "1.2.840.10008.1.2.2")
+
+                    ElseIf transferSyntaxes.Contains("1.2.840.10008.1.2") Then
+                        associateAcceptPresentationContext = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(abstractSyntax, 0, "1.2.840.10008.1.2")
+
+                    Else
+                        associateAcceptPresentationContext = New DvtkHighLevelInterface.Dicom.Other.PresentationContext(abstractSyntax, 4, "")
+
+                    End If
+
+                End If
+
+                'Add the created presentation context.
+                associateAcceptPresentationContexts.Add(associateAcceptPresentationContext)
+
+            Next
+
+            'Send back A-ASSOCIATE-RQ
+            Dim associateAc As AssociateAc = SendAssociateAc(associateAcceptPresentationContexts)
+
+            ' Fill used presentation contexts
+            presentationContexts.Clear()
+            For Each presentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext In associateAc.PresentationContexts
+                presentationContexts.Add(presentationContext)
+            Next
+
+            IsMessageHandled = True
+
+        End If
+
+    End Sub
+
+    Public Overrides Sub AfterHandlingReleaseRequest(ByVal releaseRq As DvtkHighLevelInterface.Dicom.Messages.ReleaseRq)
+
+        MyBase.AfterHandlingReleaseRequest(releaseRq)
+        m_inAssociation = False
+
+    End Sub
+    'Public Overrides Sub AfterHandlingAssociateAccept(ByVal associateAc As DvtkHighLevelInterface.Dicom.Messages.AssociateAc)
+    '    MyBase.AfterHandlingAssociateAccept(associateAc)
+    '    presentationContexts.Clear()
+    '    For Each presentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext In associateAc.PresentationContexts
+    '        presentationContexts.Add(presentationContext)
+    '    Next
+    'End Sub
+    Protected Overrides Sub AfterHandlingCFindRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingCFindRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingCStoreRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingCStoreRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingCmoveRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingCMoveRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingNSetRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingNSetRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingNActionRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingNActionRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+
+    Private Function GetTransferSyntax(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As String
+        Dim presentationContextIdDicomMessage As Byte = dicomMessage.EncodedPresentationContextID
+        If Not presentationContexts Is Nothing Then
+            For Each presentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext In presentationContexts
+                If presentationContext.ID = presentationContextIdDicomMessage Then
+                    Return presentationContext.TransferSyntax
+                End If
+            Next
+        End If
+        Return ""
+    End Function
+End Class

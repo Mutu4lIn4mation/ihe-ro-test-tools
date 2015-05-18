@@ -1,0 +1,11 @@
+
+Class QCRActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("QCR", "QCR actor")
+
+    End Sub
+
+End Class

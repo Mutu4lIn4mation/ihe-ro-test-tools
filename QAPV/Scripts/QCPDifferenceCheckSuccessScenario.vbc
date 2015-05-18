@@ -1,0 +1,71 @@
+Class QCPDifferenceCheckSuccessScenario
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim qcpActor As QCPActor = New QCPActor()
+        Dim qcrActor As QCRActor = New QCRActor()
+
+        Dim issuesFoundDialog As IssuesFoundDialog = New IssuesFoundDialog(True)
+        Dim errorDialog As ErrorDialog = New ErrorDialog()
+
+        Try
+            ' Check if dataset is present
+            DataSetHandler.CheckUpsOutputDifferenceDataSets()
+
+            'Check if the N-Create-req that is created by the QCP Start – testscenario is present, if not then stop execution and inform the user (in the validation results)
+            Try
+                DataSetHandler.CheckUPSMessageExists(DataSetHandler.UPSCacheXMLFileName, "N-CREATE-REQ")
+            Catch ex As Exception
+                Dim errorMessage As String = "First run the QCP Start Scenario, at least once."
+                errorDialog.SetMessage(errorMessage)
+                errorDialog.ShowDialog()
+                Throw ex
+            End Try
+
+            issuesFoundDialog.ShowDialog()
+            Dim roq5transactionInProgress As ROQ5Transaction = New ROQ5Transaction("INPROGRESS")
+            Dim roq5transactionCompleted As ROQ5Transaction = New ROQ5Transaction("COMPLETED")
+            Dim roq6transaction As ROQ6Transaction = New ROQ6Transaction(issuesFoundDialog.Yes, "Difference")
+            Dim roq7transaction As ROQ7Transaction = New ROQ7Transaction(qcpActor, qcrActor, issuesFoundDialog.Yes)
+            Dim roq8transaction As ROQ8Transaction = New ROQ8Transaction()
+
+            Dim receiveROQ5 As ReceiveScenarioStep = New ReceiveScenarioStep(qcrActor, qcpActor, True, NEVENTREPORTRQ, "COMPLETED")
+            Dim send As SendScenarioStep = New SendScenarioStep(qcrActor, qcpActor, True)
+
+            receiveROQ5.AddTransaction(roq5transactionInProgress)
+            receiveROQ5.AddTransaction(roq5transactionCompleted)
+
+            send.AddTransaction(roq6transaction)
+            send.AddTransaction(roq7transaction)
+            send.AddTransaction(roq8transaction)
+
+            'Configure the validate step
+            Dim validate1 As ValidateScenarioStep = New ValidateScenarioStep(receiveROQ5, 0)
+            Dim validate2 As ValidateScenarioStep = New ValidateScenarioStep(receiveROQ5, 1)
+            Dim validate3 As ValidateScenarioStep = New ValidateScenarioStep(send, 0)
+            Dim validate4 As ValidateScenarioStep = New ValidateScenarioStep(send, True, 1, True)
+            Dim validate5 As ValidateScenarioStep = New ValidateScenarioStep(send, True, 0)
+            validate1.AddRules(roq5transactionInProgress.GetCommonTransactionRulesForRequest())
+            validate2.AddRules(roq5transactionCompleted.GetCommonTransactionRulesForRequest())
+            validate3.AddRules(roq6transaction.GetCommonTransactionRulesForResponse())
+            validate4.AddRules(roq7transaction.GetCommonTransactionRulesForResponse())
+            validate5.AddRules(roq8transaction.GetCommonTransactionRulesForResponse())
+
+            'Add the steps to the list
+            m_scenarioSteps.Add(receiveROQ5)
+            m_scenarioSteps.Add(send)
+            m_scenarioSteps.Add(validate1)
+            m_scenarioSteps.Add(validate2)
+            m_scenarioSteps.Add(validate3)
+            m_scenarioSteps.Add(validate4)
+            m_scenarioSteps.Add(validate5)
+
+        Catch ex As Exception
+            errorDialog.SetMessage(ex.Message)
+            errorDialog.ShowDialog()
+            Throw ex
+        End Try
+
+    End Sub
+End Class

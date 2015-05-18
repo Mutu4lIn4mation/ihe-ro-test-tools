@@ -1,0 +1,205 @@
+Class Sender
+
+    Public IsStoppedCalled As Boolean = False
+
+#Region "Private Fields"
+
+    Private m_logger As Logger = Logger.GetInstance()
+    Private m_reporter As Reporter = Reporter.GetInstance()
+    Private m_transactions As ArrayList = Nothing
+    Private m_recievedMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+
+    Private m_finishedWithoutException As Boolean = True
+    Private m_exceptionText As String = ""
+
+    Private m_ReceiveActor As Actor
+    Private m_SenderActor As Actor
+
+    Private m_UsePortConfiguration As Boolean
+    Private m_SenderThread As SenderThread
+
+    Private Shared m_threadId As Integer = 1
+
+#End Region
+
+#Region "Ctors"
+
+    Public Sub New(ByVal senderActor As Actor, ByVal receiveActor As Actor)
+
+        MyClass.New(senderActor, receiveActor, False)
+
+    End Sub
+
+    'Constructor
+    Public Sub New(ByVal senderActor As Actor, ByVal receiveActor As Actor, ByVal usePortConfiguration As Boolean)
+
+        m_SenderActor = senderActor
+        m_ReceiveActor = receiveActor
+        m_UsePortConfiguration = usePortConfiguration
+
+    End Sub
+
+#End Region
+
+#Region "Public Properties"
+
+    Public ReadOnly Property FinishedWithoutException() As Boolean
+        Get
+            Return (m_finishedWithoutException)
+        End Get
+    End Property
+
+    Public ReadOnly Property ExceptionText() As String
+        Get
+            Return (m_exceptionText)
+        End Get
+    End Property
+
+    Public ReadOnly Property ReceivedMessages() As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+        Get
+            Return m_recievedMessages
+        End Get
+    End Property
+
+#End Region
+
+#Region "Public Methods"
+
+    ' Send the transactions to the actor under test
+    Public Sub SendTransactions(ByVal transactions As ArrayList)
+
+        m_transactions = transactions
+
+        ' Log all allowed transfersyntaxes
+        LogUsedTransferSyntaxes()
+
+        Reporter.GetInstance().ReportDebugMessage(String.Format("Starting to send transactions to the actor '{0}'", m_ReceiveActor.Id))
+
+        SendTransactionMessages()
+
+        If (Not Me.FinishedWithoutException) Then
+            Throw New System.Exception(Me.ExceptionText)
+        End If
+
+        If (Me.IsStoppedCalled) Then
+            m_logger.LogMessage("Stop is called on Sender stopped.")
+        End If
+
+        Reporter.GetInstance().ReportDebugMessage(String.Format("Transactions to to the actor '{0}' send.", m_ReceiveActor.Id))
+
+    End Sub
+
+#End Region
+
+#Region "Private Methods"
+
+    Private Function CreateSenderThread(ByVal threadId As Integer) As SenderThread
+
+        Dim senderThread As SenderThread
+        Dim scenarioName As String = "(" + TestToolConfiguration.GetInstance.GetCurrentScenario().GetType().Name + ")"
+        Dim senderThreadName As String = String.Format("Sender{0}_{1}_{2}", m_SenderActor.Id, scenarioName, threadId)
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        If m_UsePortConfiguration Then
+
+            senderThread = New SenderThread(senderThreadName, _
+                    config.GetSUTAEConfiguration(m_ReceiveActor.Id, GetDimseCommandFromTransactions(threadId)), _
+                    config.GetDVTKAEConfiguration(m_SenderActor.Id, GetDimseCommandFromTransactions(threadId)))
+
+        Else
+            senderThread = New SenderThread(senderThreadName)
+        End If
+        config.LoadDefinitionFiles(senderThread)
+
+#If Not DVT_INTERPRETS_SCRIPT Then
+        HliForm.GetSingleton().Attach(senderThread)
+        HliForm.GetSingleton().AutoExit = False
+#End If
+
+        Return senderThread
+
+    End Function
+
+    Private Function GetDimseCommandFromTransactions(ByVal transactionNumber As Integer) As DvtkData.Dimse.DimseCommand
+
+        If m_transactions.Count = 0 Then
+            Throw New Exception("Cannot use Sender without any Transactions")
+        End If
+
+        If DirectCast(m_transactions(transactionNumber - 1), Transaction).TransactionDataMessages.Count = 0 Then
+            Throw New Exception("Cannot use Sender without a Transaction containing Data Messages")
+        End If
+
+        ' Use the settings (dimse command) of the first dicom message
+        Dim msg As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = _
+            CType(DirectCast(m_transactions(transactionNumber - 1), Transaction).TransactionDataMessages.Item(0), DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+
+        Return msg.CommandSet.DimseCommand
+
+    End Function
+
+    Private Sub LogUsedTransferSyntaxes()
+
+        Dim message As String
+        message = "Supported Transfer Syntaxes for sender:"
+
+        For Each stringvalue As String In TestToolConfiguration.GetInstance().SupportedTransferSyntaxesSender
+            message += vbCrLf + vbTab + stringvalue
+        Next
+        Logger.GetInstance().LogMessage(message)
+
+    End Sub
+
+    Private Sub SendTransactionMessages()
+
+        Try
+
+            For Each transaction As Transaction In m_transactions
+
+                m_SenderThread = CreateSenderThread(m_threadId)
+                m_threadId = m_threadId + 1
+
+                For Each message As DicomMessage In transaction.TransactionDataMessages
+                    m_SenderThread.AddMessageToSend(message)
+                Next
+
+
+                m_SenderThread.Start()
+                m_SenderThread.WaitForCompletion()
+
+                For Each responseMessage As DicomMessage In m_SenderThread.ReceivedMessages
+                    m_recievedMessages.Add(responseMessage)
+                Next
+
+                'Now check if messsages can be removed from the transaction 
+                'in order to clean up memory                
+                If (transaction.ClearMessageDataAfterSending) Then
+                    transaction.ClearTransactionDataMessages()
+                End If
+
+                'm_SenderThread.ClearMessages()
+
+            Next
+
+
+        Catch ex As System.Exception
+
+            If (TypeOf ex Is System.Threading.ThreadAbortException) Then
+                IsStoppedCalled = True
+
+            End If
+
+            m_logger.LogErrorMessage("Sending of the transactions failed. " + ex.Message)
+
+            m_finishedWithoutException = False
+
+        End Try
+
+
+    End Sub
+
+#End Region
+
+
+
+End Class

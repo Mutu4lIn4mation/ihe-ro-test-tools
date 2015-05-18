@@ -1,0 +1,151 @@
+﻿
+' ------------------------------------------------------
+' DVTk - The Healthcare Validation Toolkit (www.dvtk.org)
+' Copyright © 2010 DVTk
+' ------------------------------------------------------
+' This file is part of DVTk.
+'
+' DVTk is free software; you can redistribute it and/or modify it under the terms of the GNU
+' Lesser General Public License as published by the Free Software Foundation; either version 3.0
+' of the License, or (at your option) any later version. 
+' 
+' DVTk is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+' the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+' General Public License for more details. 
+' 
+' You should have received a copy of the GNU Lesser General Public License along with this
+' library; if not, see <http://www.gnu.org/licenses/>
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports System.Text
+Imports System.Xml
+
+Imports VR = DvtkData.Dimse.VR
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+''' <summary>
+''' This class represents a Content Item with value type NUM that is present in a Structured
+''' Report Object.
+''' </summary>
+Public Class DataSetContentItemWithValueTypeNum
+    Inherits DataSetContentItem
+    '
+    ' - Constants -
+    '
+
+    ''' <summary>
+    ''' A description of the context of the numericValueQualifier field of this class.
+    ''' </summary>
+    Private Const numericValueQualifierContext As String = "DICOM - Structured Reporting - Content Item - Numeric Value Qualifier"
+
+
+
+    '
+    ' - Fields -
+    '
+
+    ''' <summary>
+    ''' See property MeasuredValue.
+    ''' </summary>
+    Private m_measuredValue As MeasuredValue = Nothing
+
+    ''' <summary>
+    ''' See property NumericValueQualifier.
+    ''' </summary>
+    Private m_numericValueQualifier As ConceptCode = Nothing
+
+
+
+    '
+    ' - Constructors -
+    '
+
+    ''' <summary>
+    ''' Hide default constructor.
+    ''' </summary>
+    Private Sub New()
+        ' Do nothing.
+        MyBase.New(Nothing, Nothing, 1)
+    End Sub
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="sequenceItem">
+    ''' The SequenceItem instance containing the DICOM attributes to construct this instance with.
+    ''' </param>
+    ''' <param name="parentContentItem">The parent Content Item.</param>
+    ''' <param name="position">The ordinal position of the associated Sequence Item in it's contained Content Sequence Item.</param>
+    Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem, position As UInteger)
+        MyBase.New(attributeSet, parentContentItem, position)
+        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = attributeSet("0x0040A300")
+
+        ValueType = "NUM"
+
+        If attribute.Exists Then
+            If attribute.VR = DvtkData.Dimse.VR.SQ Then
+                If attribute.ItemCount > 0 Then
+                    Me.m_measuredValue = New MeasuredValue(attribute.GetItem(1))
+                End If
+            End If
+        End If
+
+        Me.m_numericValueQualifier = ConceptCode.CreateConceptCode(attributeSet, "0x0040A301", numericValueQualifierContext)
+    End Sub
+
+    Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem)
+        Me.New(attributeSet, parentContentItem, 0)
+    End Sub
+
+    '
+    ' - Properties -
+    '
+
+    ''' <summary>
+    ''' Gets the Measured Value.
+    ''' </summary>
+    Public ReadOnly Property MeasuredValue() As MeasuredValue
+        Get
+            Return Me.m_measuredValue
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets the Numeric Value Qualifier.
+    ''' </summary>
+    Public ReadOnly Property NumericValueQualifier() As ConceptCode
+        Get
+            Return Me.m_numericValueQualifier
+        End Get
+    End Property
+
+
+
+    '
+    ' - Methods -
+    '
+
+    ''' <summary>
+    ''' Method used by the library to serialize this instance to xml.
+    ''' </summary>
+    ''' <param name="xmlTextWriter">The xml text writer.</param>
+    ''' <param name="serializationContext">The serialization context.</param>
+    Friend Overrides Sub ValueToXml(xmlTextWriter As XmlTextWriter, serializationContext As SerializationContext)
+        xmlTextWriter.WriteStartElement("num")
+
+        If Me.m_measuredValue IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("measuredValue")
+            Me.m_measuredValue.ToXml(xmlTextWriter, serializationContext)
+            xmlTextWriter.WriteEndElement()
+        End If
+
+        If Me.m_numericValueQualifier IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("numericValueQualifier")
+            Me.m_numericValueQualifier.ToXml(xmlTextWriter, serializationContext)
+            xmlTextWriter.WriteEndElement()
+        End If
+
+        xmlTextWriter.WriteEndElement()
+    End Sub
+End Class
+

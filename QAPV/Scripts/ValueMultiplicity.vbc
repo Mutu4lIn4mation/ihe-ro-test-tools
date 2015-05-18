@@ -1,0 +1,26 @@
+﻿
+Public Class ValueMultiplicity
+
+    Private m_Min As String = ""
+    Public Property Min() As String
+        Get
+            Return m_Min
+        End Get
+        Set(ByVal value As String)
+            m_Min = value
+        End Set
+    End Property
+
+    Private m_Max As String = ""
+    Public Property Max() As String
+        Get
+            Return m_Max
+        End Get
+        Set(ByVal value As String)
+            m_Max = value
+        End Set
+    End Property
+
+End Class
+
+

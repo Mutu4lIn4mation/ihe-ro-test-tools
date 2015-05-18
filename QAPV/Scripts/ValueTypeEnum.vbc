@@ -1,0 +1,17 @@
+﻿Public Enum ValueTypeEnum
+    'todo
+    UNDEFINED = 0
+    TEXT = 1
+    CODE = 2
+    DATETIME = 3
+    [DATE] = 4
+    TIME = 5
+    UIDREF = 6
+    PNAME = 7
+    COMPOSITE = 8
+    IMAGE = 9
+    WAVEFORM = 10
+    CONTAINER = 11
+
+End Enum
+

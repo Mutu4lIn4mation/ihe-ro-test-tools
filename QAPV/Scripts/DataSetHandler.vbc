@@ -1,0 +1,734 @@
+Public Class DataSetHandler
+
+    'file names for xml reference files
+    Public Shared ReadOnly RTAdvancedXMLFileName As String = "RTDosimetricPlanDataSet.xml"
+    Public Shared ReadOnly UPSMessagesXMLFileName As String = "UPSMessages.xml"
+    Public Shared ReadOnly UPSCacheXMLFileName As String = "UPSCache.xml"
+    Public Shared ReadOnly UPSDataXMLFileName As String = "UPSData.xml"
+
+    'node names for xml reference files
+    Public Shared ReadOnly UPSXmlNodeDatasetPath As String = "/DataSet/DataSetPath"
+    Public Shared ReadOnly UPSXmlNodeDatasetPathCt As String = "/DataSet/DataSetPathCt"
+    Public Shared ReadOnly UPSXmlNodeDatasetPathDifference As String = "/DataSet/DataSetPathDifference"
+    Public Shared ReadOnly UPSXmlNodeDatasetPathDose As String = "/DataSet/DataSetPathDose"
+    Public Shared ReadOnly UPSXmlNodeDatasetPathSRDiffGood As String = "/DataSet/DataSetPathSRDiffGood"
+    Public Shared ReadOnly UPSXmlNodeDatasetPathSRDiffIssues As String = "/DataSet/DataSetPathSRDiffIssues"
+    Public Shared ReadOnly UPSXmlNodeDatasetPathSRDoseGood As String = "/DataSet/DataSetPathSRDoseGood"
+    Public Shared ReadOnly UPSXmlNodeDatasetPathSRDoseIssues As String = "/DataSet/DataSetPathSRDoseIssues"
+    Public Shared ReadOnly UPSXmlNodeMessageNCREATEREQ As String = "/DataSet/N-CREATE-REQ"
+    Public Shared ReadOnly UPSXmlNodeMessageNGETREQ As String = "/DataSet/N-GET-REQ"
+    Public Shared ReadOnly UPSXmlNodeMessageNGETRESGOOD As String = "/DataSet/N-GET-RSP-Completed"
+    Public Shared ReadOnly UPSXmlNodeMessageNGETRESISSUES As String = "/DataSet/N-GET-RSP-Cancelled"
+    'file name mask for dicom dataset files
+    Public Shared ReadOnly UPSDatasetFileMask As String = "*.dcm"
+
+    'indices for supplement dataset information
+    Public Shared ReadOnly DatasetInfoClassIdx As Integer = 0
+    Public Shared ReadOnly DatasetInfoInstanceIdx As Integer = 1
+    Public Shared ReadOnly DatasetInfoStudyIdx As Integer = 2
+    Public Shared ReadOnly DatasetInfoSeriesIdx As Integer = 3
+    Public Shared ReadOnly DatasetInfoReferenceIdx As Integer = 4
+    Public Shared ReadOnly DatasetInfoArrayLength As Integer = 4
+
+    'defines for dicom uid values
+    'Public Shared ReadOnly DatasetInfoRtPlanClassUid As String = "1.2.840.10008.5.1.4.1.1.481.5"
+    Public Shared ReadOnly DatasetInfoRtPlanClassUid As String = SOPclass.RTPlanDosimetricSOPClassUID
+    'Public Shared ReadOnly DatasetInfoRtBeamDelivClassUid As String = "1.2.840.10008.5.1.4.34.1"
+    Public Shared ReadOnly DatasetInfoRtBeamDelivClassUid As String = SOPclass.RTBeamsDeliveryInstructionSOPClassUID
+    Public Shared ReadOnly DatasetInfoRtTreatmentRecordClassUid As String = SOPclass.RTBeamsTreatmentRecordSTOREOPClassUID
+
+    'defines for treatment type values
+    Public Shared ReadOnly DicomTextValueTreatment As String = "TREATMENT"
+    Public Shared ReadOnly DicomTextValueContinuation As String = "CONTINUATION"
+    Public Shared ReadOnly txtBundleNumber As String = Nothing
+    Public Shared ReadOnly txtDosimeterUnit As String = Nothing
+    Public Shared ReadOnly txtStartMeterset As String = Nothing
+    Public Shared ReadOnly txtEndMeterset As String = Nothing
+
+    Private Shared m_CheckWithRequest As Boolean = False
+    Private Shared m_requestMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+
+
+    Public Shared Function GetDataSetFileAndPath(ByVal XMLFileName As String, ByVal DataSetName As String) As String
+        Dim retVal As String = ""
+        ' set path to script dir in front of the filename
+        Dim XMLPathAndFile As String = TestToolConfiguration.GetInstance.GetScriptPath + XMLFileName
+        ' Create and load new XML document
+        Dim m_DataSetXML As System.Xml.XmlDocument = New System.Xml.XmlDocument
+        m_DataSetXML.Load(XMLPathAndFile)
+        ' create the relative datapath
+        Dim relativeTestDataPath As String = m_DataSetXML.SelectSingleNode("/DataSet/DataSetPath").InnerText
+        Dim datasetPath As String = TestToolConfiguration.GetInstance.SessionPath + relativeTestDataPath
+
+        'get the name of the dicom file from the xml document
+        retVal = datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/" + DataSetName.ToString).InnerText
+        Return retVal
+    End Function
+
+    Public Shared Function LoadDatasetFromFileName(ByVal FileName As String) As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+
+        If Not FileName = "" Then
+            Try
+                'Read the Dataset from the file
+                dataSet.Read(FileName)
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception("Error reading file: " + FileName)
+            End Try
+        End If
+
+        Return dataSet
+    End Function
+
+    'this whole function is from previous year
+    'it needs to be cleaned!!
+    Public Shared Function LoadDatasetFromFile(ByVal XMLFileName As String, ByVal DataSetName As String) As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+
+        'create the filename
+        Dim fileName As String = GetDataSetFileAndPath(XMLFileName, DataSetName)
+
+        If Not fileName = "" Then
+            Try
+                'Read the Dataset from the file
+                dataSet.Read(fileName)
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+
+                If XMLFileName = UPSCacheXMLFileName Then
+
+                    Dim errorMessage As String = "The test tool simulating a QCR cannot continue this scenario, since it can not read the file from the dataset: " + fileName
+
+                    'If Not DataSetName = "C-FIND-RSP" Then
+                    '    errorMessage = errorMessage + ". This file is normally generated by scenario: 2013TDWScenario_01_RetrievalOfWorklist, make sure this scenario has been completed succesfully"
+                    '    Logger.GetInstance().LogErrorMessage(errorMessage)
+                    'End If
+                End If
+        Throw New System.Exception("Error Reading the file from the Dataset: " + fileName)
+            End Try
+        End If
+        Return dataSet
+    End Function
+
+    Public Shared Function LoadDatasetFromFolderByClassUid(ByVal datasetFolder As String, ByVal sopClassUid As String) As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+        Dim fileName As String = ""
+
+        'this performs linear search for specified SOP Class UID
+        '(files are searched one by one)
+        For Each fileName In (GetDatasetFilesFromFolder(datasetFolder))
+            'load file as dataset
+            dataSet = LoadDatasetFromFileName(fileName)
+
+            If dataSet(Tags.SOPClassUID).Values(0).Equals(sopClassUid) Then
+                'we have found dataset of specified SOP Class UID
+                Exit For
+            End If
+        Next
+
+        Return dataSet
+    End Function
+
+    Public Shared Function LoadDatasetFromFolderByInstanceUid(ByVal datasetFolder As String, ByVal sopInstanceUid As String) As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+        Dim fileName As String = ""
+
+        'this performs linear search for specified SOP Instance UID
+        '(files are searched one by one)
+        For Each fileName In (GetDatasetFilesFromFolder(datasetFolder))
+            'load file as dataset
+            dataSet = LoadDatasetFromFileName(fileName)
+
+            If dataSet(Tags.SOPInstanceUID).Values(0).Equals(sopInstanceUid) Then
+                'we have found dataset of specified SOP Instance UID
+                Exit For
+            End If
+        Next
+
+        Return dataSet
+    End Function
+
+    Public Shared Function SaveDatasetToFile(ByVal dataset As Dicom.Other.DataSet, ByVal XMLFileName As String, ByVal DataSetName As String) As Boolean
+        Dim bRetVal As Boolean = False
+        'get the name of the dicom file from the xml document
+        Dim fileName As String = GetDataSetFileAndPath(XMLFileName, DataSetName)
+        If Not fileName = "" Then
+            Try
+                'Write the dataset to file
+                dataSet.Write(fileName)
+                bRetVal = True
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception("Error writing the Dataset to file: " + fileName, ex)
+            End Try
+        End If
+        Return bRetVal
+    End Function
+
+    Public Shared Function SaveDatasetToFileName(ByVal dataset As Dicom.Other.DataSet, ByVal datasetFileName As String) As Boolean
+        Dim bRetVal As Boolean = False
+        Try
+            'Write the dataset to file
+            dataset.Write(datasetFileName)
+            bRetVal = True
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error writing the Dataset to file: " + datasetFileName, ex)
+        End Try
+        Return bRetVal
+    End Function
+
+    Public Shared Function DeleteDatasetFile(ByVal XMLFileName As String, ByVal datasetName As String) As Boolean
+        Dim bRetVal As Boolean = False
+        'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+
+        'get the name of the dicom file from the xml document
+        Dim fileName As String = GetDataSetFileAndPath(XMLFileName, dataSetName)
+        If Not fileName = "" Then
+            Try
+                'Delete the dataset file
+                File.Delete(fileName)
+                bRetVal = True
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception("Error deleteing the Dataset file: " + fileName, ex)
+            End Try
+        End If
+        Return bRetVal
+    End Function
+
+    Public Shared Function DeleteDatasetFileName(ByVal datasetFileName As String) As Boolean
+        Dim bRetVal As Boolean = False
+
+        If Not datasetFileName = Nothing And Not datasetFileName = "" Then
+            Try
+                'Delete the dataset file
+                File.Delete(dataSetFileName)
+                bRetVal = True
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                'Throw New System.Exception("Error deleteing the Dataset file: " + dataSetFileName, ex)
+            End Try
+        End If
+        Return bRetVal
+    End Function
+
+
+    Public Shared Function GetAttributeValueFromDataSet(ByVal XMLFileName As String, ByVal DataSetName As String, ByVal tag As String) As String
+
+        Dim retVal As String = Nothing
+        Dim dataSet As Dicom.Other.DataSet = LoadDatasetFromFile(XMLFileName, DataSetName)
+        If (dataSet.Exists(tag)) Then
+            retVal = dataSet(tag).Values(0)
+        ElseIf (dataSet.Exists(tag)) Then
+            retVal = dataSet(tag).Values(0)
+        Else
+
+            If XMLFileName = UPSCacheXMLFileName Then
+                Dim errorMessage As String = "The test tool simulating a QCR can not continue this scenario, since it does not know the value for attribute: " + Tags.GetTagName(tag)
+
+                If DataSetName = "C-FIND-RSP" Then
+                    errorMessage = errorMessage + ". This attribute should be acquired during scenario: 2013TDDScenario_01_RetrievalOfWorklist, make sure this scenario has been completed succesfully"
+                End If
+                If DataSetName = "N-ACTION-RSP-RO60" Then
+                    errorMessage = errorMessage + ". This attribute should be acquired during scenario: 2013TDDScenario_03_DeliverIinitialization, make sure this scenario has been completed succesfully"
+                End If
+
+                Logger.GetInstance().LogErrorMessage(errorMessage)
+            End If
+        End If
+        Return retVal
+
+    End Function
+    Public Shared Function GetAttributeValueFromDataSetBySopClassUID(ByVal DatasetPath As String, ByVal DataSetSopClassUID As String, ByVal tag As String) As String
+
+        Dim retVal As String = Nothing
+        Dim dataSet As Dicom.Other.DataSet = LoadDatasetFromFolderByClassUid(DatasetPath, DataSetSopClassUID)
+        If (dataSet.Exists(tag)) Then
+            retVal = dataSet(tag).Values(0)
+        Else
+            Dim errorMessage As String = "The tag " + tag + " doesn't exsist in the dataset"
+            Logger.GetInstance().LogErrorMessage(errorMessage)
+        End If
+        Return retVal
+    End Function
+
+    Public Shared Sub CheckUPSMessageExists(ByVal XMLFileName As String, ByVal DataSetName As String)
+        Dim dataSet As Dicom.Other.DataSet = LoadDatasetFromFile(XMLFileName, DataSetName)
+    End Sub
+
+    Public Shared Function AttributeExistsInDataSet(ByVal XMLFileName As String, ByVal DataSetName As String, ByVal tag As String) As Boolean
+        Dim dataSet As Dicom.Other.DataSet = LoadDatasetFromFile(XMLFileName, DataSetName)
+        Return dataSet.Exists(tag)
+    End Function
+
+    'abstraction function to keep existing implementation intact
+    Public Shared Function GetDataPath(ByVal XMLFileName As String) As String
+
+        Return GetDataPath(XMLFileName, UPSXmlNodeDatasetPath)
+    End Function
+
+    Public Shared Function GetDataPathDiff(ByVal XMLFileName As String) As String
+
+        Return GetDataPath(XMLFileName, UPSXmlNodeDatasetPathDifference)
+    End Function
+
+    Public Shared Function GetDataPathDose(ByVal XMLFileName As String) As String
+
+        Return GetDataPath(XMLFileName, UPSXmlNodeDatasetPathDose)
+    End Function
+
+    Public Shared Function GetDataPathSRDiffGood(ByVal XMLFileName As String) As String
+
+        Return GetDataPath(XMLFileName, UPSXmlNodeDatasetPathSRDiffGood)
+    End Function
+
+    Public Shared Function GetDataPathSRDiffIssues(ByVal XMLFileName As String) As String
+
+        Return GetDataPath(XMLFileName, UPSXmlNodeDatasetPathSRDiffIssues)
+    End Function
+
+    Public Shared Function GetDataPathSRDoseGood(ByVal XMLFileName As String) As String
+
+        Return GetDataPath(XMLFileName, UPSXmlNodeDatasetPathSRDoseGood)
+    End Function
+
+    Public Shared Function GetDataPathSRDoseIssues(ByVal XMLFileName As String) As String
+
+        Return GetDataPath(XMLFileName, UPSXmlNodeDatasetPathSRDoseIssues)
+    End Function
+
+    'function that gets data path according to a specified node 
+    Public Shared Function GetDataPath(ByVal XMLFileName As String, ByVal NodeName As String) As String
+        Dim retVal As String = ""
+
+        ' set path to script dir in front of the filename
+        Dim XMLPathAndFile As String = TestToolConfiguration.GetInstance.GetScriptPath + XMLFileName
+
+        ' Create and load new XML document
+        Dim m_DataSetXML As System.Xml.XmlDocument = New System.Xml.XmlDocument
+        m_DataSetXML.Load(XMLPathAndFile)
+
+        ' create the relative datapath
+        Dim relativeTestDataPath As String = m_DataSetXML.SelectSingleNode(NodeName).InnerText
+        retVal = TestToolConfiguration.GetInstance.SessionPath + relativeTestDataPath
+
+        Return retVal
+    End Function
+
+    Public Shared Function LoadUpsDataSetInfo(ByVal folder As String) As ArrayList
+
+        Return LoadUpsDataSetInfo(folder, Nothing)
+    End Function
+
+    Public Shared Function LoadUpsDataSetInfo(ByVal datasetFolder As String, ByVal ctsetFolder As String, ByVal requestMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As ArrayList
+        m_CheckWithRequest = True
+        m_requestMessage = requestMessage
+        Dim outPut As ArrayList = LoadUpsDataSetInfo(datasetFolder, ctsetFolder)
+        m_CheckWithRequest = False
+        Return outPut
+    End Function
+
+    'intended use is to specify argument1 as folder where datasets are
+    'and argument2 where CT sets are - splitting possible, because CT sets are large
+    'in data volume and might take a long time to load
+    'HOWEVER, both arguments are treated the same - the same implementation
+    Public Shared Function LoadUpsDataSetInfo(ByVal datasetFolder As String, ByVal ctsetFolder As String) As ArrayList
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet
+        Dim fileName As String
+
+        Dim datasetInfoList As ArrayList = New ArrayList
+
+        'these two following loops are not elegant nor efficient,
+        'but I'm limited by time and awkwardness of VB language...
+        For Each fileName In (GetDatasetFilesFromFolder(datasetFolder))
+            'load file as dataset
+            dataSet = LoadDatasetFromFileName(fileName)
+
+            'acquire dataset info 
+            Dim dataSetInfo(DatasetInfoArrayLength) As String    'number of elements
+            dataSetInfo(DatasetInfoClassIdx) = dataSet(Tags.SOPClassUID).Values(0)
+            dataSetInfo(DatasetInfoInstanceIdx) = dataSet(Tags.SOPInstanceUID).Values(0)
+            dataSetInfo(DatasetInfoStudyIdx) = dataSet(Tags.StudyInstanceUID).Values(0)
+            dataSetInfo(DatasetInfoSeriesIdx) = dataSet(Tags.SeriesInstanceUID).Values(0)
+
+            If dataSetInfo(DatasetInfoClassIdx).Equals(DatasetInfoRtBeamDelivClassUid) Then
+                'TODO: referenced rt plan sop uid must be copied here
+                If dataSet.Exists(Tags.ReferencedRtPlanSequenceRSSRSSReferencedSopInstanceUid) Then
+                    dataSetInfo(DatasetInfoReferenceIdx) = dataSet(Tags.ReferencedRtPlanSequenceRSSRSSReferencedSopInstanceUid).Values(0)
+                End If
+            End If
+
+            'When m_CheckWithRequest = True the dataSetInfo will only be added if it matches the query keys.
+            If m_CheckWithRequest = True Then
+                ' Check if query keys match the dataset
+                Dim match As Boolean = True
+                If Not m_requestMessage.DataSet(Tags.PatientName).Values(0).Equals(dataSet(Tags.PatientName).Values(0)) Then
+                    'Search field may also be empty
+                    If Not m_requestMessage.DataSet(Tags.PatientName).Values(0).ToString().Equals(String.Empty) Then
+                        match = False
+                    End If
+                End If
+                If Not m_requestMessage.DataSet(Tags.PatientID).Values(0).Equals(dataSet(Tags.PatientID).Values(0)) Then
+                    'Search field may also be empty
+                    If Not m_requestMessage.DataSet(Tags.PatientID).Values(0).ToString().Equals(String.Empty) Then
+                        match = False
+                    End If
+                End If
+
+                'If Not m_requestMessage.DataSet(Tags.ScheduledStationCodeValue).Values(0).Equals(dataSet(Tags.ScheduledStationCodeValue).Values(0)) Then
+                '    'Search field may also be empty
+                '    If Not m_requestMessage.DataSet(Tags.ScheduledStationCodeValue).Values(0).ToString().Equals(String.Empty) Then
+                '        match = False
+                '    End If
+                'End If
+
+                If match = True Then
+                    datasetInfoList.Add(dataSetInfo)
+                End If
+            Else
+                'store dataset info in list
+                datasetInfoList.Add(dataSetInfo)
+            End If
+
+        Next
+        For Each fileName In (GetDatasetFilesFromFolder(ctsetFolder))
+            'load file as dataset
+            dataSet = LoadDatasetFromFileName(fileName)
+
+            'acquire dataset info 
+            Dim dataSetInfo(DatasetInfoArrayLength) As String    'number of elements
+            dataSetInfo(DatasetInfoClassIdx) = dataSet(Tags.SOPClassUID).Values(0)
+            dataSetInfo(DatasetInfoInstanceIdx) = dataSet(Tags.SOPInstanceUID).Values(0)
+            dataSetInfo(DatasetInfoStudyIdx) = dataSet(Tags.StudyInstanceUID).Values(0)
+            dataSetInfo(DatasetInfoSeriesIdx) = dataSet(Tags.SeriesInstanceUID).Values(0)
+
+            If dataSetInfo(DatasetInfoClassIdx).Equals(DatasetInfoRtBeamDelivClassUid) Then
+                'TODO: referenced rt plan sop uid must be copied here
+                If dataSet.Exists(Tags.BeamTaskSequenceReferencedRtPlanSequenceRSSRSSReferencedSopInstanceUid) Then
+                    dataSetInfo(DatasetInfoReferenceIdx) = dataSet(Tags.BeamTaskSequenceReferencedRtPlanSequenceRSSRSSReferencedSopInstanceUid).Values(0)
+                End If
+            End If
+
+            'store dataset info in list
+            datasetInfoList.Add(dataSetInfo)
+        Next
+
+        datasetInfoList = SortUpsDataSetInfoByRefUid(datasetInfoList)
+
+        Return datasetInfoList
+    End Function
+
+    Public Shared Function SortUpsDataSetInfoByRefUid(ByVal datasetInfoList As ArrayList) As ArrayList
+        Dim sortedInfoList As ArrayList = New ArrayList
+        Dim tobeRemovedItems As ArrayList = New ArrayList
+        Dim dataSetInfo(DatasetInfoArrayLength) As String
+
+        While datasetInfoList.Count > 0
+            Dim reference As String = ""
+            For Each dataSetInfo In datasetInfoList
+                If reference.Equals("") Then
+                    reference = dataSetInfo(DatasetInfoSeriesIdx)
+                End If
+                If dataSetInfo(DatasetInfoSeriesIdx).Equals(reference) Then
+                    sortedInfoList.Add(dataSetInfo)
+                    tobeRemovedItems.Add(dataSetInfo)
+                End If
+            Next
+            For Each dataSetInfo In tobeRemovedItems
+                datasetInfoList.Remove(dataSetInfo)
+            Next
+
+        End While
+
+        Return sortedInfoList
+    End Function
+
+    'this method does only the pre-requisite check
+    '- checkes whether there are only one RT Plan for the difference and dose check in the dataset folder
+
+    Public Shared Sub CheckUpsInputDataSets()
+        Dim datasetPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName)
+        Dim datasetInfoList As ArrayList = New ArrayList
+
+        Dim differencePath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName, "/DataSet/DataSetPathDifference")
+        Dim differenceInfoList As ArrayList = New ArrayList
+
+        Dim dosePath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName, "/DataSet/DataSetPathDose")
+        Dim doseInfoList As ArrayList = New ArrayList
+
+        Dim rtPlanDifferenceCount As Integer = 0
+        Dim rtPlanDoseCount As Integer = 0
+
+        Dim dataSetInfo(DatasetInfoArrayLength) As String
+
+        Dim rtPlanDifferenceDataSetInfo(DatasetInfoArrayLength) As String
+        Dim rtPlanDoseDataSetInfo(DatasetInfoArrayLength) As String
+
+        'load info about avaliable RT Plan differences
+        differenceInfoList = DataSetHandler.LoadUpsDataSetInfo(differencePath)
+
+        For Each dataSetInfo In differenceInfoList
+            If dataSetInfo(DatasetInfoClassIdx).Equals(DatasetInfoRtPlanClassUid) Then
+                rtPlanDifferenceCount = rtPlanDifferenceCount + 1
+                If rtPlanDifferenceCount > 1 Then
+                    Dim message As String = String.Format("More than one RT Plan differences records found!! Please use the testool configuration editor to add your dataset")
+                    Throw New System.Exception(message)
+                End If
+                rtPlanDifferenceDataSetInfo = dataSetInfo
+            End If
+        Next
+
+        'load info about avaliable RT Plan differences
+        doseInfoList = DataSetHandler.LoadUpsDataSetInfo(dosePath)
+
+        For Each dataSetInfo In doseInfoList
+            If dataSetInfo(DatasetInfoClassIdx).Equals(DatasetInfoRtPlanClassUid) Then
+                rtPlanDoseCount = rtPlanDoseCount + 1
+                If rtPlanDoseCount > 1 Then
+                    Dim message As String = String.Format("More than one RT Plan dose records found!! Please use the testool configuration editor to add your dataset")
+                    Throw New System.Exception(message)
+                End If
+                rtPlanDoseDataSetInfo = dataSetInfo
+            End If
+        Next
+
+        If rtPlanDifferenceCount < 1 Then
+            Dim message As String = String.Format("No RT Plan Differences set found!! Please use the testool configuration editor to add your dataset")
+            Throw New System.Exception(message)
+        End If
+
+        If rtPlanDoseCount < 1 Then
+            Dim message As String = String.Format("No RT Plan Dose set found!! Please use the testool configuration editor to add your dataset")
+            Throw New System.Exception(message)
+        End If
+
+    End Sub
+
+    Public Shared Sub CheckUpsOutputDifferenceDataSets()
+        Dim datasetPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName)
+        Dim datasetInfoList As ArrayList = New ArrayList
+
+        Dim differenceGoodPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName, "/DataSet/DataSetPathSRDiffGood")
+        Dim differenceGoodInfoList As ArrayList = New ArrayList
+
+        Dim differenceIssuesFoundPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName, "/DataSet/DataSetPathSRDiffIssues")
+        Dim differenceIssuesFoundInfoList As ArrayList = New ArrayList
+
+        Dim SRDifferenceGoodCount As Integer = 0
+        Dim SRDifferenceIssuesFoundCount As Integer = 0
+
+        Dim dataSetInfo(DatasetInfoArrayLength) As String
+
+        'load info about avaliable SR differences good
+        differenceGoodInfoList = DataSetHandler.LoadUpsDataSetInfo(differenceGoodPath)
+
+        For Each dataSetInfo In differenceGoodInfoList
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+                SRDifferenceGoodCount = SRDifferenceGoodCount + 1
+                If SRDifferenceGoodCount > 1 Then
+                    Dim message As String = String.Format("More than one SR for difference good scenario found!! Please use the testool configuration editor to add your dataset")
+                    Throw New System.Exception(message)
+                End If
+            End If
+        Next
+
+        'load info about avaliable SR differences with issues
+        differenceIssuesFoundInfoList = DataSetHandler.LoadUpsDataSetInfo(differenceIssuesFoundPath)
+
+        For Each dataSetInfo In differenceIssuesFoundInfoList
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+                SRDifferenceIssuesFoundCount = SRDifferenceIssuesFoundCount + 1
+                If SRDifferenceIssuesFoundCount > 1 Then
+                    Dim message As String = String.Format("More than one SR for difference with issues scenario found!! Please use the testool configuration editor to add your dataset")
+                    Throw New System.Exception(message)
+                End If
+            End If
+        Next
+
+        If SRDifferenceGoodCount < 1 Then
+            Dim message As String = String.Format("No SR for difference good scenario found!! Please use the testool configuration editor to add your dataset")
+            Throw New System.Exception(message)
+        End If
+
+        If SRDifferenceIssuesFoundCount < 1 Then
+            Dim message As String = String.Format("No SR for difference with issues scenario found!! Please use the testool configuration editor to add your dataset")
+            Throw New System.Exception(message)
+        End If
+
+    End Sub
+
+    Public Shared Sub CheckUpsOutputDoseDataSets()
+        Dim datasetPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName)
+        Dim datasetInfoList As ArrayList = New ArrayList
+
+        Dim doseGoodPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName, "/DataSet/DataSetPathSRDoseGood")
+        Dim doseGoodInfoList As ArrayList = New ArrayList
+
+        Dim doseIssuesFoundPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName, "/DataSet/DataSetPathSRDoseIssues")
+        Dim doseIssuesFoundInfoList As ArrayList = New ArrayList
+
+        Dim SRDoseGoodCount As Integer = 0
+        Dim SRDoseIssuesFoundCount As Integer = 0
+
+        Dim dataSetInfo(DatasetInfoArrayLength) As String
+
+        'load info about avaliable SR differences good
+        doseGoodInfoList = DataSetHandler.LoadUpsDataSetInfo(doseGoodPath)
+
+        For Each dataSetInfo In doseGoodInfoList
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+                SRDoseGoodCount = SRDoseGoodCount + 1
+                If SRDoseGoodCount > 1 Then
+                    Dim message As String = String.Format("More than one SR for dose good scenario found!! Please use the testool configuration editor to add your dataset")
+                    Throw New System.Exception(message)
+                End If
+            End If
+        Next
+
+        'load info about avaliable SR differences with issues
+        doseIssuesFoundInfoList = DataSetHandler.LoadUpsDataSetInfo(doseIssuesFoundPath)
+
+        For Each dataSetInfo In doseIssuesFoundInfoList
+            If dataSetInfo(DatasetInfoClassIdx).Equals(SOPclass.BasicTextSRSOPClassUID) Then
+                SRDoseIssuesFoundCount = SRDoseIssuesFoundCount + 1
+                If SRDoseIssuesFoundCount > 1 Then
+                    Dim message As String = String.Format("More than one SR for dose with issues scenario found!! Please use the testool configuration editor to add your dataset")
+                    Throw New System.Exception(message)
+                End If
+            End If
+        Next
+
+        If SRDoseGoodCount < 1 Then
+            Dim message As String = String.Format("No SR for dose good scenario found!! Please use the testool configuration editor to add your dataset")
+            Throw New System.Exception(message)
+        End If
+
+        If SRDoseIssuesFoundCount < 1 Then
+            Dim message As String = String.Format("No SR for dose with issues scenario found!! Please use the testool configuration editor to add your dataset")
+            Throw New System.Exception(message)
+        End If
+
+    End Sub
+
+    Public Shared Sub CleanUpsCacheFolder()
+        Dim file As String
+        Dim files() As String = GetDatasetFilesFromFolder(DataSetHandler.GetDataPath(DataSetHandler.UPSCacheXMLFileName))
+        For Each file In files
+            Dim actualFile As New FileInfo(file)
+            actualFile.Delete()
+        Next
+    End Sub
+
+
+    Public Shared Function GetDatasetFilesFromFolder(ByVal folder As String) As String()
+        Return GetFilesFromFolder(folder, UPSDatasetFileMask)
+    End Function
+
+    Public Shared Function GetFilesFromFolder(ByVal folder As String, ByVal fileMask As String) As String()
+        Dim file As String
+        Dim files As ArrayList = New ArrayList
+        Dim retVal(-1) As String
+
+        If folder <> Nothing And folder <> "" And fileMask <> Nothing And fileMask <> "" Then
+            For Each file In Directory.GetFiles(folder, fileMask)
+                files.Add(file)
+            Next
+            Dim counter As Integer = 0
+            ReDim retVal(files.Count - 1)
+
+            For counter = 0 To files.Count - 1 Step 1
+                retVal(counter) = files.Item(counter).ToString
+            Next
+        End If
+
+        Return retVal
+    End Function
+
+    Public Shared Function GetAeTitleFromConfiguration(actor As Actor) As String
+        'Dim actor As Actor = New TDDActor
+
+        Dim sutSetting As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(actor.Id, CSTORERQ)
+
+        Return sutSetting.AETitle
+    End Function
+
+    '------------------------------------------------------------------------------
+    '-- methods below are deprecated
+    '-- (created before the requirements were completely clear...)
+    '------------------------------------------------------------------------------
+    Public Shared Sub CheckDatasetsData(ByVal datasetList As String())
+        'ReferenceDataSet.GetInstance.Get...
+        'dataset file
+        Dim dataseDataXmlFileName As String = DataSetHandler.UPSDataXMLFileName
+        'individual datasets will be loaded here (testing presence by actual loading)
+        Dim datasetDummy As DvtkHighLevelInterface.Dicom.Other.DataSet
+
+        'these are the datasets that need to be present before we continue
+
+        Dim datasetName As String
+        Dim datasetCounter As Integer
+
+        'check if dataset is present
+        Try
+            datasetCounter = 0
+            For Each datasetName In datasetList
+                datasetDummy = DataSetHandler.LoadDatasetFromFile(dataseDataXmlFileName, datasetName)
+                datasetCounter = datasetCounter + 1
+            Next
+            datasetDummy = Nothing
+        Catch ex As Exception
+            datasetDummy = Nothing
+
+            'throwing an exception
+            Dim message As String = String.Format("Data set '{0}' not found!!", datasetList(datasetCounter))
+            Throw New System.Exception(message)
+        End Try
+    End Sub
+
+    Public Shared Function GetDatasetsFromXmlFile(ByVal XMLFileName As String) As String()
+        ' set path to script dir in front of the filename
+        Dim XMLPathAndFile As String = TestToolConfiguration.GetInstance.GetScriptPath + XMLFileName
+
+        ' Create and load new XML document
+        Dim m_DataSetXML As System.Xml.XmlDocument = New System.Xml.XmlDocument
+        m_DataSetXML.Load(XMLPathAndFile)
+
+        Dim node As System.Xml.XmlNode
+        Dim nodes As System.Xml.XmlNodeList = m_DataSetXML.SelectSingleNode("/DataSet").ChildNodes
+        Dim nodeName As String
+        Dim nodeNames As ArrayList = New ArrayList
+
+        For Each node In nodes
+            nodeName = node.Name
+            If Not nodeName.StartsWith("DataSetPath") Then
+                nodeNames.Add(nodeName)
+            End If
+        Next
+
+        Dim counter As Integer = 0
+        Dim retVal(nodeNames.Count - 1) As String
+
+        For counter = 0 To nodeNames.Count - 1 Step 1
+            retVal(counter) = nodeNames.Item(counter).ToString
+        Next
+
+        Return retVal
+    End Function
+
+    Public Shared Function CheckNGetHasOutputSequence(ByVal XMLFileName As String, ByVal DataSetName As String) As Boolean
+        Dim OutputSequenceFound = False
+        Dim dataSet As Dicom.Other.DataSet = LoadDatasetFromFile(XMLFileName, DataSetName)
+
+        If dataSet.Exists(Tags.UPSPerformedProcedureOutputInformationSequence) Then
+
+            Dim nrOfIisItems As Integer = dataSet.Item(Tags.UPSPerformedProcedureOutputInformationSequence).ItemCount
+            If nrOfIisItems > 0 Then
+                OutputSequenceFound = True
+            End If
+        End If
+
+
+        Return OutputSequenceFound
+    End Function
+
+
+
+
+End Class
+

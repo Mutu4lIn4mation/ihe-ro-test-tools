@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSet>
+    <DataSetPath>\..\Datasets\QAPV\UPSData</DataSetPath>
+	<DataSetPathDifference>\..\Datasets\QAPV\UPSData\Input\Difference</DataSetPathDifference>
+	<DataSetPathDose>\..\Datasets\QAPV\UPSData\Input\Dose</DataSetPathDose>
+	<DataSetPathSRDiffGood>\..\Datasets\QAPV\UPSData\Output\Difference\Good</DataSetPathSRDiffGood>
+	<DataSetPathSRDiffIssues>\..\Datasets\QAPV\UPSData\Output\Difference\Issues Found</DataSetPathSRDiffIssues>
+	<DataSetPathSRDoseGood>\..\Datasets\QAPV\UPSData\Output\Dose\Good</DataSetPathSRDoseGood>
+	<DataSetPathSRDoseIssues>\..\Datasets\QAPV\UPSData\Output\Dose\Issues Found</DataSetPathSRDoseIssues>
+</DataSet>

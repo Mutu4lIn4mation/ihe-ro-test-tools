@@ -1,0 +1,123 @@
+﻿
+
+Public Class SpecificationContentItem
+
+    '
+    ' - Properties -
+    '
+    Private m_RelationshipWithParent As RelationshipWithParentEnum = RelationshipWithParentEnum.UNDEFINED
+    Public Property RelationshipWithParent() As RelationshipWithParentEnum
+        Get
+            Return m_RelationshipWithParent
+        End Get
+        Set(ByVal value As RelationshipWithParentEnum)
+            m_RelationshipWithParent = value
+        End Set
+    End Property
+
+
+    Private m_ValueType As ValueTypeEnum = ValueTypeEnum.UNDEFINED
+    Public Property ValueType() As ValueTypeEnum
+        Get
+            Return m_ValueType
+        End Get
+        Set(ByVal value As ValueTypeEnum)
+            m_ValueType = value
+        End Set
+    End Property
+
+
+    Private m_ConceptName As New CodedConcept
+    Public Property ConceptName() As CodedConcept
+        Get
+            Return m_ConceptName
+        End Get
+        Set(ByVal value As CodedConcept)
+            m_ConceptName = value
+        End Set
+    End Property
+
+
+    Private m_ValueMultiplicity As New ValueMultiplicity
+    Public Property ValueMultiplicity() As ValueMultiplicity
+        Get
+            Return m_ValueMultiplicity
+        End Get
+        Set(ByVal value As ValueMultiplicity)
+            m_ValueMultiplicity = value
+        End Set
+    End Property
+
+
+    Private m_RequirementType As RequirementTypeEnum = RequirementTypeEnum.UNDEFINED
+    Public Property RequirementType() As RequirementTypeEnum
+        Get
+            Return m_RequirementType
+        End Get
+        Set(ByVal value As RequirementTypeEnum)
+            m_RequirementType = value
+        End Set
+    End Property
+
+
+    'Private m_Condition As Condition = Nothing
+    'Public Property Condition() As Condition
+    '    Get
+    '        Return m_Condition
+    '    End Get
+    '    Set(ByVal value As Condition)
+    '        m_Condition = value
+    '    End Set
+    'End Property
+
+    Private m_Conditions As New List(Of Condition)
+    Public Property Conditions() As List(Of Condition)
+        Get
+            Return m_Conditions
+        End Get
+        Set(ByVal value As List(Of Condition))
+            m_Conditions = value
+        End Set
+    End Property
+
+
+    Private m_ParentContentItem As SpecificationContentItem = Nothing
+    Public Property ParentContentItem() As SpecificationContentItem
+        Get
+            Return m_ParentContentItem
+        End Get
+        Set(ByVal value As SpecificationContentItem)
+            m_ParentContentItem = value
+        End Set
+    End Property
+
+
+
+    Private m_ChildContentItems As New List(Of SpecificationContentItem)
+    Public Property ChildContentItems() As List(Of SpecificationContentItem)
+        Get
+            Return m_ChildContentItems
+        End Get
+        Set(ByVal value As List(Of SpecificationContentItem))
+            m_ChildContentItems = value
+        End Set
+    End Property
+
+
+    Private Sub New()
+    End Sub
+
+    Public Sub New(parentContentItem As SpecificationContentItem)
+        If (Not parentContentItem Is Nothing) Then
+            Me.ParentContentItem = parentContentItem
+            parentContentItem.m_ChildContentItems.Add(Me)
+        End If
+
+        m_ChildContentItems = New List(Of SpecificationContentItem)()
+
+    End Sub
+
+
+End Class
+
+

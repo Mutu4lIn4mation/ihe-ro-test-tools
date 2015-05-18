@@ -1,0 +1,155 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class ROQ6Transaction
+    Inherits Transaction
+
+    Private ROQ6IODType As IODType = Nothing
+    Private m_issuesFound As Boolean
+    Private m_kindOfCheck As String
+    'Constructor
+    Public Sub New(ByVal issuesFound As Boolean, ByVal kindOfCheck As String)
+
+        MyBase.New("RO-Q6", "Output Info Sequence retrieval", IODType.UnifiedProcedureStepPush, True)
+        ROQ6IODType = IODType.UnifiedProcedureStepPush
+        m_issuesFound = issuesFound
+        m_kindOfCheck = kindOfCheck
+    End Sub
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        'add the structure set message to the arraylist
+        datasetMessages.Add(referenceData.GetUnifiedProcedureStepPush_NGET_REQ(m_issuesFound, m_kindOfCheck))
+
+        'return the array with dataset(s)
+        Return datasetMessages
+    End Function
+
+    ' This function returns all common rules that apply on a request of this transaction
+    Public Function GetCommonTransactionRulesForRequest() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        '(0x00000003)  Requested SOP Class UID
+        m_rules.Add(New IsRequiredRule(Tags.RequestedSOPClassUID, ROQ6IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RequestedSOPClassUID, SOPclass.UnifiedProcedureStepPushSOPClassUID, ROQ6IODType, ErrorSeverity.RuleError))
+
+        ' (0x00001001) Requested SOP Instance UID
+        m_rules.Add(New IsRequiredRule(Tags.RequestedSOPInstanceUID, ROQ6IODType, ErrorSeverity.RuleError))
+        'm_rules.Add(New InterOperabilityRule(Tags.RequestedSOPInstanceUID, Tags.AffectedSOPInstanceUID, DataSetHandler.UPSCacheXMLFileName, "N-CREATE-REQ", ROQ2IODType, ErrorSeverity.RuleError))
+
+        m_rules.Add(New ValueRule(Tags.CommandDataSetType, "257", ROQ6IODType, ErrorSeverity.RuleError))
+        If (m_kindOfCheck = "Cancel") Then
+
+        Else
+
+        End If
+
+        Return m_rules
+
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        '(0x00000900)  Status
+        m_rules.Add(New IsRequiredRule(Tags.StatusCommandElement, ROQ6IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.StatusCommandElement, "0", ROQ6IODType, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.CommandField, ROQ6IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.CommandField, "33040", ROQ6IODType, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.CommandDataSetType, ROQ6IODType, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.ProcedureStepState, ROQ6IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationSequence, ROQ6IODType, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, ROQ6IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedProcedureStepProgressDescription, ROQ6IODType, ErrorSeverity.RuleError))
+
+        'm_rules.Add(New ConditionalSequenceRule(Tags.UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence, New OptionalRule(Tags.UPSProgressInformationUnifiedProcedureStepCommunicationsURISequenceContactURI, ROQ6IODType, ErrorSeverity.RuleError)))
+        'm_rules.Add(New ConditionalSequenceRule(Tags.UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence, New OptionalRule(Tags.UPSProgressInformationUnifiedProcedureStepCommunicationsURISequenceContactDisplayName, ROQ6IODType, ErrorSeverity.RuleError)))
+
+
+        If (m_kindOfCheck = "Cancel") Then
+
+            'm_rules.Add(New ValueRule(Tags.CommandDataSetType, "257", ROQ6IODType, ErrorSeverity.RuleError))
+
+            m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedProcedureStepCancellationDateTime, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedReasonForCancellation, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence, ROQ6IODType, ErrorSeverity.RuleError))
+
+            m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeValue, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator, ROQ6IODType, ErrorSeverity.RuleError))
+
+        Else
+            m_rules.Add(New NotEqualToRule(Tags.CommandDataSetType, "257", ROQ6IODType, ErrorSeverity.RuleError))
+
+
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureSequence, ROQ6IODType, ErrorSeverity.RuleError))
+            'm_rules.Add(New OptionalRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequence, ROQ6IODType, ErrorSeverity.RuleError))
+
+            'm_rules.Add(New ConditionalSequenceRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, New OptionalRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodeValue, ROQ6IODType, ErrorSeverity.RuleError)))
+            'm_rules.Add(New ConditionalSequenceRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, New OptionalRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodeMeaning, ROQ6IODType, ErrorSeverity.RuleError)))
+            'm_rules.Add(New ConditionalSequenceRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, New OptionalRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodingSchemeDesignator, ROQ6IODType, ErrorSeverity.RuleError)))
+
+            'm_rules.Add(New OptionalRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformersName, ROQ6IODType, ErrorSeverity.RuleError))
+            'm_rules.Add(New OptionalRule(Tags.UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformersOrganization, ROQ6IODType, ErrorSeverity.RuleError))
+
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationNameCodeSequence, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeValue, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationNameCodeCodingSchemeDesignator, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeMeaning, ROQ6IODType, ErrorSeverity.RuleError))
+
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationClassCodeSequence, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationClassCodeCodeValue, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationClassCodeCodingSchemeDesignator, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationClassCodeCodeMeaning, ROQ6IODType, ErrorSeverity.RuleError))
+
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationGeographicLocationCodeCodeValue, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationGeographicLocationCodeCodingSchemeDesignator, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedStationGeographicLocationCodeCodeMeaning, ROQ6IODType, ErrorSeverity.RuleError))
+
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, ROQ6IODType, ErrorSeverity.RuleError))
+
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedurePerformedProcedureStepDescription, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureCommentsOnThePerformedProcedureStep, ROQ6IODType, ErrorSeverity.RuleError))
+
+            'todo attributen in deze sequence ook required ?
+            m_rules.Add(New OptionalRule(Tags.UPSPerformedProcedurePerformedProcessingParametersSequence, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureSequenceScheduledProcedureStepEndDateTime, ROQ6IODType, ErrorSeverity.RuleError))
+
+
+            ' > (0x00404033)  Output Information Sequence
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequence, ROQ6IODType, ErrorSeverity.RuleError))
+            ' >> (0x0040E021)  Type of Instances
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceTypeOfInstances, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New ValueRule(Tags.UPSPerformedProcedureOutputInformationSequenceTypeOfInstances, "DICOM", ROQ6IODType, ErrorSeverity.RuleError))
+
+
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceStudyInstanceUID, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceSerieInstanceUID, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPClassUID, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New ValueRule(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPClassUID, SOPclass.BasicTextSRSOPClassUID, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPInstanceUID, ROQ6IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequenceAETitle, ROQ6IODType, ErrorSeverity.RuleError))
+
+            ' > (0x00404032)   DICOM Retrieval Sequence
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequence, ROQ6IODType, ErrorSeverity.RuleError))
+
+        End If
+
+        Return m_rules
+
+    End Function
+
+End Class

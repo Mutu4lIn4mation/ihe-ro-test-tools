@@ -1,0 +1,10 @@
+﻿
+
+Public Interface Condition
+
+    Function evaluate(ByVal mapping As Mapping) As Boolean
+
+End Interface
+
+
+

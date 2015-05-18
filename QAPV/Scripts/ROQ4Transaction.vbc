@@ -1,0 +1,139 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class ROQ4Transaction
+    Inherits Transaction
+
+    'Constructor
+    Public Sub New(ByVal SUTActor As Actor, ByVal storeActor As Actor)
+
+        MyBase.New("RO-Q4", "Work Item Objects Retrieval For Dose", IODType.StudyRootQueryRetrieveMOVE, False)
+        m_sutActorId = SUTActor.Id 'for QAPV: QCR
+        m_storeActorId = storeActor.Id 'for QAPV: QCP
+    End Sub
+
+    Private m_sutActorId As String
+    Private m_storeActorId As String
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+        Dim messages As DicomMessageCollection = ReferenceDataSet.createCMoveRqStatic(DataSetHandler.UPSCacheXMLFileName, m_sutActorId, m_storeActorId, "N-CREATE-REQ")
+        If messages.Count = 0 Then
+            'NO messages found in the N-CREATE repsonses to retrieve from the SCP
+            Dim log As String = "The response of the first scenario should have at least a reference to the RT-Plan file (it could be that the AeTitle in the N-CREATE-RSP is not the same as the QCR ae title in the configuration file."
+            Logger.GetInstance().LogErrorMessage(log)
+            Return Nothing
+        Else
+            'add the structure set message to the arraylist
+            For Each message As DicomMessage In messages
+                datasetMessages.Add(message)
+            Next
+        End If
+        'return the array with dataset(s)
+        Return datasetMessages
+    End Function
+
+    Public Function GetCommonTransactionRulesForRequest() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        '(0x00080052)  Query/Retrieve Level
+        m_rules.Add(New ValueRule(Tags.QueryRetrieveLevel, "IMAGE", IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        m_rules.Add(New RequestedCMoveSopInstanceUIDsRule(DataSetHandler.LoadDatasetFromFile(DataSetHandler.UPSCacheXMLFileName, "N-CREATE-REQ"), IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        ' C-Move-Req bevat geen SOPCLASSUID alleen SopInstanceUID
+        'm_rules.Add(New RequestedCMoveSopClassUIDNotRTBDIRule(IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.AffectedSOPClassUID, IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.AffectedSOPClassUID, SOPclass.StudyRootQueryRetrieveMOVESOPClassUID, IODType.StudyRootQueryRetrieveMOVE, ErrorSeverity.RuleError))
+        Return m_rules
+
+    End Function
+
+    Public Function GetTransactionRulesForC_StoreRequest() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        'Atleast one RTPlan should be received. Rule is performed on the messagecollection, not on every C-Store operation, so only once.
+        m_rules.Add(New IODReceivedRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.AffectedSOPClassUID, IODType.CStoreRequest, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+    Public Function GetTransactionRulesForRequest() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        Return m_rules
+
+    End Function
+
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        Return m_rules
+
+    End Function
+
+    Public Function GetTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        Return m_rules
+
+    End Function
+
+    Public Function GetReceivedObjectRules() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        m_rules.Add(New IsRequiredRule(Tags.DoseReferenceSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.DoseReferenceStructureType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'm_rules.Add(New ValueRule(Tags.DoseReferenceStructureType, "COORDINATES", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'm_rules.Add(New IsRequiredRule(Tags.DoseReferencePointCoordinates, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        'm_rules.Add(New HasValueRule(Tags.DoseReferencePointCoordinates, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.DoseReferenceType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        'RT plan relationships
+        Dim values(1) As String
+        values(0) = "TARGET"
+        values(1) = "ORGAN_AT_RISK"
+
+        m_rules.Add(New ValueListRule(Tags.DoseReferenceType, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New OptionalRule(Tags.ConstraintWeight, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New OptionalRule(Tags.DeliveryWarningDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.DeliveryMaximumDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New HasValueRule(Tags.DeliveryMaximumDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredAndHasValueRuleIfDoseReferenceTypeIsTARGET(Tags.TargetMinimumDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredAndHasValueRuleIfDoseReferenceTypeIsTARGET(Tags.TargetPrescriptionDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredAndHasValueRuleIfDoseReferenceTypeIsTARGET(Tags.TargetMaximumDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.FractionGroupSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.FractionGroupSequenceFractionGroupNumber, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New OptionalRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New ConditionalSequenceRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, New IsRequiredRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequenceRefDoseRefNumber, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConditionalSequenceRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, New OptionalRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequenceConstraintWeight, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConditionalSequenceRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, New OptionalRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequenceDeliveryWarningDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConditionalSequenceRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, New OptionalRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequenceDeliveryMaximumDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConditionalSequenceRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, New OptionalRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequenceTargetMinimumDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConditionalSequenceRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, New OptionalRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequenceTargetPrescriptionDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+        m_rules.Add(New ConditionalSequenceRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequence, New OptionalRule(Tags.FractionGroupSequenceReferencedDoseReferenceSequenceTargetMaximumDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError)))
+
+        m_rules.Add(New IsRequiredRule(Tags.NumberOfFractionsPlanned, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New HasValueRule(Tags.NumberOfFractionsPlanned, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.ReferencedBeamSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New OptionalRule(Tags.BeamDoseSpecificationPoint, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.BeamDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New HasValueRule(Tags.BeamDose, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.BeamMeterset, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New HasValueRule(Tags.BeamMeterset, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        m_rules.Add(New IsRequiredRule(Tags.BeamSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+        m_rules.Add(New IsRequiredRule(Tags.PrimaryFluenceModeSequence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+End Class

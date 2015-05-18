@@ -1,0 +1,481 @@
+﻿
+' ------------------------------------------------------
+' DVTk - The Healthcare Validation Toolkit (www.dvtk.org)
+' Copyright © 2010 DVTk
+' ------------------------------------------------------
+' This file is part of DVTk.
+'
+' DVTk is free software; you can redistribute it and/or modify it under the terms of the GNU
+' Lesser General Public License as published by the Free Software Foundation; either version 3.0
+' of the License, or (at your option) any later version. 
+' 
+' DVTk is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+' the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+' General Public License for more details. 
+' 
+' You should have received a copy of the GNU Lesser General Public License along with this
+' library; if not, see <http://www.gnu.org/licenses/>
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports System.Text
+Imports System.Xml
+
+Imports VR = DvtkData.Dimse.VR
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+''' <summary>
+''' This class represents the non-value-type-specific part of a Content Item that is present
+''' in a Structured Report Object.
+''' </summary>
+Public Class DataSetContentItem
+    '
+    ' - Constants -
+    '
+
+    ''' <summary>
+    ''' A description of the context of an instance of this class.
+    ''' </summary>
+    Private Const context As String = "DICOM - Structured Reporting - Content Item"
+
+    ''' <summary>
+    ''' A description of the context of the conceptName field of this class.
+    ''' </summary>
+    Private Const conceptNameContext As String = "DICOM - Structured Reporting - Content Item - Concept Name"
+
+    '
+    ' - Fields -
+    '
+
+    ''' <summary>
+    ''' The Data Set or Sequence Item containing the DICOM attributes that encode the Content
+    ''' Item.
+    ''' </summary>
+    Private m_attributeSet As AttributeSet = Nothing
+
+    ''' <summary>
+    ''' If this is a root Content Item, this field contains 1. In other cases, it contains the
+    ''' ordinal position of the associated Sequence Item in it's contained Content Sequence
+    ''' Attribute.
+    ''' </summary>
+    Private position As UInteger = 0
+
+    ''' <summary>
+    ''' If this instance is the Target of a another Content Item, this field contains a
+    ''' reference to this other Content Item. If this is not the case (which implies that this
+    ''' instance represents a Root Content Item), this field contains null.
+    ''' </summary>
+    Private parentContentItem As DataSetContentItem = Nothing
+
+    ''' <summary>
+    ''' See property ChildContentItems.
+    ''' </summary>
+    Private m_childContentItems As List(Of DataSetContentItem) = Nothing
+
+    '
+    ' - Constructors -
+    '
+
+    ''' <summary>
+    ''' Hide default constructor.
+    ''' </summary>
+    ' Do nothing.
+    Private Sub New()
+    End Sub
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="sequenceItem">
+    ''' The attributeSet instance containing the DICOM attributes to construct this instance with.
+    ''' </param>
+    ''' <param name="parentContentItem">The parent Content Item.</param>
+    ''' <param name="position">
+    ''' The ordinal position of the associated Sequence Item in it's contained Content Sequence
+    ''' Item.
+    ''' </param>
+    Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem, position As UInteger)
+
+        Me.m_attributeSet = attributeSet
+        Me.position = position
+        Me.parentContentItem = parentContentItem
+        m_childContentItems = New List(Of DataSetContentItem)()
+
+        If ((Not parentContentItem Is Nothing) And (attributeSet Is Nothing)) Then
+            Dim newSquenceItem As New SequenceItem
+
+            Dim parentContentSequence As DvtkHighLevelInterface.Dicom.Other.Attribute = Me.parentContentItem.ContentSequence
+            parentContentSequence.AddItem(newSquenceItem)
+
+            Me.AttributeSet = parentContentSequence.GetItem(parentContentSequence.ItemCount)
+
+        End If
+
+    End Sub
+
+
+    '
+    ' - Properties -
+    '
+    Public Property AttributeSet() As AttributeSet
+        Get
+            Return Me.m_attributeSet
+        End Get
+        Set(value As AttributeSet)
+            Me.m_attributeSet = value
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Gets the child Content Items of this instance, i.e. all Content Item instances that are
+    ''' the Target of this this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If no child Content Items exist, an empty IList is returned.
+    ''' </remarks>
+    Public ReadOnly Property ChildContentItems() As IList(Of DataSetContentItem)
+        Get
+            Return Me.m_childContentItems
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets the Concept Name of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If no Concepts Name is available, null is returned.
+    ''' </remarks>
+    Public ReadOnly Property ConceptName() As ConceptCode
+        Get
+            If (Not Me.AttributeSet.Exists("0x0040A043")) Then
+                Me.AttributeSet.Set("0x0040A043", DvtkData.Dimse.VR.SQ)
+                Dim sequenceItem As New SequenceItem
+                Me.AttributeSet.Item("0x0040A043").AddItem(sequenceItem)
+
+            End If
+
+            Return ConceptCode.CreateConceptCode(AttributeSet, "0x0040A043", "")
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets the (implicit) Identifier of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' The returned list is created by this instance, so it may be changed by the calling code.
+    ''' </remarks>
+    Public ReadOnly Property Identifier() As IList(Of UInteger)
+        Get
+            Dim identifier__1 As IList(Of UInteger) = Nothing
+
+            If Me.parentContentItem Is Nothing Then
+                ' This is a Root Content Item.
+                identifier__1 = New List(Of UInteger)()
+                identifier__1.Add(1)
+            Else
+                ' This is a non-root Content Item.
+                identifier__1 = Me.parentContentItem.Identifier
+                identifier__1.Add(Me.position)
+            End If
+
+            Return identifier__1
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets the (implicit) Identifier of this instance as a string.
+    ''' </summary>
+    Public ReadOnly Property IdentifierAsString() As String
+        Get
+            Dim identifierAsString__1 As String = ""
+
+            Dim identifier__2 As IList(Of UInteger) = Identifier
+
+            For Each position As UInteger In identifier__2
+                If identifierAsString__1 = "" Then
+                    identifierAsString__1 = position.ToString()
+                Else
+                    identifierAsString__1 += "." + position.ToString()
+                End If
+            Next
+
+            Return (identifierAsString__1)
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets the Relationship Type of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If the associated DICOM attribute is not present, null is returned.
+    ''' If the associated DICOM attribute is present and has no values, "" is returned.
+    ''' If the associated DICOM attribute is present and has values, the first value is returned.
+    ''' </remarks>
+    Public Property RelationshipType() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.AttributeSet, "0x0040A010"))
+        End Get
+
+        Set(value As [String])
+            'Dim sequenceItem As New SequenceItem
+            Me.AttributeSet.Set("0x0040A010", DvtkData.Dimse.VR.CS, value)
+        End Set
+    End Property
+
+
+    ''' <summary>
+    ''' Gets the Value Type of this instance.
+    ''' </summary>
+    ''' <remarks>
+    ''' If the associated DICOM attribute is not present, null is returned.
+    ''' If the associated DICOM attribute is present and has no values, "" is returned.
+    ''' If the associated DICOM attribute is present and has values, the first value is returned.
+    ''' </remarks>
+    Public Property ValueType() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.AttributeSet, "0x0040A040"))
+        End Get
+
+        Set(value As [String])
+            Me.AttributeSet.Set("0x0040A040", DvtkData.Dimse.VR.CS, value)
+
+        End Set
+    End Property
+
+    Public ReadOnly Property ContentSequence() As DvtkHighLevelInterface.Dicom.Other.Attribute
+        Get
+            'Dim sequenceItem As New SequenceItem
+            If (Not Me.AttributeSet.Exists("0x0040A730")) Then
+                Me.AttributeSet.Set("0x0040A730", DvtkData.Dimse.VR.SQ)
+
+                'sequenceItem.Set("0x55555555",DvtkData.Dimse.VR.CS)
+
+                'Me.AttributeSet.Item("0x0040A730").AddItem(sequenceItem)
+                'Me.m_attributeSet = sequenceItem
+                'Me.AttributeSet = Me.AttributeSet.Item("0x0040A730")
+            End If
+
+            Return Me.AttributeSet.Item("0x0040A730")
+        End Get
+
+    End Property
+
+    '
+    ' - Methods -
+    '
+
+
+    ''' <summary>
+    ''' Create a single Content Item instance without creating (possible) child Content Item instances.
+    ''' </summary>
+    ''' <remarks>
+    ''' The child Content Items will be created by the CreateContentItems methods.
+    ''' </remarks>
+    ''' <param name="attributeSet">The Attribute Set from which the Content Item is constructed.</param>
+    ''' <returns>A single Content Item instance.</returns>
+    Private Shared Function CreateContentItem(attributeSet As AttributeSet, parentContentItem As DataSetContentItem, position As UInteger) As DataSetContentItem
+        Dim contentItem As DataSetContentItem = Nothing
+
+        Dim valueType As [String] = Convert.FirstAttributeValueToString(attributeSet, "0x0040A040")
+
+        valueType = valueType.TrimStart(" "c)
+        valueType = valueType.TrimEnd(" "c)
+
+        Select Case valueType
+            Case "CODE"
+                contentItem = New DataSetContentItemWithValueTypeCode(attributeSet, parentContentItem, position)
+                Exit Select
+            Case "NUM"
+                contentItem = New DataSetContentItemWithValueTypeNum(attributeSet, parentContentItem, position)
+                Exit Select
+            Case "CONTAINER"
+                contentItem = New DataSetContentItemWithValueTypeContainer(attributeSet, parentContentItem, position)
+                Exit Select
+            Case "COMPOSITE"
+                contentItem = New DataSetContentItemWithValueTypeComposite(attributeSet, parentContentItem, position)
+                Exit Select
+            Case "TEXT"
+                contentItem = New DataSetContentItemWithValueTypeText(attributeSet, parentContentItem, position)
+                Exit Select
+            Case "DATETIME"
+                contentItem = New DataSetContentItemWithValueTypeDateTime(attributeSet, parentContentItem, position)
+                Exit Select
+            Case "UID"
+                contentItem = New DataSetContentItemWithValueTypeUIDRef(attributeSet, parentContentItem, position)
+                Exit Select
+
+
+            Case Else
+
+                contentItem = New DataSetContentItem(attributeSet, parentContentItem, position)
+                Exit Select
+        End Select
+
+        Return (contentItem)
+    End Function
+
+    ''' <summary>
+    ''' Create both a Content Item instance and all its direct and indirect child Content Item instances.
+    ''' </summary>
+    ''' <param name="attributeSet">
+    ''' <param name="dataSet">
+    ''' The AttributeSet instance containing the DICOM attributes to construct this Content 
+    ''' Item instance and its direct and indirect child Content Item instances with.
+    ''' </param>
+    ''' </param>
+    ''' <param name="parentContentItem">
+    ''' The parent Content Item instance.
+    ''' If no parent exists, supply null.
+    ''' </param>
+    ''' <param name="position">
+    ''' The ordinal position of the associated Sequence Item in it's contained Content Sequence.
+    ''' Item.
+    ''' </param>
+    ''' <returns>A Content Item instance.</returns>
+    Private Shared Function CreateContentItems(attributeSet As AttributeSet, parentContentItem As DataSetContentItem, position As UInteger) As DataSetContentItem
+        '
+        ' Create the single Content Item instance using the Attribute Set instance supplied.
+        '
+
+        Dim contentItem As DataSetContentItem = CreateContentItem(attributeSet, parentContentItem, position)
+
+
+        '
+        ' If existing, create its child Content Item instances.
+        '
+
+        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = attributeSet("0x0040A730")
+        ' Content Sequence Attribute.
+        If attribute.Exists Then
+            If attribute.VR = DvtkData.Dimse.VR.SQ Then
+                For sequenceItemIndex As UInteger = 1 To attribute.ItemCount
+                    Dim sequenceItem As SequenceItem = attribute.GetItem(System.Convert.ToInt32(sequenceItemIndex))
+
+                    Dim childContentItem As DataSetContentItem = CreateContentItems(sequenceItem, contentItem, sequenceItemIndex)
+                    contentItem.ChildContentItems.Add(childContentItem)
+                Next
+            End If
+        End If
+
+        Return (contentItem)
+    End Function
+
+    ''' <summary>
+    ''' Create both the root Content Item instance and all its direct and indirect child Content Item instances.
+    ''' </summary>
+    ''' <param name="dataSet">
+    ''' The DataSet instance containing the DICOM attributes to construct this root Content 
+    ''' Item instance and its direct and indirect child Content Item instances with.
+    ''' </param>
+    ''' <returns>The root Content Item instance.</returns>
+    Public Shared Function CreateContentItems(dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet) As DataSetContentItem
+        Return (CreateContentItems(dataSet, Nothing, 1))
+    End Function
+
+    ''' <summary>
+    ''' Method used by the library to serialize this instance to xml.
+    ''' </summary>
+    ''' <param name="xmlTextWriter">The xml text writer.</param>
+    ''' <param name="serializationContext">The serialization context.</param>
+    Friend Sub ToXml(xmlTextWriter As XmlTextWriter, serializationContext As SerializationContext)
+        '
+        ' Start of Content Item.
+        '
+
+        xmlTextWriter.WriteStartElement("contentItem")
+
+
+        '
+        ' Identifier.
+        '
+
+        xmlTextWriter.WriteAttributeString("identifier", IdentifierAsString)
+
+
+        '
+        ' Relationship Type.
+        '
+
+        Dim relationshipType__1 As [String] = RelationshipType
+
+        If relationshipType__1 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("relationshipType")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(relationshipType__1)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+
+        '
+        ' Value Type
+        '
+
+        Dim valueType__2 As [String] = ValueType
+
+        If valueType__2 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("valueType")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(valueType__2)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+
+        '
+        ' Value Type specific.
+        '
+
+        xmlTextWriter.WriteStartElement("valueTypeSpecific")
+        ValueToXml(xmlTextWriter, serializationContext)
+        xmlTextWriter.WriteEndElement()
+
+
+        '
+        ' Concept Name
+        '
+
+        If ConceptName IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("conceptName")
+            ConceptName.ToXml(xmlTextWriter, serializationContext)
+            xmlTextWriter.WriteEndElement()
+        End If
+
+        '
+        ' Child Content Items.
+        '
+
+        If Me.m_childContentItems.Count > 0 Then
+            xmlTextWriter.WriteStartElement("childContentItems")
+
+            For Each childContentItem As DataSetContentItem In Me.m_childContentItems
+                childContentItem.ToXml(xmlTextWriter, serializationContext)
+            Next
+
+
+            xmlTextWriter.WriteEndElement()
+        End If
+
+
+        '
+        ' End of Content Item.
+        '
+
+        xmlTextWriter.WriteEndElement()
+    End Sub
+
+    ''' <summary>
+    ''' Method used by the library to serialize the value of this instance to xml.
+    ''' </summary>
+    ''' <param name="xmlTextWriter">The xml text writer.</param>
+    ''' <param name="serializationContext">The serialization context.</param>
+    Friend Overridable Sub ValueToXml(xmlTextWriter As XmlTextWriter, serializationContext As SerializationContext)
+        ' Do nothing.
+    End Sub
+
+    Public Overrides Function ToString() As String
+        Return IdentifierAsString + " (" + ConceptName.CodeValue + ", " + ConceptName.CodingSchemeDesignator + ", " + ConceptName.CodeMeaning + ")"
+    End Function
+
+End Class
+
+

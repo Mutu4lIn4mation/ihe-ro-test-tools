@@ -1,0 +1,53 @@
+Class ROINumberRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("ROI Number Rule", "", iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        If iodType = Me.IODTypeRule Then
+            Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+            Dim message As String
+            Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+            Dim roiNumberValue As DvtkHighLevelInterface.Dicom.Other.Values
+            Dim roiNumberValueCompare As DvtkHighLevelInterface.Dicom.Other.Values
+            Dim isUnique As Boolean = True
+
+            'Get Structure Set ROI Sequence
+            attribute = dicomMessage.DataSet(Tags.StructureSetROITagSequence)
+
+            Dim i As Integer
+            Dim j As Integer
+            'Itterate through the items
+            For i = 1 To attribute.ItemCount()
+                seqItem = attribute.GetItem(i)
+                'Get RoiNumber Value
+                roiNumberValue = seqItem.GetValues(Tags.RoiNumber)
+
+                For j = i + 1 To attribute.ItemCount()
+                    seqItem = attribute.GetItem(j)
+                    'Get RoiNumber Value
+                    roiNumberValueCompare = seqItem.GetValues(Tags.RoiNumber)
+                    'Compare the found values
+                    If roiNumberValue(0) = roiNumberValueCompare(0) Then
+                        isUnique = False
+                    End If
+                Next
+            Next
+
+            If isUnique = True Then
+                message = "No equal RoiNumbers found"
+                Me.SetValid(message)
+            Else
+                message = "Equal RoiNumbers found"
+                Me.SetError(message)
+            End If
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

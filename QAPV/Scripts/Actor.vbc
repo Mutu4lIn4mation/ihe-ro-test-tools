@@ -1,0 +1,31 @@
+
+'Actor class object
+Public MustInherit Class Actor
+
+    'has an id
+    Protected m_id As String
+    'has a (readable) name
+    Protected m_name As String
+
+    'Constructor
+    Public Sub New(ByVal id As String, ByVal name As String)
+        m_id = id
+        m_name = name
+    End Sub
+
+    'The Id of this Actor
+    Public ReadOnly Property Id As String
+        Get
+            Return m_id
+        End Get
+    End Property
+
+    'The (readable) name of this Actor
+    Public ReadOnly Property Name As String
+        Get
+            Return m_name
+        End Get
+    End Property
+
+
+End Class

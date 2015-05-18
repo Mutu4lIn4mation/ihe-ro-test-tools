@@ -1,0 +1,11 @@
+
+Class QCPActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("QCP", "QCP actor")
+
+    End Sub
+
+End Class

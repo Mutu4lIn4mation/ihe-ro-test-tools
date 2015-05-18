@@ -1,0 +1,70 @@
+﻿
+Public Class OrderValidator
+
+    Public Sub Validate(specificationContentItem As SpecificationContentItem, mapping As Mapping)
+
+        Dim datasetContentItems As List(Of DataSetContentItem) = mapping.GetDatasetContentItems(specificationContentItem)
+
+        For Each datasetContentItem As DataSetContentItem In datasetContentItems
+
+            Dim previousIndexMax As Integer = -1
+            Dim previousSpecificationContentItemChild As SpecificationContentItem = Nothing
+            Dim previousMappedDatasetContentItemChilds As List(Of DataSetContentItem) = Nothing
+
+            Dim datasetContentItemChilds As List(Of DataSetContentItem) = datasetContentItem.ChildContentItems
+            Dim specificationContentItemChilds As List(Of SpecificationContentItem) = specificationContentItem.ChildContentItems
+
+            For Each specificationContentItemChild As SpecificationContentItem In specificationContentItemChilds
+
+                Dim mappedDatasetContentItemChilds As List(Of DataSetContentItem) = mapping.GetDatasetContentItems(specificationContentItemChild)
+
+                If (mappedDatasetContentItemChilds.Count > 0) Then
+
+                    Dim indexMin As Integer = datasetContentItemChilds.IndexOf(mappedDatasetContentItemChilds.Item(0))
+                    Dim indexMax As Integer = datasetContentItemChilds.IndexOf(mappedDatasetContentItemChilds.Item(mappedDatasetContentItemChilds.Count - 1))
+
+                    If (indexMin <= previousIndexMax) Then
+                        logError(specificationContentItemChild, previousSpecificationContentItemChild, mappedDatasetContentItemChilds, previousMappedDatasetContentItemChilds)
+                    Else
+                        'log goed
+                        'If Not (previousIndexMax = -1) Then
+                        Reporter.GetInstance.Report(mappedDatasetContentItemChilds.Item(0).ToString() + " is on correct place in dataset", ErrorSeverity.RuleInfo)
+                        'End If
+
+                    End If
+
+                    previousIndexMax = indexMax
+                    previousSpecificationContentItemChild = specificationContentItemChild
+                    previousMappedDatasetContentItemChilds = mappedDatasetContentItemChilds
+                End If
+
+            Next
+        Next
+
+        For Each specificationContentItemChild As SpecificationContentItem In specificationContentItem.ChildContentItems
+
+            Validate(specificationContentItemChild, mapping)
+
+        Next
+
+    End Sub
+
+    Public Sub logError(ByVal specificationContentItemChild As SpecificationContentItem, ByVal previousSpecificationContentItemChild As SpecificationContentItem, ByVal mappedDatasetContentItemChilds As List(Of DataSetContentItem), ByVal previousMappedDatasetContentItemChilds As List(Of DataSetContentItem))
+        Dim logString As String = ""
+
+        logString = "The following order is specified in the template:" + Environment.NewLine + previousSpecificationContentItemChild.ConceptName.ToString() + " ... " + specificationContentItemChild.ConceptName.ToString() + Environment.NewLine
+
+        logString += " The following dataset content item identifier(s) are mapped to " + previousSpecificationContentItemChild.ConceptName.ToString() + Environment.NewLine
+        For Each dataSetContentItem As DataSetContentItem In previousMappedDatasetContentItemChilds
+            logString += "- " + dataSetContentItem.IdentifierAsString + Environment.NewLine
+        Next
+
+        logString += " The following dataset content item identifier(s) are mapped to the " + specificationContentItemChild.ConceptName.ToString() + Environment.NewLine
+        For Each dataSetContentItem As DataSetContentItem In mappedDatasetContentItemChilds
+            logString += "- " + dataSetContentItem.IdentifierAsString + Environment.NewLine
+        Next
+
+        Reporter.GetInstance.Report(logString, ErrorSeverity.RuleError)
+
+    End Sub
+End Class

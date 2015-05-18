@@ -1,0 +1,144 @@
+﻿
+' ------------------------------------------------------
+' DVTk - The Healthcare Validation Toolkit (www.dvtk.org)
+' Copyright © 2010 DVTk
+' ------------------------------------------------------
+' This file is part of DVTk.
+'
+' DVTk is free software; you can redistribute it and/or modify it under the terms of the GNU
+' Lesser General Public License as published by the Free Software Foundation; either version 3.0
+' of the License, or (at your option) any later version. 
+' 
+' DVTk is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+' the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+' General Public License for more details. 
+' 
+' You should have received a copy of the GNU Lesser General Public License along with this
+' library; if not, see <http://www.gnu.org/licenses/>
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports System.Text
+Imports System.Xml
+
+Imports VR = DvtkData.Dimse.VR
+
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+
+''' <summary>
+''' This class represents the Measured Value of a Content Item with value type NUM that is
+''' present in a Structured Report Object.
+''' </summary>
+Public Class ContentTemplate
+    '
+    ' - Constants -
+    '
+
+    ''' <summary>
+    ''' A description of the context of an instance of this class.
+    ''' </summary>
+    Private Const context As String = "DICOM - Structured Reporting - Content Item - Content Template"
+
+    '
+    ' - Fields -
+    ''' <summary>
+    ''' The single sequence item in the Measured Value Sequence that encodes this Measured
+    ''' Value.
+    ''' </summary>
+    Private sequenceItem As SequenceItem = Nothing
+
+    '
+    ' - Constructors -
+    '
+    ''' <summary>
+    ''' Hide default constructor.
+    ''' </summary>
+
+    Private Sub New()
+        ' Do nothing.
+    End Sub
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="sequenceItem">The single sequence item that encodes this Measured Value.</param>
+    Public Sub New(sequenceItem As SequenceItem)
+
+        Me.sequenceItem = sequenceItem
+
+    End Sub
+
+
+
+    '
+    ' - Properties -
+    '
+
+    ''' <summary>
+    ''' Gets the Mapping Resource for this instance.
+    ''' </summary>
+    Public Property MappingResource() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.sequenceItem, "0x00080105"))
+        End Get
+
+        Set(value As [String])
+            Me.sequenceItem.Set("0x00080105", DvtkData.Dimse.VR.CS, value)
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Gets the Template Identifier for this instance.
+    ''' </summary>
+    Public Property TemplateIdentifier() As [String]
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.sequenceItem, "0x0040DB00"))
+        End Get
+
+        Set(value As [String])
+            Me.sequenceItem.Set("0x0040DB00", DvtkData.Dimse.VR.CS, value)
+
+        End Set
+
+    End Property
+
+
+
+    '
+    ' - Methods -
+    '
+
+    ''' <summary>
+    ''' Method used by the library to serialize this instance to xml.
+    ''' </summary>
+    ''' <param name="xmlTextWriter">The xml text writer.</param>
+    ''' <param name="serializationContext">The serialization context.</param>
+    Friend Sub ToXml(xmlTextWriter As XmlTextWriter, serializationContext As SerializationContext)
+
+        xmlTextWriter.WriteStartElement("contenttemplate")
+
+        Dim mappingResource__1 As [String] = MappingResource
+
+        If mappingResource__1 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("continuityOfContent")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(mappingResource__1)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+        Dim templateIdentifier__1 As [String] = TemplateIdentifier
+
+        If templateIdentifier__1 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("continuityOfContent")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(templateIdentifier__1)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+        xmlTextWriter.WriteEndElement()
+
+    End Sub
+End Class
+

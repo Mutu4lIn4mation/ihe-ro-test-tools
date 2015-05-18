@@ -1,0 +1,117 @@
+Class QCROutputObjectsRetrievalScenario
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim qcpActor As QCPActor = New QCPActor()
+        Dim qcrActor As QCRActor = New QCRActor()
+
+        Dim kindOfCheckDialog As ChooseKindOfCheckDialog = New ChooseKindOfCheckDialog(True)
+        Dim errorDialog As ErrorDialog = New ErrorDialog()
+        Dim issuesFoundDialog As IssuesFoundDialog = New IssuesFoundDialog(True)
+
+        Try
+            Dim checkOutputSequence As Boolean
+            'Check if the N-Get-rsp that is created by the QCP dose or difference success – testscenario contains a outputsequence, if not then stop execution and inform the user (in the validation results)
+            Try
+                checkOutputSequence = DataSetHandler.CheckNGetHasOutputSequence(DataSetHandler.UPSCacheXMLFileName, "N-GET-RSP")
+            Catch ex As Exception
+                Dim errorMessage As String = "First run the QCP Difference check success or Dose check success scenario, at least once."
+                errorDialog.SetMessage(errorMessage)
+                errorDialog.ShowDialog()
+                Throw ex
+            End Try
+
+            If Not checkOutputSequence Then
+                Dim errorMessage As String = "First run the QCP Difference check success or Dose check success scenario, at least once."
+                errorDialog.SetMessage(errorMessage)
+                errorDialog.ShowDialog()
+            Else
+
+                issuesFoundDialog.ShowDialog()
+                kindOfCheckDialog.ShowDialog()
+
+                Dim roq7transaction As ROQ7Transaction = New ROQ7Transaction(qcpActor, qcrActor, issuesFoundDialog.Yes)
+                Dim roq8transaction As ROQ8Transaction = New ROQ8Transaction()
+
+                Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+                Dim UPSDvtkSettings As SUTAESettingWrapper = config.GetDVTKAEConfiguration(qcpActor.Id, NGETRQ)
+                Dim CMOVEDvtkSettings As SUTAESettingWrapper = config.GetDVTKAEConfiguration(qcpActor.Id, CMOVERQ)
+
+                Dim receive As ReceiveScenarioStep = Nothing
+                If (issuesFoundDialog.Yes) Then
+
+                    If (UPSDvtkSettings.Port = CMOVEDvtkSettings.Port) Then
+                        If (kindOfCheckDialog.Difference) Then
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, NGETRQ, "DiffIssues")
+                        Else
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, NGETRQ, "DoseIssues")
+                        End If
+
+                    Else
+                        If (kindOfCheckDialog.Difference) Then
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, qcpActor, NGETRQ, "DiffIssues")
+                        Else
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, qcpActor, NGETRQ, "DoseIssues")
+                        End If
+
+                    End If
+
+                Else
+                    If (UPSDvtkSettings.Port = CMOVEDvtkSettings.Port) Then
+                        If (kindOfCheckDialog.Difference) Then
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, NGETRQ, "DiffGood")
+                        Else
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, NGETRQ, "DoseGood")
+                        End If
+
+                    Else
+                        If (kindOfCheckDialog.Difference) Then
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, qcpActor, NGETRQ, "DiffGood")
+                        Else
+                            receive = New ReceiveScenarioStep(qcpActor, qcrActor, True, qcpActor, NGETRQ, "DoseGood")
+                        End If
+
+                    End If
+
+                End If
+
+                If (kindOfCheckDialog.Difference) Then
+                    receive.setKindOfCheckAndIssues("Difference", issuesFoundDialog.Yes)
+                Else
+                    receive.setKindOfCheckAndIssues("Dose", issuesFoundDialog.Yes)
+                End If
+
+                receive.AddTransaction(roq7transaction)
+                receive.AddTransaction(roq8transaction)
+
+
+                Dim validateROQ7 As ValidateScenarioStep = Nothing
+                Dim validateROQ8 As ValidateScenarioStep = Nothing
+
+                If (UPSDvtkSettings.Port = CMOVEDvtkSettings.Port) Then
+                    validateROQ7 = New ValidateScenarioStep(receive, True, 1)
+                    validateROQ8 = New ValidateScenarioStep(receive, True, 0)
+                Else
+                    validateROQ7 = New ValidateScenarioStep(receive, True, 0)
+                    validateROQ8 = New ValidateScenarioStep(receive, 0)
+                End If
+
+                validateROQ7.AddRules(roq7transaction.GetCommonTransactionRulesForRequest())
+                validateROQ8.AddRules(roq8transaction.GetCommonTransactionRulesForRequest())
+
+                m_scenarioSteps.Add(receive)
+                m_scenarioSteps.Add(validateROQ7)
+                m_scenarioSteps.Add(validateROQ8)
+
+            End If
+
+        Catch ex As Exception
+            errorDialog.SetMessage(ex.Message)
+            errorDialog.ShowDialog()
+            Throw ex
+        End Try
+
+    End Sub
+End Class

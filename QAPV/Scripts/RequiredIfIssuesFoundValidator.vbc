@@ -1,0 +1,40 @@
+﻿Public Class RequiredIfIssuesFoundValidator
+
+    Dim isValid As Boolean = False
+    Dim IssuesFound As Boolean
+
+    Public Sub Validate(specificationContentItem As SpecificationContentItem, mapping As Mapping, dataSet As DataSetContentItem)
+
+        For Each contentItem As DataSetContentItem In dataSet.ChildContentItems
+
+            If (contentItem.ValueType = ValueTypeEnum.CODE.ToString) Then
+                Dim dataSetContentItemCode As DataSetContentItemWithValueTypeCode = contentItem
+
+                If (dataSetContentItemCode.ConceptCode.CodeValue = "R-0038D" And dataSetContentItemCode.ConceptCode.CodingSchemeDesignator = "SRT") Then
+                    IssuesFound = True
+                End If
+            End If
+
+        Next
+
+
+
+        Dim numberOfdatasetContentItems As Integer = mapping.GetDatasetContentItems(specificationContentItem).Count
+        If IssuesFound Then
+            If (numberOfdatasetContentItems >= specificationContentItem.ValueMultiplicity.Min And numberOfdatasetContentItems <= specificationContentItem.ValueMultiplicity.Max) Then
+                isValid = True
+            End If
+
+        Else
+            isValid = True
+        End If
+
+        If Not (isValid) Then
+            'log
+        End If
+
+    End Sub
+
+End Class
+
+

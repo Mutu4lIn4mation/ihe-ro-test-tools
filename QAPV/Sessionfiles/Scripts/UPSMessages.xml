@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSet>
+    <DataSetPath>\..\Datasets\QAPV\UPSMessages\</DataSetPath>
+    <N-CREATE-REQ>\..\Datasets\QAPV\UPSMessages\QAPV-RO-Q1-N-CREATE-REQ.dcm</N-CREATE-REQ>
+	<N-GET-REQ>\..\Datasets\QAPV\UPSMessages\QAPV-RO-Q6-N-GET-REQ.dcm</N-GET-REQ>
+	<N-GET-RSP-Completed>\..\Datasets\QAPV\UPSMessages\QAPV-RO-Q6-N-GET-RSP-Completed.dcm</N-GET-RSP-Completed>
+	<N-GET-RSP-Cancelled>\..\Datasets\QAPV\UPSMessages\QAPV-RO-Q6-N-GET-RSP-Canceled.dcm</N-GET-RSP-Cancelled>
+</DataSet>

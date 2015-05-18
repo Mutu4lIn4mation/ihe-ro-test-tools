@@ -1,0 +1,10 @@
+﻿
+
+Public Enum RequirementTypeEnum
+
+    UNDEFINED = 0
+    M = 1
+    MC = 2
+    U = 3
+
+End Enum

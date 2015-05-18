@@ -1,0 +1,13 @@
+﻿Public Enum RelationshipWithParentEnum
+
+    UNDEFINED = 0
+    CONTAINS = 1
+    HAS_OBS_CONTEXT = 2
+    HAS_ACQ_CONTEXT = 3
+    HAS_CONCEPT_MOD = 4
+    HAS_PROPERTIES = 5
+    INFERRED_FROM = 6
+
+End Enum
+
+

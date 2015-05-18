@@ -1,0 +1,47 @@
+Class QCRStartScenario
+    Inherits Scenario
+    'Constructor
+    Public Sub New()
+
+        Dim kindOfCheckDialog As ChooseKindOfCheckDialog = New ChooseKindOfCheckDialog(True)
+        Dim errorDialog As ErrorDialog = New ErrorDialog()
+
+        Try
+
+            ' Check if dataset is present
+            DataSetHandler.CheckUpsInputDataSets()
+
+            'clean up cache directory
+            DataSetHandler.CleanUpsCacheFolder()
+
+            kindOfCheckDialog.ShowDialog()
+
+            Dim ROQ1transaction As ROQ1Transaction = New ROQ1Transaction(kindOfCheckDialog.Difference)
+            Dim ROQ2transaction As ROQ2Transaction = New ROQ2Transaction()
+
+            'Configure the receive steps
+            Dim receive As ReceiveScenarioStep = New ReceiveScenarioStep(New QCPActor(), New QCRActor(), True, NCREATERQ)
+            receive.AddTransaction(ROQ1transaction)
+            'Dim receiveROQ2 As ReceiveScenarioStep = New ReceiveScenarioStep(New QCPActor(), New QCRActor(), True, NACTIONRQ)
+            receive.AddTransaction(ROQ2transaction)
+
+            'Configure the validate steps
+            Dim validate1 As ValidateScenarioStep = New ValidateScenarioStep(receive, 0, kindOfCheckDialog.Difference)
+            validate1.AddRules(ROQ1transaction.GetCommonTransactionRulesForRequest())
+            Dim validate2 As ValidateScenarioStep = New ValidateScenarioStep(receive, 1)
+            validate2.AddRules(ROQ2transaction.GetCommonTransactionRulesForRequest())
+
+            'Add the steps to the list
+            m_scenarioSteps.Add(receive)
+            'm_scenarioSteps.Add(receive)
+            m_scenarioSteps.Add(validate1)
+            m_scenarioSteps.Add(validate2)
+
+        Catch ex As Exception
+            errorDialog.SetMessage(ex.Message)
+            errorDialog.ShowDialog()
+            Throw ex
+        End Try
+    End Sub
+
+End Class

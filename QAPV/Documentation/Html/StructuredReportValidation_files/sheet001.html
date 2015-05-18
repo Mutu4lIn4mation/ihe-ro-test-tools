@@ -1,0 +1,366 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 12">
+<link id=Main-File rel=Main-File href="../StructuredReportValidation.html">
+<link rel=File-List href=filelist.xml>
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\,";
+	mso-displayed-thousand-separator:"\.";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(0);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../StructuredReportValidation.html");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=blue vlink=purple>
+
+<table border=0 cellpadding=0 cellspacing=0 width=850 style='border-collapse:
+ collapse;table-layout:fixed;width:637pt'>
+ <col width=105 style='mso-width-source:userset;mso-width-alt:3840;width:79pt'>
+ <col width=103 style='mso-width-source:userset;mso-width-alt:3766;width:77pt'>
+ <col width=91 style='mso-width-source:userset;mso-width-alt:3328;width:68pt'>
+ <col width=103 style='mso-width-source:userset;mso-width-alt:3766;width:77pt'>
+ <col width=64 span=7 style='width:48pt'>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl68 colspan=2 width=208 style='height:15.0pt;mso-ignore:
+  colspan;width:156pt'><a href="javascript:history.back(1)" target="_parent"><span
+  style='font-size:11.0pt'>Back to scenario description</span></a></td>
+  <td width=91 style='width:68pt'></td>
+  <td width=103 style='width:77pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl68 style='height:15.0pt'></td>
+  <td colspan=10 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl75 colspan=6 style='height:15.0pt;mso-ignore:colspan'>For
+  the validation of a structured report the following validators will be used.</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl75 style='height:15.0pt'></td>
+  <td colspan=10 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=6 style='height:15.0pt;mso-ignore:colspan'>CodeValueValidator
+  (Checks if the codevalue of the content item is correct)</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=11 style='height:15.0pt;mso-ignore:colspan'>NumberOfOccurrencesValidator
+  (Checks if the number of occurences is correct of the content item,
+  conditions are also checked here)</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=5 style='height:15.0pt;mso-ignore:colspan'>OrderValidator
+  (Checks if order in dataset is thesame as in template)</td>
+  <td colspan=6 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=7 style='height:15.0pt;mso-ignore:colspan'>RelationshipWithParentValidator
+  (Checks if relationship with parent is correct of content item)</td>
+  <td colspan=4 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=9 style='height:15.0pt;mso-ignore:colspan'>TextValidator
+  (Checks if the value of a text content item must be of an specified format
+  that this format is correct)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=9 style='height:15.0pt;mso-ignore:colspan'>UIDRefValidator
+  (Checks if the value of a UIDref content item must be a given value that this
+  value is correct)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=6 style='height:15.0pt;mso-ignore:colspan'>ValueTypeValidator
+  (Checks if the valuetype of the content item is correct)</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td colspan=10 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl71></td>
+  <td class=xl72></td>
+  <td colspan=8 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl70 colspan=8 style='height:15.0pt;mso-ignore:colspan'>Content
+  items template that is validated (the numbers are showing the hierarchy of
+  the template)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl74></td>
+  <td colspan=8 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=5 style='height:15.0pt;mso-ignore:colspan'>CONTAINER:
+  (XYZ000,DCM,&quot;RT Treatment Check Request Result&quot;)<span
+  style='mso-spacerun:yes'> </span></td>
+  <td colspan=6 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=4 style='mso-ignore:colspan'>&gt;CONTAINS: CODE:
+  (XYZ001,DCM,&quot;Critical Issues Found&quot;)<span
+  style='mso-spacerun:yes'> </span></td>
+  <td colspan=6 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;CONTAINS: CODE:
+  (113876,DCM,&quot;Device Role In Procedure&quot;)<span
+  style='mso-spacerun:yes'> </span></td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;&gt;HAS_PROPERTIES: TEXT:
+  (113877,DCM,&quot;Device Name&quot;)<span style='mso-spacerun:yes'> </span></td>
+  <td colspan=4 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;HAS_PROPERTIES: TEXT:
+  (113878,DCM,&quot;Device Manufacturer&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;HAS_PROPERTIES: TEXT:
+  (113879,DCM,&quot;Device Model Name&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;HAS_PROPERTIES: TEXT:
+  (113880,DCM,&quot;Device Serial Number&quot;)<span
+  style='mso-spacerun:yes'> </span></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;HAS_PROPERTIES: UIDREF:
+  (121012,DCM,&quot;Device Observer UID&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=7 style='mso-ignore:colspan'>&gt;CONTAINS: DATETIME:
+  (XYZ011,DCM,&quot;Datetime When The Check Was Completed&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=4 style='mso-ignore:colspan'>&gt;CONTAINS: TEXT:
+  (XYZ002,DCM,&quot;Summary Of Result&quot;)</td>
+  <td colspan=6 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;CONTAINS: UIDREF:
+  (XYZ009,DCM,&quot;Candidate SOP Class UID&quot;)</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;CONTAINS: UIDREF:
+  (XYZ003,DCM,&quot;Candidate SOP Instance UID&quot;)</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;CONTAINS: UIDREF:
+  (XYZ008,DCM,&quot;Assessed SOP Instance UID&quot;)</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=4 style='mso-ignore:colspan'>&gt;CONTAINS: TEXT:
+  (XYZ004,DCM,&quot;Check Results&quot;)</td>
+  <td colspan=6 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;: CONTAINER:
+  (XYZ100,DCM,&quot;RT Check Request Result Detail&quot;)</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;&gt;CONTAINS: CODE:
+  (XYZ101,DCM,&quot;Critical Issues Found&quot;)</td>
+  <td colspan=4 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;CONTAINS: CODE:
+  (XYZ106,DCM,&quot;Informational Issue Found&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;&gt;CONTAINS: TEXT:
+  (XYZ102,DCM,&quot;Assessment Code&quot;)</td>
+  <td colspan=4 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;CONTAINS: CODE:
+  (XYZ103,DCM,&quot;Assessment Reporting Type&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;: CONTAINER:
+  (XYZ104,DCM,&quot;Specific Assessment Sequence&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=3 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;&gt;&gt;CONTAINS: TEXT:
+  (XYZ111,DCM,&quot;Value Units&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl74></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;&gt;CONTAINS: TEXT:
+  (&quot;XYZ112&quot;, &quot;DCM&quot;, &quot;Upper Bound Value&quot;)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl74></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;&gt;CONTAINS: TEXT:
+  (&quot;XYZ113&quot;, &quot;DCM&quot;, &quot;Lower Bound Value&quot;)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=3 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;&gt;CONTAINS: TEXT:
+  (XYZ114,DCM,&quot;Supplied Attribute Name&quot;)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=3 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;&gt;CONTAINS: TEXT:
+  (XYZ115,DCM,&quot;Supplied Attribute Tag&quot;)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl69></td>
+  <td></td>
+  <td colspan=7 style='mso-ignore:colspan'>&gt;&gt;: CONTAINER:
+  (&quot;XYZ105&quot;, &quot;DCM&quot;, &quot;General Assessment
+  Sequence&quot;)</td>
+  <td></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl69></td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;: CONTAINS: TEXT:
+  (&quot;XYZ117&quot;, &quot;DCM&quot;, &quot;Check Description&quot;)</td>
+  <td></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=3 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 style='mso-ignore:colspan'>&gt;&gt;&gt;CONTAINS: TEXT:
+  (XYZ116,DCM,&quot;Supplied Attribute Value&quot;)</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=7 style='mso-ignore:colspan'>&gt;CONTAINS: UIDREF:
+  (121126,DCM,&quot;Performed Procedure Step SOP Instance UID&quot;)</td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=4 style='mso-ignore:colspan'>&gt;CONTAINS: TEXT:
+  (XYZ006,DCM,&quot;Requester AE Title&quot;)</td>
+  <td colspan=6 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td colspan=5 style='mso-ignore:colspan'>&gt;CONTAINS: TEXT:
+  (XYZ007,DCM,&quot;Check Performer Result Key&quot;)</td>
+  <td colspan=5 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=11 style='height:15.0pt;mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl68 colspan=2 style='height:15.0pt;mso-ignore:colspan'><a
+  href="javascript:history.back(1)" target="_parent"><span style='font-size:
+  11.0pt'>Back to scenario description</span></a></td>
+  <td colspan=9 style='mso-ignore:colspan'></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=105 style='width:79pt'></td>
+  <td width=103 style='width:77pt'></td>
+  <td width=91 style='width:68pt'></td>
+  <td width=103 style='width:77pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+  <td width=64 style='width:48pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>

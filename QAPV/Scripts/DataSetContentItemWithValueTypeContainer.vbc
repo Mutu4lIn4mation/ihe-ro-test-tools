@@ -1,0 +1,155 @@
+﻿
+' ------------------------------------------------------
+' DVTk - The Healthcare Validation Toolkit (www.dvtk.org)
+' Copyright © 2010 DVTk
+' ------------------------------------------------------
+' This file is part of DVTk.
+'
+' DVTk is free software; you can redistribute it and/or modify it under the terms of the GNU
+' Lesser General Public License as published by the Free Software Foundation; either version 3.0
+' of the License, or (at your option) any later version. 
+' 
+' DVTk is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+' the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+' General Public License for more details. 
+' 
+' You should have received a copy of the GNU Lesser General Public License along with this
+' library; if not, see <http://www.gnu.org/licenses/>
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports System.Text
+Imports System.Xml
+
+Imports VR = DvtkData.Dimse.VR
+Imports DvtkHighLevelInterface.Dicom.Other
+#End If
+
+''' <summary>
+''' This class represents a Content Item with value type NUM that is present in a Structured
+''' Report Object.
+''' </summary>
+Public Class DataSetContentItemWithValueTypeContainer
+    Inherits DataSetContentItem
+    '
+    ' - Constants -
+    '
+
+    ''' <summary>
+    ''' A description of the context of the containerValueQualifier field of this class.
+    ''' </summary>
+    Private Const containerValueQualifierContext As String = "DICOM - Structured Reporting - Content Item - Container Value Qualifier"
+
+
+
+    '
+    ' - Fields -
+    '
+
+
+    '
+    ' - Constructors -
+    '
+
+    ''' <summary>
+    ''' Hide default constructor.
+    ''' </summary>
+    Private Sub New()
+        ' Do nothing.
+        MyBase.New(Nothing, Nothing, 1)
+        ValueType = ValueTypeEnum.CONTAINER
+    End Sub
+
+    ''' <summary>
+    ''' Constructor.
+    ''' </summary>
+    ''' <param name="sequenceItem">
+    ''' The SequenceItem instance containing the DICOM attributes to construct this instance with.
+    ''' </param>
+    ''' <param name="parentContentItem">The parent Content Item.</param>
+    ''' <param name="position">The ordinal position of the associated Sequence Item in it's contained Content Sequence Item.</param>
+    Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem, position As UInteger)
+        MyBase.New(attributeSet, parentContentItem, position)
+        ValueType = ValueTypeEnum.CONTAINER.ToString
+
+    End Sub
+
+    Public Sub New(attributeSet As AttributeSet, parentContentItem As DataSetContentItem)
+        Me.New(attributeSet, parentContentItem, 0)
+    End Sub
+
+
+
+    '
+    ' - Properties -
+    '
+
+    ''' <summary>
+    ''' Gets the ContentTemplate Value.
+    ''' </summary>
+    Public ReadOnly Property ContentTemplate() As ContentTemplate
+
+        Get
+            If (Not Me.AttributeSet.Exists("0x0040A504")) Then
+                Me.AttributeSet.Set("0x0040A504", DvtkData.Dimse.VR.SQ)
+
+            End If
+
+            Dim sequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Me.AttributeSet.Item("0x0040A504")
+
+            If (sequenceAttribute.ItemCount = 0) Then
+                sequenceAttribute.AddItem(New SequenceItem())
+
+            End If
+
+            Return New ContentTemplate(sequenceAttribute.GetItem(1))
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Gets the Measured Value.
+    ''' </summary>
+    Public Property ContinuityOfContent() As [String]
+
+        Get
+            Return (Convert.FirstAttributeValueToString(Me.AttributeSet, "0x0040A050"))
+        End Get
+
+        Set(value As [String])
+            Me.AttributeSet.Set("0x0040A050", DvtkData.Dimse.VR.CS, value)
+        End Set
+    End Property
+
+
+
+    '
+    ' - Methods -
+    '
+
+    Public Shared Function CreateRootContainer(dataset As DvtkHighLevelInterface.Dicom.Other.DataSet) As DataSetContentItemWithValueTypeContainer
+
+
+
+    End Function
+
+    ''' <summary>
+    ''' Method used by the library to serialize this instance to xml.
+    ''' </summary>
+    ''' <param name="xmlTextWriter">The xml text writer.</param>
+    ''' <param name="serializationContext">The serialization context.</param>
+    Friend Overrides Sub ValueToXml(xmlTextWriter As XmlTextWriter, serializationContext As SerializationContext)
+        xmlTextWriter.WriteStartElement("container")
+
+        Dim continuityOfContent__1 As [String] = ContinuityOfContent
+
+        If continuityOfContent__1 IsNot Nothing Then
+            xmlTextWriter.WriteStartElement("continuityOfContent")
+            xmlTextWriter.WriteStartElement("value")
+            xmlTextWriter.WriteString(continuityOfContent__1)
+            xmlTextWriter.WriteEndElement()
+            xmlTextWriter.WriteEndElement()
+        End If
+
+        xmlTextWriter.WriteEndElement()
+    End Sub
+End Class
+

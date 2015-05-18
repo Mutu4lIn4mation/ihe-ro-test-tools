@@ -1,0 +1,49 @@
+﻿Public Class ConceptNames
+
+    Public Shared ReadOnly CriticalIssuesFoundOptionYes As New CodedConcept("R-0038D", "SRT", "YES")
+    Public Shared ReadOnly CriticalIssuesFoundOptionNo As New CodedConcept("R-00339", "SRT", "NO")
+
+    Public Shared ReadOnly UpperBound As New CodedConcept("113916", "DCM", "Upper Bound")
+    Public Shared ReadOnly LowerBound As New CodedConcept("113917", "DCM", "Lower Bound")
+    Public Shared ReadOnly Range As New CodedConcept("113918", "DCM", "Range")
+    Public Shared ReadOnly AttributeInconsistency As New CodedConcept("113919", "DCM", "Attribute Inconsistency")
+    Public Shared ReadOnly Equality As New CodedConcept("113920", "DCM", "Equality")
+    Public Shared ReadOnly NonSpecific As New CodedConcept("113922", "DCM", "Non Specific")
+
+
+    Public Shared ReadOnly rootContentItem As New CodedConcept("XYZ000", "DCM", "RT Treatment Check Request Result")
+    Public Shared ReadOnly CriticalIssuesFound As New CodedConcept("XYZ001", "DCM", "Critical Issues Found")
+    Public Shared ReadOnly DeviceRoleInProcedure As New CodedConcept("113876", "DCM", "Device Role In Procedure")
+    Public Shared ReadOnly DeviceName As New CodedConcept("113877", "DCM", "Device Name")
+    Public Shared ReadOnly DeviceManufacturer As New CodedConcept("113878", "DCM", "Device Manufacturer")
+    Public Shared ReadOnly DeviceModelName As New CodedConcept("113879", "DCM", "Device Model Name")
+    Public Shared ReadOnly DeviceSerialNumber As New CodedConcept("113880", "DCM", "Device Serial Number")
+    Public Shared ReadOnly DeviceObserverUID As New CodedConcept("121012", "DCM", "Device Observer UID")
+
+    Public Shared ReadOnly DatetimeWhenTheCheckWasCompleted As New CodedConcept("XYZ011", "DCM", "Datetime When The Check Was Completed")
+    Public Shared ReadOnly SummaryOfResult As New CodedConcept("XYZ002", "DCM", "Summary Of Result")
+
+    Public Shared ReadOnly CandidateSOPClassUID As New CodedConcept("XYZ009", "DCM", "Candidate SOP Class UID")
+
+    Public Shared ReadOnly CandidateSOPInstanceUID As New CodedConcept("XYZ003", "DCM", "Candidate SOP Instance UID")
+    Public Shared ReadOnly AssessedSOPInstanceUID As New CodedConcept("XYZ008", "DCM", "Assessed SOP Instance UID")
+    Public Shared ReadOnly CheckResults As New CodedConcept("XYZ004", "DCM", "Check Results")
+    Public Shared ReadOnly RTCheckRequestResultDetail As New CodedConcept("XYZ100", "DCM", "RT Check Request Result Detail")
+    Public Shared ReadOnly CriticalIssuesFoundTID2310 As New CodedConcept("XYZ101", "DCM", "Critical Issues Found")
+    Public Shared ReadOnly InformationalIssueFound As New CodedConcept("XYZ106", "DCM", "Informational Issue Found")
+    Public Shared ReadOnly AssessmentCode As New CodedConcept("XYZ102", "DCM", "Assessment Code")
+    Public Shared ReadOnly AssessmentReportingType As New CodedConcept("XYZ103", "DCM", "Assessment Reporting Type")
+    Public Shared ReadOnly SpecificAssessmentSequence As New CodedConcept("XYZ104", "DCM", "Specific Assessment Sequence")
+    Public Shared ReadOnly ValueUnits As New CodedConcept("XYZ111", "DCM", "Value Units")
+    Public Shared ReadOnly UpperBoundValue As New CodedConcept("XYZ112", "DCM", "Upper Bound Value")
+    Public Shared ReadOnly LowerBoundValue As New CodedConcept("XYZ113", "DCM", "Lower Bound Value")
+    Public Shared ReadOnly SuppliedAttributeName As New CodedConcept("XYZ114", "DCM", "Supplied Attribute Name")
+    Public Shared ReadOnly SuppliedAttributeTag As New CodedConcept("XYZ115", "DCM", "Supplied Attribute Tag")
+    Public Shared ReadOnly SuppliedAttributeValue As New CodedConcept("XYZ116", "DCM", "Supplied Attribute Value")
+    Public Shared ReadOnly GeneralAssessmentSequence As New CodedConcept("XYZ105", "DCM", "General Assessment Sequence")
+    Public Shared ReadOnly CheckDescription As New CodedConcept("XYZ117", "DCM", "Check Description")
+    Public Shared ReadOnly PerformedProcedureStepSOPInstanceUID As New CodedConcept("121126", "DCM", "Performed Procedure Step SOP Instance UID")
+    Public Shared ReadOnly RequesterAETitle As New CodedConcept("XYZ006", "DCM", "Requester AE Title")
+    Public Shared ReadOnly CheckPerformerResultKey As New CodedConcept("XYZ007", "DCM", "Check Performer Result Key")
+
+End Class

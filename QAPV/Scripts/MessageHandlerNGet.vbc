@@ -1,0 +1,52 @@
+Class MessageHandlerNGet
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    Private m_KindOfCheck As String
+    Private m_IssuesFound As String
+
+    Public Sub New(ByVal KindOfCheck As String, ByVal IssuesFound As Boolean)
+        m_KindOfCheck = KindOfCheck
+        m_IssuesFound = IssuesFound
+    End Sub
+
+    'DimseCommand.NCREATE
+    Public Overrides Function HandleNGetRequest(ByVal theDicomMessage As DicomMessage) As Boolean
+
+        Dim requestedSOPClassUID As String = theDicomMessage.CommandSet.Item(Tags.RequestedSOPClassUID).Values(0)
+
+        'save the N-Create-REQ to cache directory
+        DataSetHandler.SaveDatasetToFile(theDicomMessage.DataSet, DataSetHandler.UPSCacheXMLFileName, "N-GET-REQ")
+
+        If requestedSOPClassUID = SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString() Then
+            ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+            Dim index As Integer = 0
+            'there were more messages in 2009 project
+            'one message should be loaded in 2010 project 
+            'and one success message
+            For Each message As DicomMessage In ReferenceDataSet.GetInstance().GetUnifiedProcedureStepPull_NGET_RES(m_KindOfCheck, m_IssuesFound)
+                'handle response messages generally
+                'copy attributes from receive message
+                'CopyInterRelationAttributes(theDicomMessage, message)
+
+                index = index + 1
+                'handle response messages specifically
+                If index <= 1 Then
+
+                    'save the updated response message to cache directory
+                    DataSetHandler.SaveDatasetToFile(message.DataSet, DataSetHandler.UPSCacheXMLFileName, "N-GET-RSP")
+                End If
+
+                ' send the response message
+                Send(message, theDicomMessage.EncodedPresentationContextID)
+            Next
+
+            Return (True)
+
+        Else
+            Throw New Exception(String.Format("Handling N-GET RQ of requested SOP Class UID '{0}' not supported", requestedSOPClassUID))
+        End If
+
+    End Function
+
+End Class
