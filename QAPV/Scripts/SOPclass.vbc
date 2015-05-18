@@ -22,7 +22,11 @@ Class SOPclass
     Public Shared ReadOnly RTBeamsTreatmentRecordSTOREOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.4"
     Public Shared ReadOnly BasicTextSRSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.88.11"
     Public Shared ReadOnly EnhancedSRSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.88.22"
-
+    Public Shared ReadOnly RTIonPlanSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.8"
+    Public Shared ReadOnly RTIonBeamsTreatmentRecordSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.9"
+    Public Shared ReadOnly RTBrachyTreatmentRecordSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.6"
+    Public Shared ReadOnly RTTreatmentSummaryRecordSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.481.7"
+    Public Shared ReadOnly XRayRadiationDoseSRSOPClassUID As String = "1.2.840.10008.5.1.4.1.1.88.67"
 #End Region
 
 #Region "Private Fields"
@@ -52,6 +56,10 @@ Class SOPclass
         m_IODtoSOPMapping.Add(IODType.NAction, UnifiedProcedureStepPushSOPClassUID)
         m_IODtoSOPMapping.Add(IODType.BasicTextSR, BasicTextSRSOPClassUID)
         m_IODtoSOPMapping.Add(IODType.EnhancedSR, EnhancedSRSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTIonPlan, RTIonPlanSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTIonBeamsTreatmentRecord, RTIonBeamsTreatmentRecordSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTBrachyTreatmentRecord, RTBrachyTreatmentRecordSOPClassUID)
+        m_IODtoSOPMapping.Add(IODType.RTTreatmentSummaryRecord, RTTreatmentSummaryRecordSOPClassUID)
     End Sub
 
 #End Region
