@@ -18,6 +18,8 @@ Public Enum IODType
     RTPlanDosimetric
     UnifiedProcedureStepPull
     UnifiedProcedureStepPush
+    UnifiedProcedureStepWatch
+    UnifiedProcedureStepEvent
     StudyRootQueryRetrieveMOVE
     RTImage
     RTBeamsDeliveryInstruction
