@@ -346,7 +346,7 @@ Class TestToolConfiguration
 
         'load new definition files
         thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("Verification.def")
-        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("File Meta.def")
+        thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("FileMeta.def")
 
         'thread.Options.DvtkScriptSession.DefinitionManagement.LoadDefinitionFile("RTTreatmentSummaryRecordStorage.def")
 
