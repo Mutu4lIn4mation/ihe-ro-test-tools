@@ -1444,19 +1444,19 @@ MODULE "Unified Procedure Step Performed Procedure Information Module" U
      >(0x00080104,1,LO,1) "Code Meaning" 
      ) "Human Performer Code Sequence" 
   ) "Actual Human Performers Sequence" 
- >(0x00404028,2,SQ,1,
+ >(0x00404028,1C,SQ,1,
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080103,1C,SH,1) "Coding Scheme Version"
    >(0x00080104,1,LO,1) "Code Meaning" 
   ) "Performed Station Name Code Sequence" 
- >(0x00404029,2,SQ,1,
+ >(0x00404029,1C,SQ,1,
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080103,1C,SH,1) "Coding Scheme Version"
    >(0x00080104,1,LO,1) "Code Meaning" 
   ) "Performed Station Class Code Sequence" 
- >(0x00404030,2,SQ,1,
+ >(0x00404030,1C,SQ,1,
    >(0x00080100,1,SH,1) "Code Value" 
    >(0x00080102,1,SH,1) "Coding Scheme Designator" 
    >(0x00080103,1C,SH,1) "Coding Scheme Version"
@@ -1516,8 +1516,8 @@ MODULE "Unified Procedure Step Performed Procedure Information Module" U
      >(0x00080104,1,LO,1) "Code Meaning"
     ) "Concept Code Sequence"  : VALUE 0x0040A040 = "CODE"
   ) "Performed Processing Parameters Sequence" 
- >(0x00404051,1,DT,1) "Performed Procedure Step End DateTime" 
- >(0x00404033,2,SQ,1,
+ >(0x00404051,3,DT,1) "Performed Procedure Step End DateTime" 
+ >(0x00404033,1C,SQ,1,
    >(0x0040E020,1,CS,1) "Type of Instances" 
    >(0x0020000D,1,UI,1) "Study Instance UID" 
    >(0x0020000E,1,UI,1) "Series Instance UID" 
