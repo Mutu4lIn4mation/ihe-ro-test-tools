@@ -1,0 +1,126 @@
+Public Class EditQueryForm
+    Public m_requestDataset As DvtkHighLevelInterface.Dicom.Other.DataSet
+    Public m_resumeTreatment As Boolean = False
+
+    Private Sub EditQueryForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+        'm_DateTimePickerStart.Value = DateTime.Now
+        'm_DateTimePickerStart.Value.AddHours(-m_DateTimePickerStart.Value.Hour)
+        'm_DateTimePickerStart.Value.AddSeconds(-m_DateTimePickerStart.Value.Second)
+        'm_DateTimePickerStart.Value.AddMilliseconds(-m_DateTimePickerStart.Value.Millisecond)
+
+        m_DateTimePickerStop.Value = m_DateTimePickerStop.Value.AddHours(23)
+        m_DateTimePickerStop.Value = m_DateTimePickerStop.Value.AddMinutes(59)
+        m_DateTimePickerStop.Value = m_DateTimePickerStop.Value.AddSeconds(59)
+        ' m_DateTimePickerStop.Value = m_DateTimePickerStop.Value.AddMilliseconds(9999)
+
+        If m_requestDataset.Exists(Tags.PatientName) Then
+            m_PatientsNameText.Text = m_requestDataset(Tags.PatientName).Values(0)
+        End If
+
+        If m_requestDataset.Exists(Tags.PatientID) Then
+            m_PatientIDText.Text = m_requestDataset(Tags.PatientID).Values(0)
+        End If
+
+        ' load also the data already in the RQ
+        If m_requestDataset.GetitemCount(Tags.ScheduledStationNameCodeSequence) > 0 Then
+            If m_requestDataset.Exists(Tags.ScheduledStationCodeValue) Then
+                m_CodeValueText.Text = m_requestDataset(Tags.ScheduledStationCodeValue).Values(0)
+            End If
+            If m_requestDataset.Exists(Tags.ScheduledStationCodingSchemeDesignator) Then
+                m_CodeSchemeText.Text = m_requestDataset(Tags.ScheduledStationCodingSchemeDesignator).Values(0)
+            End If
+            'CodeMeaning not used
+            'If m_requestDataset.Exists(Tags.ScheduledStationCodeMeaning) Then
+            '    m_CodeMeaningText.Text = m_requestDataset(Tags.ScheduledStationCodeMeaning).Values(0)
+            'End If
+        End If
+        'CodeMeaning not used
+        Label10.Visible = False
+        m_CodeMeaningText.Visible = False
+    End Sub
+
+    Private Sub m_SendButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles m_SendButton.Click
+
+        'Codevalue mandatory; CodeScheme optional; CodeMeaning not used
+        'If (Not (m_CodeValueText.Text = "" And m_CodeMeaningText.Text = "" And m_CodeSchemeText.Text = "")) And (Not ((m_CodeValueText.Text <> "" And m_CodeMeaningText.Text <> "" And m_CodeSchemeText.Text <> ""))) Then
+        If m_CodeValueText.Text = "" And m_CodeSchemeText.Text = "" Then
+            changeRequestDataset()
+            Me.DialogResult = Windows.Forms.DialogResult.OK
+            Me.Close()
+        ElseIf Not m_CodeValueText.Text = "" And Not m_CodeSchemeText.Text = "" Then
+            changeRequestDataset()
+            Me.DialogResult = Windows.Forms.DialogResult.OK
+            Me.Close()
+
+        Else
+            labelCodeValue.Visible = True
+        End If
+        'create get message and send 
+    End Sub
+
+    
+    Private Sub m_DateTimePickerStart_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles m_DateTimePickerStart.ValueChanged
+        checkRange()
+    End Sub
+
+    Private Sub m_DateTimePickerStop_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles m_DateTimePickerStop.ValueChanged
+        checkRange()
+    End Sub
+
+    Private Sub checkRange()
+        If m_DateTimePickerStop.Value < m_DateTimePickerStart.Value Then
+            warningLabel.Visible = True
+            m_SendButton.Enabled = False
+        Else
+            warningLabel.Visible = False
+            m_SendButton.Enabled = True
+        End If
+    End Sub
+
+    Private Sub m_DateTimePickerStop_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles m_DateTimePickerStop.Validating
+
+    End Sub
+
+    Private Sub InfoCheckBox_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InfoCheckBox.CheckedChanged
+        If InfoCheckBox.Checked Then
+            Me.Height = 625
+        Else
+            Me.Height = 450
+        End If
+    End Sub
+
+    Public Sub addMessage(ByVal dataset As DvtkHighLevelInterface.Dicom.Other.DataSet)
+        m_requestDataset = dataset
+    End Sub
+
+    Private Sub changeRequestDataset()
+        Dim range As String = m_DateTimePickerStart.Value.ToString("yyyyMMddHHmmss") + ".0000-" + m_DateTimePickerStop.Value.ToString("yyyyMMddHHmmss") + ".9999"
+        'change the tags, also if the value used is empty
+        m_requestDataset.Set(Tags.ScheduledProcedureStepStartDateandTime, DT, range)
+
+        'CodeMeanig not used
+        'If Not m_CodeValueText.Text = "" And Not m_CodeSchemeText.Text = "" And Not m_CodeMeaningText.Text = "" Then
+        'If m_CodeValueText.Text = "" And m_CodeSchemeText.Text = "" Then
+        '    If m_requestDataset.GetitemCount(Tags.ScheduledStationNameCodeSequence) > 0 Then
+        '        m_requestDataset(Tags.ScheduledStationNameCodeSequence).ClearItems()
+        '    End If
+        'Else
+        'm_requestDataset.Set(Tags.ScheduledStationCodeMeaning, LO, m_CodeMeaningText.Text)
+        m_requestDataset.Set(Tags.ScheduledStationCodeValue, SH, m_CodeValueText.Text)
+        m_requestDataset.Set(Tags.ScheduledStationCodingSchemeDesignator, SH, m_CodeSchemeText.Text)
+        'End If
+        m_requestDataset.Set(Tags.PatientName, PN, m_PatientsNameText.Text)
+        m_requestDataset.Set(Tags.PatientID, LO, m_PatientIDText.Text)
+
+        If m_resumeTreatment Then
+            'set "CONTINUATION
+            m_requestDataset.Set(Tags.ScheduledProcessingParametersTextValue, UT, DataSetHandler.DicomTextValueContinuation)
+        Else
+            'set "TREATMENT"
+            m_requestDataset.Set(Tags.ScheduledProcessingParametersTextValue, UT, DataSetHandler.DicomTextValueTreatment)
+        End If
+        'and save the request to the datadirectory (overwrite C-FIND-REQ)
+    End Sub
+
+End Class

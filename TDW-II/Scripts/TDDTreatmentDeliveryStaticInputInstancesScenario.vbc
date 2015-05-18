@@ -1,0 +1,57 @@
+Class TDDTreatmentDeliveryStaticInputInstancesScenario
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim ostActor As OSTActor = New OSTActor
+        Dim tddActor As TDDActor = New TDDActor()
+
+        Dim treatmentForm As ChooseKindOfTreatmentDialog = New ChooseKindOfTreatmentDialog()
+        Dim treatmentType As String = String.Empty
+        Dim errorDialog As ErrorDialog = New ErrorDialog()
+        Dim isResumeTreatmentDialog As ResumeTreatmentDialog = New ResumeTreatmentDialog()
+        Dim queryForm As EditQueryForm = New EditQueryForm()
+
+        Try
+            ' Check if dataset is present
+            DataSetHandler.CheckUpsDataSets()
+
+            'Check if the C-Find response that is created by the “TDD Retrieval of worklist – testscenario” is present, if not then stop execution and inform the user (in the validation results)
+            Try
+                DataSetHandler.CheckUPSMessageExists(DataSetHandler.UPSCacheXMLFileName, "C-FIND-RSP")
+            Catch ex As Exception
+                Dim errorMessage As String = "First run the TDD Retrieval of Worklist testscenario, at least once."
+                errorDialog.SetMessage(errorMessage)
+                errorDialog.ShowDialog()
+                Throw ex
+            End Try
+
+            'remove cached datasets (if any)
+            Try
+                DataSetHandler.DeleteDatasetFile(DataSetHandler.UPSCacheXMLFileName, "RtBeamDeliv")
+            Catch ex As Exception
+                'do nothing - if not present everything is fine
+            End Try
+
+            'Configure the receive step: set the cstore thread as part of the C-Move command
+            Dim receive As ReceiveScenarioStep = New ReceiveScenarioStep(New OSTActor(), New TDDActor(), True)
+            Dim ro59transaction As RO59Transaction = New RO59Transaction(ostActor, tddActor)
+            receive.AddTransaction(ro59transaction)
+
+            'Configure the validate step
+            Dim validate As ValidateScenarioStep = New ValidateScenarioStep(receive)
+            validate.AddRules(ro59transaction.GetCommonTransactionRulesForRequest())
+            validate.AddRules(ro59transaction.GetTransactionRulesForRequest())
+
+            'Add the steps to the list
+            m_scenarioSteps.Add(receive)
+            m_scenarioSteps.Add(validate)
+
+        Catch ex As Exception
+            errorDialog.SetMessage(ex.Message)
+            errorDialog.ShowDialog()
+            Throw ex
+        End Try
+
+    End Sub
+End Class

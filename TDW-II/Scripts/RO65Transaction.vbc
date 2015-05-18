@@ -1,0 +1,142 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class RO65Transaction
+    Inherits Transaction
+
+    Private ro65IODType As IODType = Nothing
+    Private m_isCancelled As Boolean = False
+
+    'Constructor
+    Public Sub New(ByVal isCancelled As Boolean)
+
+        MyBase.New("RO-65", "Treatment Delivery Completed/Canceled", IODType.NAction, True)
+        m_isCancelled = isCancelled
+        ro65IODType = IODType.NAction
+
+    End Sub
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+
+        ' Set the refDataSet to correct XML use
+        Dim refDataSet As ReferenceDataSet = ReferenceDataSet.GetInstance
+        refDataSet.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim message As DicomMessage = refDataSet.GetUnifiedProcedureStepPush_NACTION_REQ_RO65()
+
+        ' Set the Requested SOPClassUID 
+        message.Set(Tags.RequestedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+        ' Set the Requested SOP Instance UID
+        message.Set(Tags.RequestedSOPInstanceUID, UI, DataSetHandler.GetAttributeValueFromDataSet(DataSetHandler.UPSCacheXMLFileName, createCFindRespString(), Tags.SOPInstanceUID))
+
+        ' ActionType ID
+        message.Set(Tags.ActionTypeID, US, "1")
+
+        ' Set the actionType to empty
+        message.Set(Tags.TransactionUID, UI, DataSetHandler.GetAttributeValueFromDataSet(DataSetHandler.UPSCacheXMLFileName, createNActionReqString(), Tags.TransactionUID))
+
+        If m_isCancelled = True Then
+            'Set Unified Procedure Step State to "Canceled"
+            message.DataSet.Set(Tags.ProcedureStepState, CS, "CANCELED")
+        Else
+            'Set Unified Procedure Step State to "COMPLETED"
+            message.DataSet.Set(Tags.ProcedureStepState, CS, "COMPLETED")
+        End If
+
+        datasetMessages.Add(message)
+
+        Return datasetMessages
+
+    End Function
+
+    ' This function returns all common rules that apply on a request of this transaction
+    Public Function GetCommonTransactionRulesForRequest() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        '(0x00000003)  Requested SOP Class UID
+        m_rules.Add(New IsRequiredRule(Tags.RequestedSOPClassUID, ro65IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.RequestedSOPClassUID, SOPclass.UnifiedProcedureStepPushSOPClassUID, ro65IODType, ErrorSeverity.RuleError))
+
+        '(0x00001001)  Requested SOP Instance UID
+        m_rules.Add(New IsRequiredRule(Tags.RequestedSOPInstanceUID, ro65IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New InterOperabilityRule(Tags.SOPInstanceUID, Tags.RequestedSOPInstanceUID, DataSetHandler.UPSCacheXMLFileName, createCFindRespString(), ro65IODType, ErrorSeverity.RuleError))
+
+        '(0x00081195)  Transaction UID
+        m_rules.Add(New IsRequiredRule(Tags.TransactionUID, ro65IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New InterOperabilityRule(Tags.TransactionUID, Tags.TransactionUID, DataSetHandler.UPSCacheXMLFileName, createNActionReqString(), ro65IODType, ErrorSeverity.RuleError))
+
+        '(0x00741000)  Procedure Step State
+        m_rules.Add(New IsRequiredRule(Tags.ProcedureStepState, ro65IODType, ErrorSeverity.RuleError))
+
+        If m_isCancelled = True Then
+            m_rules.Add(New ValueRule(Tags.ProcedureStepState, "CANCELED", ro65IODType, ErrorSeverity.RuleError))
+        Else
+            m_rules.Add(New ValueRule(Tags.ProcedureStepState, "COMPLETED", ro65IODType, ErrorSeverity.RuleError))
+        End If
+
+        '(0x00001008)  ActionTypeID
+        m_rules.Add(New IsRequiredRule(Tags.ActionTypeID, ro65IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New ValueRule(Tags.ActionTypeID, "1", ro65IODType, ErrorSeverity.RuleError))
+
+
+        Return m_rules
+
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        ' Some rules need the dicomMessage send in the request
+        Dim msg As DicomMessage = DirectCast(TransactionDataMessages(0), DicomMessage)
+
+        ' (0x00000002) Affected SOP Class UID
+        m_rules.Add(New InterRelationRule(msg, Tags.RequestedSOPClassUID, Tags.AffectedSOPClassUID, ro65IODType, ErrorSeverity.RuleError))
+
+        ' (0x00001000) Affected SOP Instance UID
+        m_rules.Add(New IsRequiredRule(Tags.AffectedSOPInstanceUID, ro65IODType, ErrorSeverity.RuleError))
+        m_rules.Add(New InterRelationRule(msg, Tags.RequestedSOPInstanceUID, Tags.AffectedSOPInstanceUID, ro65IODType, ErrorSeverity.RuleError))
+
+        '(0x00000900)  Status
+        m_rules.Add(New ValueRule(Tags.StatusCommandElement, "0", ro65IODType, ErrorSeverity.RuleError))
+
+        '(0x00741000)  Unified Procedure Step State
+        m_rules.Add(New IsRequiredRule(Tags.ProcedureStepState, ro65IODType, ErrorSeverity.RuleError))
+        If m_isCancelled = True Then
+            m_rules.Add(New ValueRule(Tags.ProcedureStepState, "CANCELED", ro65IODType, ErrorSeverity.RuleError))
+        Else
+            m_rules.Add(New ValueRule(Tags.ProcedureStepState, "COMPLETED", ro65IODType, ErrorSeverity.RuleError))
+        End If
+
+        ' (0x00741002)  UPS Progress Information Sequence
+        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationSequence, ro65IODType, ErrorSeverity.RuleError))
+
+        ' > (0x00741004)  Unified Procedure Step Progress
+        m_rules.Add(New IsRequiredRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, ro65IODType, ErrorSeverity.RuleError))
+
+        If m_isCancelled = True Then
+            m_rules.Add(New ValueInRangeRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, 0, 99, ro65IODType, ErrorSeverity.RuleError))
+        Else
+            m_rules.Add(New ValueRule(Tags.UPSProgressInformationUnifiedProcedureStepProgress, "100", ro65IODType, ErrorSeverity.RuleError))
+        End If
+        Return m_rules
+
+    End Function
+
+    ' Returns the C-FIND-RESP string depending on the procedure step. This String can be used to select the right dataset
+    Private Function createCFindRespString() As String
+        Dim retVal As String = "C-FIND-RSP"
+        Return retVal
+    End Function
+
+    ' Returns the N-ACTION-REQ string depending on the procedure step. This String can be used to select the right dataset
+    Private Function createNActionReqString() As String
+        Dim retVal As String = "N-ACTION-REQ-RO60"
+        Return retVal
+    End Function
+
+End Class

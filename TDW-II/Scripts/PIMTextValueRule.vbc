@@ -1,0 +1,88 @@
+Class PIMTextValueRule
+    Inherits AttributeRule
+
+    ''' <summary>
+    ''' The value of the attribute should be present in the dataset
+    ''' </summary>
+    ''' <param name="valueTag">the attribute to be checked</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+
+    Public Sub New(ByVal valueTag As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("PIM Text Value Rule", valueTag, iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+
+        Dim errorEncountered As Boolean = False
+        Dim sourceValues(0) As String
+        Dim datasetPath As String = DataSetHandler.GetDataPath(DataSetHandler.UPSDataXMLFileName)
+
+        Dim refMessage As DicomMessage = ReferenceDataSet.GetInstance.GetDCMObjectFromFileBySopClassUID(SOPclass.RTPlanDosimetricSOPClassUID, DataDirSelector.UPSDataDir)
+
+
+        If iodType = IODTypeRule Then
+            Dim message As String
+            Dim RefBeamNumber As String
+            Dim counter As Integer = 0
+            Dim nrOfItems As Integer = 0
+
+            If refMessage.Exists(Tags.BeamSequence) Then
+                nrOfItems = refMessage.Item(Tags.BeamSequence).ItemCount
+            End If
+
+            If Not nrOfItems = 0 Then
+
+                For serieItem As Integer = 1 To nrOfItems
+                    Dim sqLisItem As Dicom.Other.SequenceItem = refMessage.Item(Tags.BeamSequence).GetItem(serieItem)
+
+                    If sqLisItem.Exists(Tags.BeamNumber2) Then
+                        RefBeamNumber = sqLisItem.GetValues(Tags.BeamNumber2).Item(0)
+                        Array.Resize(sourceValues, counter + 1)
+                        sourceValues(counter) = RefBeamNumber
+                        counter = counter + 1
+                    Else
+                        message = "The attribute: Beam Number (0x300A00C0)is not present."
+                        Me.SetError(message)
+                        errorEncountered = True
+                        Me.Report()
+                    End If
+                Next
+            Else
+                message = "The attribute: '" + Tags.GetTagName(Tags.BeamSequence) + " is not present."
+                Me.SetError(message)
+                errorEncountered = True
+                Me.Report()
+            End If
+        End If
+
+        If Not errorEncountered Then
+            Dim WordIndex As Integer = -1
+            If WordIndex = -1 Then
+                WordIndex = Array.IndexOf(sourceValues, dicomMessage(m_TagSequence).Values.Item(0))
+            End If
+            If WordIndex = -1 Then
+                Dim errorString As String = "The Value: " + dicomMessage(m_TagSequence).Values.Item(0).ToString() + " of attribute: " + Tags.GetTagName(m_TagSequence) + ". is not one of the expected value(s): "
+                For Each s As String In sourceValues
+                    errorString = errorString + s + " "
+                Next
+                Me.SetError(errorString)
+
+                errorEncountered = True
+                Me.Report()
+            Else
+                Dim errorString As String = "The Value: " + dicomMessage(m_TagSequence).Values.Item(0).ToString() + " of attribute: " + Tags.GetTagName(m_TagSequence) + " has one of the expected value(s): "
+                For Each s As String In sourceValues
+                    errorString = errorString + s + " "
+                Next
+                Me.SetValid(errorString)
+                Me.Report()
+            End If
+            WordIndex = -1
+        End If
+    End Sub
+
+End Class

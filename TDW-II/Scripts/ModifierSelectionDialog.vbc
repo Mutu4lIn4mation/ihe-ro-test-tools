@@ -1,0 +1,243 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Windows.Forms
+Imports System.Collections.Generic
+#End If
+
+Public Class ModifierSelectionDialog
+
+#Region "Private Fields"
+
+    Private m_mapping As New Dictionary(Of Modifier, CheckBox)
+    Private m_BeamModifierRetriever As BeamModifierRetriever = New BeamModifierRetriever()
+    Private m_OptionalModifiers As List(Of Modifier)
+
+#End Region
+
+#Region "Private Classes"
+
+    Private Class BeamModifierRetriever
+
+        Public Function GetOptionalModifiers(ByVal scenario As ARTO_Scenario) As IEnumerable(Of Modifier)
+
+            Dim mods As List(Of Modifier) = New List(Of Modifier)
+
+            Select Case scenario
+                Case ARTO_Scenario.BasicStaticBeam, ARTO_Scenario.MotorizedWedgeBeam, ARTO_Scenario.HardWedgeBeam, ARTO_Scenario.VirtualWedgeBeam
+
+                    mods.Add(Modifier.BolusBeamModifier)
+                    mods.Add(Modifier.BlockBeamModifier)
+                    mods.Add(Modifier.CompensatorBeamModifier)
+
+                Case ARTO_Scenario.ArcBeam, ARTO_Scenario.ConformalArcBeam
+
+                    mods.Add(Modifier.BolusBeamModifier)
+
+                Case ARTO_Scenario.StaticElectronBeam
+
+                    mods.Add(Modifier.BolusBeamModifier)
+                    mods.Add(Modifier.BlockBeamModifier)
+
+                Case ARTO_Scenario.StereotacticBeam, ARTO_Scenario.IMATVMATBeam
+
+                    mods.Add(Modifier.BolusBeamModifier)
+
+                Case ARTO_Scenario.StepAndShootBeam, ARTO_Scenario.SlidingWindowBeam
+                    mods.Add(Modifier.BolusBeamModifier)
+                    mods.Add(Modifier.BlockBeamModifier)
+                    mods.Add(Modifier.HardWedgeBeamModifier)
+
+                Case ARTO_Scenario.StereotacticArcBeam
+                    mods.Add(Modifier.BolusBeamModifier)
+
+                Case ARTO_Scenario.BasicStaticMLCBeam
+                    mods.Add(Modifier.BolusBeamModifier)
+                    mods.Add(Modifier.CompensatorBeamModifier)
+
+                Case ARTO_Scenario.MLCArcBeam
+                    mods.Add(Modifier.BolusBeamModifier)
+
+                Case Else
+                    Throw New Exception(String.Format("Cannot determine optional beam modifiers for unknown scenario '{0}'.", scenario))
+            End Select
+
+            Return mods
+
+        End Function
+
+        Public Function GetRequiredModifiers(ByVal scenario As ARTO_Scenario) As IEnumerable(Of Modifier)
+
+            Dim mods As List(Of Modifier) = New List(Of Modifier)
+
+            Select Case scenario
+                Case ARTO_Scenario.BasicStaticBeam
+                Case ARTO_Scenario.MotorizedWedgeBeam
+                Case ARTO_Scenario.HardWedgeBeam
+
+                    mods.Add(Modifier.HardWedgeBeamModifier)
+
+                Case ARTO_Scenario.VirtualWedgeBeam
+                Case ARTO_Scenario.StepAndShootBeam
+                Case ARTO_Scenario.ArcBeam
+                Case ARTO_Scenario.ConformalArcBeam
+                Case ARTO_Scenario.SlidingWindowBeam
+                Case ARTO_Scenario.StaticElectronBeam
+                Case ARTO_Scenario.StereotacticBeam
+                Case ARTO_Scenario.StereotacticArcBeam
+                Case ARTO_Scenario.BasicStaticMLCBeam
+                Case ARTO_Scenario.MLCArcBeam
+
+                    'todo: add Stereo Collimator Beam Modifier?
+
+                Case ARTO_Scenario.IMATVMATBeam
+                Case Else
+                    Throw New Exception(String.Format("Cannot determine optional beam modifiers for unknown scenario '{0}'.", scenario))
+            End Select
+
+            Return mods
+
+        End Function
+
+        Public Function GetMustLeaveOutModifiers(ByVal scenario As ARTO_Scenario) As IEnumerable(Of Modifier)
+
+            Dim optionalModifiers As List(Of Modifier) = New List(Of Modifier)(GetOptionalModifiers(scenario))
+            Dim requiredModifiers As List(Of Modifier) = New List(Of Modifier)(GetRequiredModifiers(scenario))
+
+            Dim allModifiers As Modifier() = _
+                            {Modifier.BlockBeamModifier, Modifier.BolusBeamModifier, Modifier.CompensatorBeamModifier, Modifier.HardWedgeBeamModifier}
+
+            Dim result As List(Of Modifier) = New List(Of Modifier)
+            For Each modifier As Modifier In allModifiers
+
+                If Not (optionalModifiers.Contains(modifier)) And Not (requiredModifiers.Contains(modifier)) Then
+                    result.Add(modifier)
+                End If
+
+            Next
+
+            Return result
+
+        End Function
+
+    End Class
+
+#End Region
+
+#Region "Ctor"
+
+    Public Sub New(ByVal scenario As ARTO_Scenario)
+
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        Me.Text = String.Format("{0} Scenario: select additional modifiers", scenario)
+
+        InitMapping()
+
+        m_OptionalModifiers = New List(Of Modifier)(m_BeamModifierRetriever.GetOptionalModifiers(scenario))
+        InitOptionalModifiers(m_OptionalModifiers)
+
+        InitRequiredModifiers(m_BeamModifierRetriever.GetRequiredModifiers(scenario))
+        InitMustLeaveOutModifiers(m_BeamModifierRetriever.GetMustLeaveOutModifiers(scenario))
+
+
+    End Sub
+
+#End Region
+
+#Region "Private Methods"
+
+    Private Sub InitMapping()
+
+        m_mapping.Add(Modifier.BlockBeamModifier, Me.checkBoxBlockBeamModifier)
+        m_mapping.Add(Modifier.BolusBeamModifier, Me.checkBoxBolusBeamModifier)
+        m_mapping.Add(Modifier.CompensatorBeamModifier, Me.checkBoxCompensatorBeamModifier)
+        m_mapping.Add(Modifier.HardWedgeBeamModifier, Me.checkBoxHardWedgeBeamModifier)
+
+    End Sub
+
+    Private Sub InitOptionalModifiers(ByVal modifiers As IEnumerable(Of Modifier))
+
+        For Each modifier As Modifier In modifiers
+
+            CheckMappingContainsModifier(modifier)
+
+            m_mapping(modifier).Enabled = True
+            m_mapping(modifier).CheckState = CheckState.Checked
+
+        Next
+
+    End Sub
+
+    Private Sub InitRequiredModifiers(ByVal modifiers As IEnumerable(Of Modifier))
+
+        For Each modifier As Modifier In modifiers
+
+            CheckMappingContainsModifier(modifier)
+
+            m_mapping(modifier).Enabled = False
+            m_mapping(modifier).CheckState = CheckState.Checked
+            m_mapping(modifier).Text = m_mapping(modifier).Text + " (Required)"
+
+        Next
+
+    End Sub
+
+    Private Sub InitMustLeaveOutModifiers(ByVal modifiers As IEnumerable(Of Modifier))
+
+        For Each modifier As Modifier In modifiers
+
+            CheckMappingContainsModifier(modifier)
+
+            m_mapping(modifier).Enabled = False
+            m_mapping(modifier).CheckState = CheckState.Unchecked
+            m_mapping(modifier).Text = m_mapping(modifier).Text + " (Not allowed)"
+
+        Next
+
+    End Sub
+
+    Private Sub CheckMappingContainsModifier(ByVal modifier As Modifier)
+
+        If Not (m_mapping.ContainsKey(modifier)) Then
+            Throw New Exception(String.Format("Mapping doesn't contain modifier '{0}'.", modifier))
+        End If
+
+    End Sub
+
+    Private Sub buttonOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonOK.Click
+
+        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.Close()
+
+    End Sub
+
+#End Region
+
+#Region "Public Methods"
+
+    Public Function GetDeselectedOptionalModifiers() As List(Of Modifier)
+
+        Dim mods As List(Of Modifier) = New List(Of Modifier)
+
+        For Each pair As KeyValuePair(Of Modifier, CheckBox) In m_mapping
+
+            If Not pair.Value.Checked And m_OptionalModifiers.Contains(pair.Key) Then
+                mods.Add(pair.Key)
+            End If
+
+        Next
+
+        Return mods
+
+    End Function
+
+    Public ReadOnly Property OptionalModifiers() As List(Of Modifier)
+        Get
+            Return m_OptionalModifiers
+        End Get
+    End Property
+
+#End Region
+
+End Class

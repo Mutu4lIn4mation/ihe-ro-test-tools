@@ -1,0 +1,1289 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 12">
+<link id=Main-File rel=Main-File
+href="../2013_04a_TDDScenario_DeliverSuccess_vbs.html">
+<link rel=File-List href=filelist.xml>
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+x\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]-->
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\,";
+	mso-displayed-thousand-separator:"\.";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(1);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../2013_04a_TDDScenario_DeliverSuccess_vbs.html");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]><![if !supportAnnotations]><style id="dynCom" type="text/css"><!-- --></style>
+
+<script language="JavaScript"><!--
+
+function msoCommentShow(com_id,anchor_id) {
+	if(msoBrowserCheck()) {
+	   c = document.all(com_id);
+	   a = document.all(anchor_id);
+	   if (null != c) {
+		var cw = c.offsetWidth;
+		var ch = c.offsetHeight;
+		var aw = a.offsetWidth;
+		var ah = a.offsetHeight;
+		var x = a.offsetLeft;
+		var y = a.offsetTop;
+		var el = a;
+		while (el.tagName != "BODY") {
+		   el = el.offsetParent;
+		   x = x + el.offsetLeft;
+		   y = y + el.offsetTop;
+		   }		
+		var bw = document.body.clientWidth;
+		var bh = document.body.clientHeight;
+		var bsl = document.body.scrollLeft;
+		var bst = document.body.scrollTop;
+		if (x + cw + ah/2 > bw + bsl && x + aw - ah/2 - cw >= bsl ) {
+		   c.style.left = x + aw - ah / 2 - cw; 
+		}
+		else {
+		   c.style.left = x + ah/2; 
+		}
+		if (y + ch + ah/2 > bh + bst && y + ah/2 - ch >= bst ) {
+	 	   c.style.top = y + ah/2 - ch;
+		} 
+		else {
+		   c.style.top = y + ah/2;
+		}
+		c.style.visibility = "visible";
+	   }
+	}
+}
+
+function msoCommentHide(com_id) {
+	if(msoBrowserCheck()) {
+	  c = document.all(com_id)
+	  if (null != c) {
+	    c.style.visibility = "hidden";
+	    c.style.left = "-10000";
+	    c.style.top = "-10000";
+	  }
+	}
+}
+
+function msoBrowserCheck() {
+ ms=navigator.appVersion.indexOf("MSIE");
+ vers = navigator.appVersion.substring(ms+5, ms+6);
+ ie4 = (ms>0) && (parseInt(vers) >=4);
+ return ie4
+}
+
+if (msoBrowserCheck()) {
+document.styleSheets.dynCom.addRule(".msocomspan1","position:absolute");
+document.styleSheets.dynCom.addRule(".msocomspan2","position:absolute");
+document.styleSheets.dynCom.addRule(".msocomspan2","left:-1.5ex");
+document.styleSheets.dynCom.addRule(".msocomspan2","width:2ex");
+document.styleSheets.dynCom.addRule(".msocomspan2","height:0.5em");
+document.styleSheets.dynCom.addRule(".msocomanch","font-size:0.5em");
+document.styleSheets.dynCom.addRule(".msocomanch","color:red");
+document.styleSheets.dynCom.addRule(".msocomhide","display: none");
+document.styleSheets.dynCom.addRule(".msocomtxt","visibility: hidden");
+document.styleSheets.dynCom.addRule(".msocomtxt","position: absolute");        
+document.styleSheets.dynCom.addRule(".msocomtxt","top:-10000");         
+document.styleSheets.dynCom.addRule(".msocomtxt","left:-10000");         
+document.styleSheets.dynCom.addRule(".msocomtxt","width: 33%");                 
+document.styleSheets.dynCom.addRule(".msocomtxt","background: infobackground");
+document.styleSheets.dynCom.addRule(".msocomtxt","color: infotext");
+document.styleSheets.dynCom.addRule(".msocomtxt","border-top: 1pt solid threedlightshadow");
+document.styleSheets.dynCom.addRule(".msocomtxt","border-right: 2pt solid threedshadow");
+document.styleSheets.dynCom.addRule(".msocomtxt","border-bottom: 2pt solid threedshadow");
+document.styleSheets.dynCom.addRule(".msocomtxt","border-left: 1pt solid threedlightshadow");
+document.styleSheets.dynCom.addRule(".msocomtxt","padding: 3pt 3pt 3pt 3pt");
+document.styleSheets.dynCom.addRule(".msocomtxt","z-index: 100");
+}
+
+// -->
+</script>
+<![endif]>
+</head>
+
+<body link=blue vlink=purple class=xl72>
+
+<table border=0 cellpadding=0 cellspacing=0 width=1698 style='border-collapse:
+ collapse;table-layout:fixed;width:1275pt'>
+ <col class=xl72 width=310 style='mso-width-source:userset;mso-width-alt:11337;
+ width:233pt'>
+ <col class=xl72 width=167 style='mso-width-source:userset;mso-width-alt:6107;
+ width:125pt'>
+ <col class=xl72 width=165 style='mso-width-source:userset;mso-width-alt:6034;
+ width:124pt'>
+ <col class=xl72 width=251 style='mso-width-source:userset;mso-width-alt:9179;
+ width:188pt'>
+ <col class=xl72 width=243 style='mso-width-source:userset;mso-width-alt:8886;
+ width:182pt'>
+ <col class=xl72 width=184 style='mso-width-source:userset;mso-width-alt:6729;
+ width:138pt'>
+ <col class=xl72 width=62 style='width:47pt'>
+ <col class=xl72 width=124 style='mso-width-source:userset;mso-width-alt:4534;
+ width:93pt'>
+ <col class=xl72 width=68 style='mso-width-source:userset;mso-width-alt:2486;
+ width:51pt'>
+ <col class=xl75 width=62 span=2 style='mso-width-source:userset;mso-width-alt:
+ 2267;width:47pt'>
+ <col class=xl72 width=124 style='mso-width-source:userset;mso-width-alt:4534;
+ width:93pt'>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 width=310 style='height:15.0pt;width:233pt'><a
+  name="RANGE!A1" href="../2013RuleOverview.html" target="_parent">Rule
+  Overview</a></td>
+  <td class=xl73 width=167 style='width:125pt'></td>
+  <td class=xl74 width=165 style='width:124pt'></td>
+  <td class=xl72 width=251 style='width:188pt'></td>
+  <td class=xl72 width=243 style='width:182pt'></td>
+  <td class=xl72 width=184 style='width:138pt'></td>
+  <td class=xl72 width=62 style='width:47pt'></td>
+  <td class=xl72 width=124 style='width:93pt'></td>
+  <td class=xl72 width=68 style='width:51pt'></td>
+  <td class=xl75 width=62 style='width:47pt'></td>
+  <td class=xl75 width=62 style='width:47pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'>TDD Deliver succes</td>
+  <td class=xl73></td>
+  <td class=xl74></td>
+  <td colspan=6 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl72 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl74></td>
+  <td colspan=6 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'>Treatment Delivery Progress
+  Update [RO-62]</td>
+  <td colspan=8 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 colspan=9 class=xl72 style='height:15.75pt;mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl77 style='height:15.0pt'>UPS N-SET Attribute
+  Requirements for UPS Prog<span style='display:none'>ress Update Transaction</span></td>
+  <td class=xl78 style='border-left:none'>&nbsp;</td>
+  <td class=xl78 style='border-left:none'>&nbsp;</td>
+  <td class=xl79 style='border-left:none'>&nbsp;</td>
+  <td class=xl80>&nbsp;</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl81 style='height:45.0pt;border-top:none'>Attribute Name</td>
+  <td class=xl82 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl83 width=165 style='border-top:none;border-left:none;width:124pt'>Type<br>
+    SCU/SCP</td>
+  <td class=xl84 width=251 style='border-top:none;border-left:none;width:188pt'>IHE-RO
+  Additional<br>
+    Notes/Requirements<br>
+    on SCU</td>
+  <td class=xl82 style='border-top:none'>Code Rule SCU</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>Requested SOP
+  Instance UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0000,1001)</td>
+  <td class=xl87 width=165 style='border-top:none;border-left:none;width:124pt'>1/-</td>
+  <td class=xl88 width=251 style='border-top:none;border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl89 width=243 style='border-top:none;width:182pt'>InterOperabilityRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl85 style='height:30.0pt;border-top:none'>Transaction
+  UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,1195)</td>
+  <td class=xl90 width=165 style='border-top:none;border-left:none;width:124pt'>(see
+  DICOM Standard 2011, P3.4 CC.2.8.1.2.1)</td>
+  <td class=xl91 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl89 width=243 style='border-top:none;width:182pt'>IsRequiredRule /
+  InterOperabilityRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl92 colspan=2 style='height:15.0pt;mso-ignore:colspan'>Unified
+  Procedure Step Progress Information Module</td>
+  <td class=xl94></td>
+  <td colspan=2 class=xl93 style='mso-ignore:colspan'></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl85 style='height:30.0pt'>UPS Progress Information
+  Sequence</td>
+  <td class=xl95 style='border-left:none'>(0074,1002)</td>
+  <td class=xl90 width=165 style='border-left:none;width:124pt'>3</td>
+  <td class=xl96 width=251 style='border-left:none;width:188pt'>Required by
+  IHE-RO in all instances of this transaction.</td>
+  <td class=xl97>IsRequiredRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl85 style='height:30.0pt;border-top:none'>&gt;Unified
+  Procedure Step Progress</td>
+  <td class=xl98>(0074,1004)</td>
+  <td class=xl99 style='border-top:none'>1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>0%
+  - 100% (in our scenarios)</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>IsRequiredRule
+  /<br>
+    ValueListRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl101 width=310 style='height:30.0pt;border-top:none;
+  width:233pt'>&gt;Unified Procedure Step Discontinuation<br>
+    Reason Code Sequence</td>
+  <td class=xl102 style='border-left:none'>(0074,100e)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>3</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>Not
+  required to be supplied for this profile.</td>
+  <td class=xl97 style='border-top:none'>&nbsp;</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl92 colspan=2 style='height:15.0pt;mso-ignore:colspan'>Unified
+  Procedure Step Performed Procedure Information Module</td>
+  <td class=xl94></td>
+  <td colspan=2 class=xl93 style='mso-ignore:colspan'></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl103 width=310 style='height:15.0pt;width:233pt'>UPS
+  Performed Procedure Sequence</td>
+  <td class=xl102 style='border-left:none'>(0074,1216)</td>
+  <td class=xl99 style='border-left:none'>1</td>
+  <td class=xl96 width=251 style='border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl97>IsRequiredRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl103 width=310 style='height:30.0pt;border-top:none;
+  width:233pt'>&gt;Performed Processing Parameters Sequence</td>
+  <td class=xl102 style='border-top:none;border-left:none'>(0074,1212)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>3</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>Required
+  by IHE-RO if UPS Performed Procedure Sequence is provided</td>
+  <td class=xl93>IsRequiredRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl103 width=310 style='height:15.0pt;border-top:none;
+  width:233pt'>&gt;&gt;Value Type</td>
+  <td class=xl102 style='border-top:none;border-left:none'>(0040,A040)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>‘TEXT’</td>
+  <td class=xl100 width=243 style='width:182pt'>IsRequiredRule / ValueRule<span
+  style='mso-spacerun:yes'> </span></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl101 width=310 style='height:15.0pt;border-top:none;
+  width:233pt'>&gt;&gt;Concept Name Code Sequence</td>
+  <td class=xl102 style='border-top:none;border-left:none'>(0040,A043)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl97 style='border-top:none'>&nbsp;</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl103 width=310 style='height:15.0pt;border-top:none;
+  width:233pt'>&gt;&gt;&gt;Code Value</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0100)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>‘121700’</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>IsRequiredRule
+  / ValueRule<span style='mso-spacerun:yes'> </span></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>&gt;&gt;&gt;Coding
+  Scheme Designator</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0102)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>‘DCM’</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>IsRequiredRule
+  / ValueRule<span style='mso-spacerun:yes'> </span></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl85 style='height:30.0pt;border-top:none'>&gt;&gt;&gt;Code
+  Meaning</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0104)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>‘Referenced
+  Beam Number in Progress’</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>IsRequiredRule
+  / ValueRule<span style='mso-spacerun:yes'> </span></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl85 style='height:30.0pt;border-top:none'>&gt;&gt;Text
+  Value</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,A160)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>Integer
+  string equal to the value of Referenced Beam Number (300C,0006)<![if !supportAnnotations]><span
+  class=msocomspan1><span class=msocomspan2 id="_anchor_1"
+  onmouseover="msoCommentShow('_com_1','_anchor_1')"
+  onmouseout="msoCommentHide('_com_1')" language=JavaScript><a
+  class=msocomanch href="#_msocom_1" name="_msoanchor_1">[1]</a></span></span><![endif]></td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>IsRequiredRule
+  / PIMTextValueRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl103 width=310 style='height:30.0pt;border-top:none;
+  width:233pt'>&gt;Output Information Sequence</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4033)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>2</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>Shall
+  be empty</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>IsRequiredRule
+  / EmptySequenceRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl103 width=310 style='height:30.0pt;border-top:none;
+  width:233pt'>&gt;Non-DICOM Output Information Sequence</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4032)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>2</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>Shall
+  be empty</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>IsRequiredRule
+  / EmptySequenceRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl103 width=310 style='height:15.0pt;border-top:none;
+  width:233pt'>&gt;Performed Workitem Code Sequence</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4019)</td>
+  <td class=xl99 style='border-top:none;border-left:none'>3/1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>OptionalRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl103 width=310 style='height:30.0pt;border-top:none;
+  width:233pt'>&gt;&gt;Code Value</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0100)</td>
+  <td class=xl104 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl85 style='height:30.0pt;border-top:none'>&gt;&gt;Coding
+  Scheme Designator</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0102)</td>
+  <td class=xl104 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl85 style='height:30.0pt;border-top:none'>&gt;&gt;Code
+  Meaning</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0104)</td>
+  <td class=xl104 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl96 width=251 style='border-top:none;border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl100 width=243 style='border-top:none;width:182pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl105 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl106></td>
+  <td colspan=6 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl105 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl106></td>
+  <td colspan=6 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'>Store Treatment Delivery
+  Results to TMS [RO-63]</td>
+  <td colspan=8 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 colspan=9 class=xl72 style='height:15.75pt;mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl77 style='height:15.0pt'>C-STORE-RQ</td>
+  <td class=xl78 style='border-left:none'>&nbsp;</td>
+  <td class=xl78 style='border-left:none'>&nbsp;</td>
+  <td class=xl107 style='border-left:none'>&nbsp;</td>
+  <td class=xl79 style='border-left:none'>&nbsp;</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl108 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl109 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl109 style='border-top:none;border-left:none'>IHE-Rule</td>
+  <td class=xl110 style='border-top:none;border-left:none'>Description</td>
+  <td class=xl111 style='border-top:none;border-left:none'>Code Rule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl112 style='height:15.0pt;border-top:none'>SOP Class UID</td>
+  <td class=xl113 style='border-top:none;border-left:none'>(0008,0016)</td>
+  <td class=xl113 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl114 width=251 style='border-top:none;border-left:none;width:188pt'>Value
+  should be one specified below.</td>
+  <td class=xl115 width=243 style='border-top:none;border-left:none;width:182pt'>ValueRule</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 class=xl116 style='height:15.75pt'>&nbsp;</td>
+  <td class=xl117 style='border-left:none'>&nbsp;</td>
+  <td class=xl117 style='border-left:none'>&nbsp;</td>
+  <td class=xl118 width=251 style='border-left:none;width:188pt'>&nbsp;</td>
+  <td class=xl119 style='border-left:none'>&nbsp;</td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=3 class=xl93 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td class=xl120></td>
+  <td class=xl93></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl121 style='height:15.0pt'>SOP Class Support for OST</td>
+  <td class=xl72></td>
+  <td class=xl93></td>
+  <td class=xl120></td>
+  <td class=xl93></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl122 style='height:15.0pt;border-top:none'>SOP Class
+  Name</td>
+  <td class=xl122 style='border-left:none'>SOP Class UID</td>
+  <td class=xl93></td>
+  <td class=xl120></td>
+  <td class=xl93></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl121 style='height:15.0pt;border-top:none'>RT Beams
+  Treatment Record Storage</td>
+  <td class=xl121 style='border-top:none;border-left:none'>1.2.840.10008.5.1.4.1.1.481.<span
+  style='display:none'>4</span></td>
+  <td class=xl93></td>
+  <td class=xl120></td>
+  <td class=xl93></td>
+  <td colspan=4 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 colspan=9 class=xl72 style='height:15.75pt;mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td colspan=4 height=21 class=xl156 style='height:15.75pt'>Received objects
+  (TDD Deliver succes – test scenario )</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 class=xl123 style='height:15.75pt'>Received<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl124 width=167 style='border-left:none;width:125pt'>IHE-Rule</td>
+  <td class=xl125 width=165 style='border-left:none;width:124pt'>Description</td>
+  <td class=xl126 width=251 style='border-left:none;width:188pt'>Code Rule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=102 style='height:76.5pt'>
+  <td height=102 class=xl127 style='height:76.5pt'>RT Beams Treatment Record
+  Storage</td>
+  <td class=xl128 width=167 style='border-left:none;width:125pt'>A C-STORE
+  Request shall be sent from the Performing Device to the OST. An instance of
+  the RT Beams Treatment Record Storage IOD<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl129 width=165 style='border-left:none;width:124pt'>&nbsp;</td>
+  <td class=xl129 width=251 style='border-left:none;width:188pt'>IODReceivedRule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=9 class=xl72 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=9 class=xl72 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'>UPS Final Update [RO-64]</td>
+  <td class=xl72></td>
+  <td class=xl130 align=right>100%</td>
+  <td colspan=6 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 colspan=3 class=xl72 style='height:15.75pt;mso-ignore:colspan'></td>
+  <td colspan=3 class=xl98 style='mso-ignore:colspan'></td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl77 style='height:15.0pt'>UPS N-Set Final State
+  Attribute Requirements</td>
+  <td class=xl78 style='border-left:none'>&nbsp;</td>
+  <td class=xl78 style='border-left:none'>&nbsp;</td>
+  <td class=xl107 style='border-left:none'>&nbsp;</td>
+  <td class=xl79 style='border-left:none'>&nbsp;</td>
+  <td class=xl80>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl81 style='height:45.0pt;border-top:none'>Attribute Name</td>
+  <td class=xl82 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl83 width=165 style='border-top:none;border-left:none;width:124pt'>Req.
+  Type<br>
+    N-SET<br>
+    (SCU/SCP)</td>
+  <td class=xl83 width=251 style='border-top:none;border-left:none;width:188pt'>Final<br>
+    State</td>
+  <td class=xl84 width=243 style='border-top:none;border-left:none;width:182pt'>IHE-RO
+  Additional<br>
+    Notes/Requirements<br>
+    on SCU</td>
+  <td class=xl82 style='border-top:none'>Code Rule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl85 style='height:15.0pt;border-top:none'>Requested SOP
+  Instance UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0000,1001)</td>
+  <td class=xl87 width=165 style='border-top:none;border-left:none;width:124pt'>&nbsp;</td>
+  <td class=xl131 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>&nbsp;</td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>InterOperabilityRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl85 style='height:45.0pt;border-top:none'>Transaction
+  UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,1195)</td>
+  <td class=xl90 width=165 style='border-top:none;border-left:none;width:124pt'>(see
+  DICOM Standard 2011, P3.4 CC.2.8.1.2.1)</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>transaction
+  UID should be the one we have send earlier (from N-action-RSP)</td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>IsRequiredRule /
+  InterOperabilityRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl132 style='height:15.0pt'>SOP Common Information Module</td>
+  <td class=xl133>&nbsp;</td>
+  <td colspan=2 class=xl134 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=2 class=xl133 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl85 style='height:60.0pt'>Specific Character Set</td>
+  <td class=xl86 style='border-left:none'>(0008,0005)</td>
+  <td class=xl87 width=165 style='border-left:none;width:124pt'>1C/1C (Required
+  if extended or replacement character set is used)</td>
+  <td class=xl135 width=251 style='border-left:none;width:188pt'>Set if
+  required<br>
+    </td>
+  <td class=xl88 width=243 style='border-left:none;width:182pt'>Only ISO-IR 100
+  (Latin-1) shall be supported.</td>
+  <td class=xl136>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl85 style='height:45.0pt;border-top:none'>SOP Class UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0016)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>Not allowed</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Affected
+  SOP Class (0000,0002) is always ‘UPS-Push' SOP Class<br>
+    </td>
+  <td class=xl136 style='border-top:none'>NotPresentRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl85 style='height:60.0pt;border-top:none'>SOP Instance
+  UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0018)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>Not allowed.</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Affected
+  SOP Instance (0000,1000) supplied by C-FIND responses of UPS query<br>
+    </td>
+  <td class=xl136 style='border-top:none'>NotPresentRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl132 colspan=2 style='height:15.0pt;mso-ignore:colspan'>Unified
+  Procedure Step Progress Information Module</td>
+  <td colspan=2 class=xl134 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=2 class=xl133 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;width:233pt'>Procedure
+  Step State<br>
+    </td>
+  <td class=xl86 style='border-left:none'>(0074,1000)</td>
+  <td class=xl87 width=165 style='border-left:none;width:124pt'>Not Allowed.
+  Use N-ACTION<br>
+    </td>
+  <td class=xl131 style='border-left:none'>R</td>
+  <td class=xl91 style='border-left:none'>&nbsp;</td>
+  <td class=xl136>NotPresentRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl132 colspan=2 style='height:15.0pt;mso-ignore:colspan'>Unified
+  Procedure Step Scheduled Procedure Information Module</td>
+  <td colspan=2 class=xl134 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=2 class=xl133 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;width:233pt'>Scheduled
+  Procedure Step Priority<br>
+    </td>
+  <td class=xl86 style='border-left:none'>(0040,4003)</td>
+  <td class=xl138 style='border-left:none'>3/1</td>
+  <td class=xl131 style='border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-left:none;width:182pt'>Supplied
+  implicitly by TMS – not required in N-SET.<br>
+    </td>
+  <td class=xl136>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>Scheduled Procedure Step Modification Date and Time<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4010)</td>
+  <td class=xl87 width=165 style='border-top:none;border-left:none;width:124pt'>-/1<br>
+    SCP will use time of SET</td>
+  <td class=xl131 style='border-top:none;border-left:none'>O*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  implicitly by TMS – not required in N-SET.<br>
+    </td>
+  <td class=xl136 style='border-top:none'>OptionalRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl132 colspan=2 style='height:15.0pt;mso-ignore:colspan'>Unified
+  Procedure Step Performed Procedure Information Module</td>
+  <td colspan=2 class=xl134 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=2 class=xl133 style='mso-ignore:colspan'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=100 style='height:75.0pt'>
+  <td height=100 class=xl103 width=310 style='height:75.0pt;width:233pt'>UPS
+  Performed Procedure Sequence<br>
+    </td>
+  <td class=xl86 style='border-left:none'>(0074,1216)</td>
+  <td class=xl137 style='border-left:none'>3/2</td>
+  <td class=xl131 style='border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-left:none;width:182pt'>Supplied by
+  this transaction in IHE-RO, if UPS was not ‘CANCELED’ prior to radiation
+  delivery. May be supplied otherwise</td>
+  <td class=xl88 width=184 style='width:138pt'>IsRequiredRule (success
+  scenario)<br>
+    <br>
+    NotPresentRule(cancel scenario)</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>&gt;Actual Human Performers Sequence<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4035)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>3/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>RC*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Shall
+  be provided if known. Not required to be known in IHE-RO.<br>
+    </td>
+  <td class=xl136 style='border-top:none'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>&gt;&gt;Human Performer Code Sequence<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>'(0040,4009)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>3/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>RC*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Shall
+  be provided if known. Not required to be known in IHE-RO.<br>
+    </td>
+  <td class=xl136 style='border-top:none'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>&gt;&gt;Human Performer’s Name<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4037)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>3/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>RC</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Shall
+  be provided if known. Not required to be known in IHE-RO.<br>
+    </td>
+  <td class=xl136 style='border-top:none'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>&gt;Performed Station Name Code Sequence<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4028)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>3/2</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction in IHE-RO.<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>OptionalRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=140 style='height:105.0pt'>
+  <td height=140 class=xl85 style='height:105.0pt;border-top:none'>&gt;&gt;Code
+  Value</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0100)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Name
+  of machine performing UPS. Supplied by this transaction (RO-64: UPS Final
+  Update) in IHE-RO.<br>
+    <br>
+    Same value as the C-Find response of RO-58<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=140 style='height:105.0pt'>
+  <td height=140 class=xl85 style='height:105.0pt;border-top:none'>&gt;&gt;Coding
+  Scheme Designator</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0102)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Any
+  private coding scheme designator. Supplied by this transaction (RO-64: UPS
+  Final Update)) in IHE-RO.<br>
+    <br>
+    Same value as the C-Find response of RO-58</td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=140 style='height:105.0pt'>
+  <td height=140 class=xl85 style='height:105.0pt;border-top:none'>&gt;&gt;Code
+  Meaning</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0104)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Value
+  shall be ‘Performed Station Name’. Supplied by this transaction (RO-64: UPS
+  Final Update)) in IHE-RO.<br>
+    <br>
+    Same value as the C-Find response of RO-58<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>&gt;Performed Procedure Step Start DateTime<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>0040,4050</td>
+  <td class=xl137 style='border-top:none;border-left:none'>3/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction in IHE-RO<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>IsRequiredRule /
+  HasValueRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>&gt;Performed Workitem Code Sequence<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4019)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>3/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction (RO-64: UPS Final Update)) in IHE-RO<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>OptionalRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=140 style='height:105.0pt'>
+  <td height=140 class=xl85 style='height:105.0pt;border-top:none'>&gt;&gt;Code
+  Value</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0100)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Performed
+  work item code value. Supplied by this transaction (RO-64: UPS Final Update))
+  in IHE-RO.<br>
+    <br>
+    Same value as the C-Find response of RO-58<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=140 style='height:105.0pt'>
+  <td height=140 class=xl85 style='height:105.0pt;border-top:none'>&gt;&gt;Coding
+  Scheme Designator</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0102)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Value
+  shall be ‘DCM’. Supplied by this transaction (RO-64: UPS Final Update)) in
+  IHE-RO.<br>
+    <br>
+    <br>
+    Same value as the C-Find response of RO-58</td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=160 style='height:120.0pt'>
+  <td height=160 class=xl85 style='height:120.0pt;border-top:none'>&gt;&gt;Code
+  Meaning</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0104)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Value
+  shall be consistent with Code Value as described in Supplement 74 PS 3.16
+  Annex B. Supplied by this transaction (RO-64: UPS Final Update)) in
+  IHE-RO.<br>
+    <br>
+    Same value as the C-Find response of RO-58</td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>ConditionalSequenceRule(
+  InterOperabilityRule )</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl103 width=310 style='height:45.0pt;border-top:none;
+  width:233pt'>&gt;Performed Procedure Step End DateTime<br>
+    </td>
+  <td class=xl86 style='border-top:none;border-left:none'>0040,4051</td>
+  <td class=xl137 style='border-top:none;border-left:none'>3/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction in IHE-RO<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>IsRequiredRule /
+  HasValueRule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=100 style='height:75.0pt'>
+  <td height=100 class=xl85 style='height:75.0pt;border-top:none'>&gt;Output
+  Information Sequence</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0040,4033)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>2/2</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction (RO-64: UPS Final Update) in IHE-RO. May be empty (null)
+  in N-SET if no output objects are created.<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>IsRequiredRule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl85 style='height:45.0pt;border-top:none'>&gt;&gt;Type
+  of Instances</td>
+  <td class=xl86 style='border-top:none;border-left:none'>0040,E020</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction in IHE –RO Value shall be “DICOM”<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>IsRequiredRule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl85 style='height:45.0pt;border-top:none'>&gt;&gt;Study
+  Instance UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0020,000D)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R*</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction (RO-64: UPS Final Update)) in IHE-RO<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl139 style='height:45.0pt'>&gt;&gt;Series Instance UID</td>
+  <td class=xl86 style='border-top:none'>(0020,000E)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction (RO-64: UPS Final Update)) in IHE-RO<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl139 style='height:45.0pt'>&gt;&gt;Referenced SOP
+  Sequence</td>
+  <td class=xl86 style='border-top:none'>(0008,1199)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction (RO-64: UPS Final Update)) in IHE-RO<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=180 style='height:135.0pt'>
+  <td height=180 class=xl139 style='height:135.0pt'>&gt;&gt;&gt;Referenced SOP
+  Class UID</td>
+  <td class=xl86 style='border-top:none'>(0008,1150)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction (RO-64: UPS Final Update)) in IHE-RO. See transactions
+  RO-22: Store Position Acquisition Results to Archive, RO-23: Store Position
+  Registration Results to Archive, RO-24: Store Delivery Results to Archivefor
+  permitted SOP Classes.<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl139 style='height:45.0pt'>&gt;&gt;&gt;Referenced SOP
+  Instance UID</td>
+  <td class=xl86 style='border-top:none'>(0008,1155)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1/1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Supplied
+  by this transaction (RO-64: UPS Final Update)) in IHE-RO<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 class=xl140 width=310 style='height:15.75pt;width:233pt'>&gt;&gt;DICOM
+  Retrieval Sequence</td>
+  <td class=xl86 style='border-top:none'>(0040,E021)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1C</td>
+  <td class=xl131 style='border-top:none;border-left:none'>R</td>
+  <td class=xl141 width=243 style='width:182pt'>&nbsp;</td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>IsRequiredRule</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=81 style='height:60.75pt'>
+  <td height=81 class=xl85 style='height:60.75pt'>&gt;&gt;&gt;Retrieve AE Title</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0008,0054)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>RC</td>
+  <td class=xl88 width=243 style='border-left:none;width:182pt'>Supplied by
+  this transaction (RO-64: UPS Final Update) for IHE-RO (File Media Set not
+  supported)<br>
+    </td>
+  <td class=xl89 width=184 style='border-top:none;width:138pt'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl85 style='height:45.0pt;border-top:none'>&gt;&gt;&gt;Storage
+  Media File-Set ID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0088,0130)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>2</td>
+  <td class=xl131 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Never
+  supplied for IHE-RO (File Media Set not supported)<br>
+    </td>
+  <td class=xl136 style='border-top:none'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl85 style='height:45.0pt;border-top:none'>&gt;&gt;&gt;Storage
+  Media File-Set UID</td>
+  <td class=xl86 style='border-top:none;border-left:none'>(0088,0140)</td>
+  <td class=xl137 style='border-top:none;border-left:none'>1</td>
+  <td class=xl131 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl88 width=243 style='border-top:none;border-left:none;width:182pt'>Never
+  supplied for IHE-RO (File Media Set not supported)<br>
+    </td>
+  <td class=xl136 style='border-top:none'>&nbsp;</td>
+  <td colspan=3 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=3 class=xl142 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=6 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=9 class=xl72 style='height:15.0pt;mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'>Treatment Delivery
+  Completed/Canceled [RO-65]</td>
+  <td colspan=8 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='height:15.75pt'>
+  <td height=21 colspan=9 class=xl72 style='height:15.75pt;mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl143 style='height:15.0pt'>UPS N-ACTION
+  Completed/Canceled Requireme<span style='display:none'>nts</span></td>
+  <td class=xl144 style='border-left:none'>&nbsp;</td>
+  <td class=xl145 style='border-left:none'>&nbsp;</td>
+  <td class=xl146>&nbsp;</td>
+  <td class=xl147>&nbsp;</td>
+  <td colspan=6 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl148 style='height:15.0pt;border-top:none'>Attribute
+  Name</td>
+  <td class=xl148 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl149 style='border-top:none;border-left:none'>Description</td>
+  <td class=xl148 style='border-top:none;border-left:none'>Code Rule</td>
+  <td colspan=7 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl150 width=310 style='height:15.0pt;border-top:none;
+  width:233pt'>Requested SOP Class UID</td>
+  <td class=xl151 style='border-top:none;border-left:none'>(0000,0003)</td>
+  <td class=xl152 style='border-top:none;border-left:none'>1.2.840.10008.5.1.4.34.6.3</td>
+  <td class=xl153 width=251 style='border-top:none;border-left:none;width:188pt'>IsRequiredRule
+  / ValueRule</td>
+  <td colspan=7 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl151 style='height:15.0pt;border-top:none'>Requested SOP
+  Instance UID</td>
+  <td class=xl151 style='border-top:none;border-left:none'>(0000,1001)</td>
+  <td class=xl154 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl153 width=251 style='border-top:none;border-left:none;width:188pt'>IsRequiredRule
+  / InterOperabilityRule</td>
+  <td colspan=7 class=xl72 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl151 style='height:15.0pt;border-top:none'>Action Type
+  ID</td>
+  <td class=xl151 style='border-top:none;border-left:none'>(0000,1008)</td>
+  <td class=xl154 style='border-top:none;border-left:none'>1</td>
+  <td class=xl153 width=251 style='border-top:none;border-left:none;width:188pt'>IsRequiredRule
+  / ValueRule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl151 style='height:15.0pt;border-top:none'>Transaction
+  UID</td>
+  <td class=xl151 style='border-top:none;border-left:none'>(0008,1195)</td>
+  <td class=xl152 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl152 style='border-top:none;border-left:none'>IsRequiredRule /
+  InterOperabilityRule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl150 width=310 style='height:30.0pt;border-top:none;
+  width:233pt'>Procedure Step State<br>
+    </td>
+  <td class=xl151 style='border-top:none;border-left:none'>(0074,1000)</td>
+  <td class=xl151 style='border-top:none;border-left:none'>Completed</td>
+  <td class=xl153 width=251 style='border-top:none;border-left:none;width:188pt'>IsRequiredRule
+  / ValueRule</td>
+  <td colspan=5 class=xl72 style='mso-ignore:colspan'></td>
+  <td colspan=2 class=xl75 style='mso-ignore:colspan'></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=310 style='width:233pt'></td>
+  <td width=167 style='width:125pt'></td>
+  <td width=165 style='width:124pt'></td>
+  <td width=251 style='width:188pt'></td>
+  <td width=243 style='width:182pt'></td>
+  <td width=184 style='width:138pt'></td>
+  <td width=62 style='width:47pt'></td>
+  <td width=124 style='width:93pt'></td>
+  <td width=68 style='width:51pt'></td>
+  <td width=62 style='width:47pt'></td>
+  <td width=62 style='width:47pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+<div style='mso-element:comment-list'><![if !supportAnnotations]>
+
+<hr class=msocomhide align=left size=1 width="33%">
+
+<![endif]>
+
+<div style='mso-element:comment'><![if !supportAnnotations]>
+
+<div id="_com_1" class=msocomtxt
+onmouseover="msoCommentShow('_com_1','_anchor_1')"
+onmouseout="msoCommentHide('_com_1')" language=JavaScript><![endif]>
+
+<div><![if !supportAnnotations]><a class=msocomhide href="#_msoanchor_1"
+name="_msocom_1">[1]</a><![endif]><!--[if gte mso 9]><xml>
+ <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202" path="m,l,21600r21600,l21600,xe">
+  <v:stroke joinstyle="miter"/>
+  <v:path gradientshapeok="t" o:connecttype="rect"/>
+ </v:shapetype><v:shape id="_x0001_s2049" o:spid="_x0000_s1028" type="#_x0000_t202"
+  style='position:absolute;margin-left:825pt;margin-top:-2850.75pt;width:320.25pt;
+  height:123pt;z-index:1;visibility:hidden' fillcolor="#ffffe1" o:insetmode="auto">
+  <v:fill color2="#ffffe1"/>
+  <v:shadow on="t" color="black" obscured="t"/>
+  <v:path o:connecttype="none"/>
+  <v:textbox style='mso-direction-alt:auto'/>
+  <x:ClientData ObjectType="Note">
+   <x:MoveWithCells/>
+   <x:SizeWithCells/>
+   <x:AutoFill>False</x:AutoFill>
+   <x:Row>21</x:Row>
+   <x:Column>3</x:Column>
+   <x:Author>Author</x:Author>
+  </x:ClientData>
+ </v:shape></xml><![endif]--><![if !vml]><span style='mso-ignore:vglayout'><![endif]>
+
+<div v:shape="_x0001_s2049" style='padding:.75pt 0pt 0pt .75pt;text-align:left'
+class=shape><font class="font15">Author:</font><font class="font16"><br>
+<br>
+This value can be found in: RT BEAMS DELIVERY INSTRUCTION MODULE--&gt;
+(0074,1020)/(300C,0006)<br>
+<br>
+</font></div>
+
+<![if !vml]></span><![endif]></div>
+
+<![if !supportAnnotations]></div>
+
+<![endif]></div>
+
+</div>
+
+</body>
+
+</html>

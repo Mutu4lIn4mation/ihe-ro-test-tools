@@ -1,0 +1,12 @@
+MustInherit Class ScenarioStep
+
+    Public MustOverride Sub Execute()
+
+    Public ReadOnly Property Name() As String
+        Get
+            Return Me.GetType().Name
+        End Get
+    End Property
+
+
+End Class

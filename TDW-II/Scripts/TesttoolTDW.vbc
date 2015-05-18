@@ -1,0 +1,78 @@
+
+'Test tool base class, specially for TDW scenarios
+MustInherit Class TestToolTDW
+    Inherits TestToolBase
+
+    Private m_WorkflowScenarioType As TDW_Scenario
+    Private m_WorkFlowSUTActorType As DVTKActor
+
+    Public Sub New(ByVal workflowSUTActorType As DVTKActor, ByVal workflowScenarioType As TDW_Scenario)
+
+        m_WorkflowScenarioType = workflowScenarioType
+        m_WorkFlowSUTActorType = workflowSUTActorType
+
+    End Sub
+
+    Protected Overrides Sub Execute()
+
+        CheckWorkFlowState()
+
+        m_scenarioRunner.RunScenario(GetScenarioToRun())
+
+        SetWorkFlowState()
+
+    End Sub
+
+    Public MustOverride Function GetScenarioToRun() As Scenario
+
+    Private Sub CheckWorkFlowState()
+
+        Select Case m_WorkFlowSUTActorType
+
+            Case DVTKActor.TDD
+                WorkflowStateMachine.Instance.TDD.CheckState(m_WorkflowScenarioType)
+            Case DVTKActor.TMS
+                WorkflowStateMachine.Instance.TMS.CheckState(m_WorkflowScenarioType)
+            Case DVTKActor.OST
+                WorkflowStateMachine.Instance.OST.CheckState(m_WorkflowScenarioType)
+            Case Else
+                Throw New NotImplementedException(String.Format("Cannot check workflow state. No workflow state defined for actor '{0}'", m_WorkFlowSUTActorType))
+
+        End Select
+
+    End Sub
+
+    Private Sub SetWorkFlowState()
+
+        If GetTotalNrOfErrors() = 0 Then
+
+            Select Case m_WorkFlowSUTActorType
+
+                Case DVTKActor.TDD
+                    WorkflowStateMachine.Instance.TDD.SetScenarioFinished(m_WorkflowScenarioType)
+                Case DVTKActor.TMS
+                    WorkflowStateMachine.Instance.TMS.SetScenarioFinished(m_WorkflowScenarioType)
+                Case DVTKActor.OST
+                    WorkflowStateMachine.Instance.OST.SetScenarioFinished(m_WorkflowScenarioType)
+                Case Else
+                    Throw New NotImplementedException(String.Format("Cannot set workflow state. No workflow state defined for actor '{0}'", m_WorkFlowSUTActorType))
+
+            End Select
+
+        End If
+
+    End Sub
+
+    Private Function GetTotalNrOfErrors() As Integer
+
+        Dim totalErrorCount As Integer = Me.NrOfErrors
+
+        For Each childThread As Dicom.Threads.DicomThread In Me.childs
+            totalErrorCount = totalErrorCount + childThread.NrOfErrors
+        Next
+
+        Return totalErrorCount
+
+    End Function
+
+End Class

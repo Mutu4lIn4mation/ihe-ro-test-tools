@@ -1,0 +1,316 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 12">
+<link id=Main-File rel=Main-File href="../2013RuleOverview.html">
+<link rel=File-List href=filelist.xml>
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\,";
+	mso-displayed-thousand-separator:"\.";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(0);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../2013RuleOverview.html");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=blue vlink=purple>
+
+<table border=0 cellpadding=0 cellspacing=0 width=857 style='border-collapse:
+ collapse;table-layout:fixed;width:643pt'>
+ <col width=353 style='mso-width-source:userset;mso-width-alt:12909;width:265pt'>
+ <col width=504 style='mso-width-source:userset;mso-width-alt:18432;width:378pt'>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl68 width=353 style='height:15.0pt;width:265pt'><a
+  href="javascript:history.back(1)" target="_parent"><span style='font-size:
+  11.0pt'>Back to used rules</span></a></td>
+  <td width=504 style='width:378pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl71 style='height:15.0pt'>Rule overview</td>
+  <td class=xl71 style='border-left:none'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl72 style='height:15.0pt;border-top:none'>Ruletype</td>
+  <td class=xl73 width=504 style='border-top:none;border-left:none;width:378pt'>Description</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>BeamLimitingDeviceSequenceRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>checks
+  how many device types there are in the RT Plan and of which type these are</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>BeamLimitingDeviceTypeRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Validates
+  beam limiting device type data as described in the IHE technical framework.
+  This is different among the beam types.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>BeamModifierDetectionRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Reports
+  if a beam modifier is detected in the dataset.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>CFindRsp1InputInformationSequenceRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if this sequence has several SOP class UIDs (RT Images) according the TDW
+  specification.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>CFindRspInputInformationSequenceRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if this sequence has several SOP class UIDs (RT Beam Delivery Instruction and
+  RT Plan) according the TDW specification.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>CompareRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>compares
+  an incoming dicommessage with a dicommessage in the reference dataset</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>CompatibilityRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>verifies
+  if the value in this attribute is a correct one, according to the value that
+  is provided</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>ConditionalSequenceRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Applies
+  another rule on the first item in the sequence if this sequence is present.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>ConstantValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>The
+  value of an attribute is constant over more then one sequence item. The last
+  item in the sequence should not be present.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>DateTimeRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  that the DateTime attribute has a value which is between 2 specified values.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>DicomHasValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute is present with a value in the dataset</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>DicomIsRequiredRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  the attribute is present in the dataset</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>DicomValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>verifies
+  if the value in this attribute is a correct one, according to the value that
+  is provided</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>DifferentValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if all attributes of a certain type in one sequence have different values.
+  The last item in the sequence should not be present.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>EmptySequenceRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if sequence has no items</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>EmptyValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute has no value</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>HasValueIfPresentRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute has a value if present</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>HasValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>verifies
+  if the value in this attribute is a not empty</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td rowspan=3 height=80 class=xl69 style='height:60.0pt;border-top:none'>InteroperabilityRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if an attribute has the same value between datasets of different commands.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl74 width=504 style='height:15.0pt;border-top:none;
+  border-left:none;width:378pt'>For example: between C-FIND-RSP and
+  N-ACTION-RQ.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl74 width=504 style='height:15.0pt;border-top:none;
+  border-left:none;width:378pt'>The TMS actor is typically the actor which
+  checks the interoperabilities.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td rowspan=2 height=80 class=xl69 style='height:60.0pt;border-top:none'>InterrelationRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if an attribute has the same value between the request and response dataset
+  of the same command.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl74 width=504 style='height:30.0pt;border-top:none;
+  border-left:none;width:378pt'>The PDS actor is typically the actor which
+  checks an attribute of the response dataset with the request send earlier.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>IODReceivedRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  that atleast one object should be received.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>IODNotReceivedRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  that the object is not received.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>IsRequiredRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute or sequence is present.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td rowspan=2 height=60 class=xl69 style='height:45.0pt;border-top:none'>MappingRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if an attribute in a request dataset has the same value as defined in the</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl74 width=504 style='height:15.0pt;border-top:none;
+  border-left:none;width:378pt'>response dataset.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>NotPresentRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute or sequence is NOT present</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>NrOfSequenceItemsRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  that a sequence has the same number of sequence items indicated by the value
+  of another attribute.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>OptionalRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Reports
+  if an attribute is present or not.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>PIMTextValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Validates
+  if the value of the Text Value (0040,A160) of Performed Procedure Information
+  Module has one of the Beam Numbers of the RT Plan</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>ReferencedSequenceRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Validates
+  that the correct reference to the required sequence is present.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>RequestedCMoveSopInstanceUIDs</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  that the requested SOP Instance UIDs in the C-Move request are listed in the
+  Input Information Sequence of the C-Find-Resonse of TDW-RO-1</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>RequiredConditionalRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>When
+  a conditional attribute is present and has a certain value, it checks if a
+  required attribute is present.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>SequenceLoopRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Applies
+  another rule for each item in a sequence.</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>SequenceRangeRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the value multiplicity value of a sequence attribute is within the given
+  range</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl69 style='height:30.0pt;border-top:none'>TBDRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>To
+  Be Defined Rule. The Technical committee of IHE-RO has to define requirements</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl70 style='height:60.0pt;border-top:none'>TreatmentDeliveryTypeRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  that the Treatment Delivery Type of the first Beam Task Sequence Item has the
+  value Continuation and if the attributes: DosimeterUnit, StartMeterset and
+  EndMeterset are present if the isContinuation parameter is set true</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>ValueEqualOrHigherRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute has a value that is bigger then 1.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>ValueInRangeRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute is in the given range.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>ValueListRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute has the right value given in the specified list of values.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt;border-top:none'>ValueRule</td>
+  <td class=xl74 width=504 style='border-top:none;border-left:none;width:378pt'>Checks
+  if the attribute has the right value.</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 colspan=2 style='height:15.0pt;mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl68 style='height:15.0pt'><a
+  href="javascript:history.back(1)" target="_parent"><span style='font-size:
+  11.0pt'>Back to used rules</span></a></td>
+  <td></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=353 style='width:265pt'></td>
+  <td width=504 style='width:378pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>

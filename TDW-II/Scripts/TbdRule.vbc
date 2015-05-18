@@ -1,0 +1,26 @@
+Class TbdRule
+    Inherits AttributeRule
+    ''' <summary>
+    ''' IHE has some rules in it's technical framweork that are still going to be defined,
+    ''' this rule can be used to make sure we don't forget them after the definition is there.
+    ''' </summary>
+    ''' <param name="valueTag">the attribute which should get a rule according to IHE, still to be defined</param>
+    ''' <param name="iodType"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal valueTag As String, ByVal iodType As IODType)
+
+        MyBase.New("Tbd Rule", valueTag, iodType, ErrorSeverity.RuleError)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal iodType As IODType)
+        Dim message As String = "Rule for attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is undefined!"
+
+        If iodType = IODTypeRule Then
+            If TestToolConfiguration.GetInstance().ReportTBDRule Then
+                Me.SetError(message)
+                Me.Report()
+            End If
+        End If
+    End Sub
+End Class

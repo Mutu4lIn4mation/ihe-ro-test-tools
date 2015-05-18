@@ -1,0 +1,30 @@
+Class MessageHandlerNSet
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    'DimseCommand.NSETRSP
+    Public Overrides Function HandleNSetRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As Boolean
+
+        Dim requestedSOPClassUID As String = dicomMessage.CommandSet.Item(Tags.RequestedSOPClassUID).Values(0)
+        If requestedSOPClassUID = SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString() Then
+
+            Dim dicomMessageToSend As DicomMessage = MessageHandlerHelper.CreateResponseMessage(DvtkData.Dimse.DimseCommand.NSETRSP, dicomMessage)
+
+            dicomMessageToSend.Set(Tags.TransactionUID, UI, dicomMessage.DataSet(Tags.TransactionUID).Values(0))
+            'dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, dicomMessage.DataSet.Item(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0))
+
+            Send(dicomMessageToSend, dicomMessage.EncodedPresentationContextID)
+
+            ' Check message for progress, and store progress in referencedata
+            If dicomMessage.Exists(Tags.UPSProgressInformationUnifiedProcedureStepProgress) = True Then
+                ReferenceDataSet.GetInstance.ReceivedProgress = Integer.Parse(dicomMessage.DataSet(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0))
+            End If
+
+            Return True
+
+        Else
+            Throw New Exception(String.Format("Handling N-SET RQ of Requested SOP Class UID '{0}' not supported", requestedSOPClassUID))
+        End If
+
+    End Function
+
+End Class

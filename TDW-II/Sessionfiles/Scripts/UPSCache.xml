@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSet>
+    <DataSetPath>\..\Datasets\TDW\Cache</DataSetPath>
+    <C-FIND-REQ>TDW-RO-58-C-FIND-Req.dcm</C-FIND-REQ>
+    <C-FIND-RSP>TDW-RO-58-C-FIND-Rsp.dcm</C-FIND-RSP>
+	<N-ACTION-RSP-RO60>TDW-RO-60-ACTION-RSP.dcm</N-ACTION-RSP-RO60>
+	<N-ACTION-REQ-RO60>TDW-RO-60-ACTION-REQ.dcm</N-ACTION-REQ-RO60>
+	<N-SET-RSP-RO62>TDW-RO-62-N-SET-RSP.dcm</N-SET-RSP-RO62>
+    <RtBeamDeliv>RtBeamDeliv.dcm</RtBeamDeliv> 
+</DataSet>

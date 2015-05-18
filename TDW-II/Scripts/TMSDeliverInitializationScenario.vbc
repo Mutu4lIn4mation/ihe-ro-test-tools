@@ -1,0 +1,83 @@
+Class TMSDeliverInitializationScenario
+    Inherits Scenario
+    'Constructor
+    Public Sub New()
+        Dim tmsActor As TMSActor = New TMSActor
+        Dim tddActor As TDDActor = New TDDActor()
+
+        Dim treatmentForm As ChooseKindOfTreatmentDialog = New ChooseKindOfTreatmentDialog()
+        Dim queryForm As EditQueryForm = New EditQueryForm()
+        Dim errorDialog As ErrorDialog = New ErrorDialog()
+
+
+        Try
+            ' Check if dataset is present
+            DataSetHandler.CheckUpsDataSets()
+
+            Try
+                DataSetHandler.CheckUPSMessageExists(DataSetHandler.UPSCacheXMLFileName, "C-FIND-RSP")
+            Catch ex As Exception
+                Dim errorMessage As String = "First run the 'TMS Retrieval of Worklist testscenario' followed by the 'OST Retrieve Static Treatment Delivery Input Instances testscenario', at least once."
+                errorDialog.SetMessage(errorMessage)
+                errorDialog.ShowDialog()
+                Throw ex
+            End Try
+            'Detect treatment type
+            treatmentForm.ShowDialog()
+
+            'Configure the UPS In Progress request step
+            'RO-60: Treatment Delivery in Progress
+            Dim sendRO60 As SendScenarioStep = New SendScenarioStep(New TDDActor(), New TMSActor(), True)
+            Dim ro60transaction As RO60Transaction = New RO60Transaction()
+            sendRO60.AddTransaction(ro60transaction)
+
+            'Configure the sendRO61 step
+            'RO-61: Retrieve Dynamic Treatment Delivery Input Instances from TMS
+            Dim sendRO61 As SendScenarioStep = New SendScenarioStep(New TDDActor(), New TMSActor(), True)
+            Dim ro61transaction As RO61Transaction = New RO61Transaction(tmsActor, tddActor)
+            sendRO61.AddTransaction(ro61transaction)
+
+            'Configure the validateRO60 response step
+            'RO-60: Treatment Delivery in Progress
+            Dim validateRO60 As ValidateScenarioStep = New ValidateScenarioStep(sendRO60)
+            validateRO60.AddRules(ro60transaction.GetCommonTransactionRulesForResponse())
+
+            'Configure the validateRO61 response steps
+            'RO-61: Retrieve Dynamic Treatment Delivery Input Instances from TMS
+            Dim validateRO61 As ValidateScenarioStep = New ValidateScenarioStep(sendRO61)
+
+            ' Apply validation rules for the received objects
+            If treatmentForm.DialogResult = System.Windows.Forms.DialogResult.Yes Then
+                validateRO61.AddRules(ro61transaction.GetReceivedObjectRules(True))
+            Else
+                validateRO61.AddRules(ro61transaction.GetReceivedObjectRules(False))
+            End If
+            'apply rules for C-MOVE Response and C-Store Request
+            validateRO61.AddRules(ro61transaction.GetCommonTransactionRulesForResponse())
+            validateRO61.AddRules(ro61transaction.GetTransactionRulesForResponse())
+            validateRO61.AddRules(ro61transaction.GetTransactionRulesForC_StoreRequest())
+
+            'Add the steps to the list
+            m_scenarioSteps.Add(sendRO60)
+
+            'save message to cache
+            'save must be done on both sides of the testtool
+            Dim saveStep1 As SaveScenarioStep = New SaveScenarioStep(sendRO60, 0, "N-ACTION-RSP-RO60")
+            m_scenarioSteps.Add(saveStep1)
+
+            'Add the steps to the list
+            m_scenarioSteps.Add(sendRO61)
+
+            m_scenarioSteps.Add(validateRO60)
+            m_scenarioSteps.Add(validateRO61)
+
+
+
+        Catch ex As Exception
+            errorDialog.SetMessage(ex.Message)
+            errorDialog.ShowDialog()
+            Throw ex
+        End Try
+    End Sub
+
+End Class

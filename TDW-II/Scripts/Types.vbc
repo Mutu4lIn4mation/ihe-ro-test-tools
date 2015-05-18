@@ -1,0 +1,98 @@
+
+Public Enum ErrorSeverity
+    RuleError = 0
+    RuleWarning
+    RuleInfo
+End Enum
+
+Public Enum IODType
+    CTImage = 0
+    RTDose
+    RTDoseSinglePlan
+    RTDoseComposite
+    RTStructureSet
+    MRImage
+    PETImage
+    SpatialRegistration
+    DeformableSpatialRegistration
+    RTPlanDosimetric
+    UnifiedProcedureStepPull
+    UnifiedProcedureStepPush
+    StudyRootQueryRetrieveMOVE
+    RTImage
+    RTBeamsDeliveryInstruction
+    RTBeamsTreatmentRecordSTORE
+    CStoreRequest
+    NAction
+    RTPlanGeometric
+
+    ' Unknown  ' can be used when the SOP Class UID of a received message can not be identified
+
+    NotSpecified  ' used for validating messages where the SOP Class is not known yet, or can be a list of several
+
+    Generic
+
+End Enum
+
+Enum CTSet
+    SingleSerieCTSet
+    MultiSerieCTSet
+End Enum
+
+Public Enum ValueUniquePresent
+    isUnique
+    isNotUnique
+    isPresent
+    isNotPresent
+End Enum
+
+Enum DialogResult
+    CANCEL = 0
+    CT_PET
+    CT_MR
+    CT_PET_MR
+    CT_MR_PET
+    CTPET_MR
+    CTMR_PET
+    ARCHIVE
+    MR_PET
+    ONEOBJECT
+    RECEIVE_NOTHING
+    Yes
+End Enum
+
+Public Enum ARTO_Scenario
+    BasicStaticBeam
+    'Insert New enum values AFTER HERE!
+    MotorizedWedgeBeam
+    HardWedgeBeam
+    VirtualWedgeBeam
+    ArcBeam
+    ConformalArcBeam
+    StepAndShootBeam
+    SlidingWindowBeam
+    StaticElectronBeam
+    StereotacticBeam
+    StereotacticArcBeam
+    BasicStaticMLCBeam
+    MLCArcBeam
+    'Insert New enum values BEFORE HERE!
+    IMATVMATBeam
+End Enum
+
+Public Enum Modifier
+    HardWedgeBeamModifier
+    BolusBeamModifier
+    BlockBeamModifier
+    CompensatorBeamModifier
+End Enum
+
+Public Enum DataDirSelector
+    UPSDataDir
+    RTTreatmentRecordDir
+    Unknown
+End Enum
+
+
+
+

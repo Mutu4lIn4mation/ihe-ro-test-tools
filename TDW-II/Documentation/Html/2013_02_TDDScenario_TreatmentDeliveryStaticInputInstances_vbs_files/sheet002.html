@@ -1,0 +1,781 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 12">
+<link id=Main-File rel=Main-File
+href="../2013_02_TDDScenario_TreatmentDeliveryStaticInputInstances_vbs.html">
+<link rel=File-List href=filelist.xml>
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\,";
+	mso-displayed-thousand-separator:"\.";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(1);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../2013_02_TDDScenario_TreatmentDeliveryStaticInputInstances_vbs.html");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=blue vlink=purple>
+
+<table border=0 cellpadding=0 cellspacing=0 width=1386 style='border-collapse:
+ collapse;table-layout:fixed;width:1041pt'>
+ <col width=226 style='mso-width-source:userset;mso-width-alt:8265;width:170pt'>
+ <col class=xl74 width=95 style='mso-width-source:userset;mso-width-alt:3474;
+ width:71pt'>
+ <col class=xl75 width=61 style='mso-width-source:userset;mso-width-alt:2230;
+ width:46pt'>
+ <col width=349 style='mso-width-source:userset;mso-width-alt:12763;width:262pt'>
+ <col width=246 style='mso-width-source:userset;mso-width-alt:8996;width:185pt'>
+ <col width=409 style='mso-width-source:userset;mso-width-alt:14957;width:307pt'>
+ <col width=97 style='mso-width-source:userset;mso-width-alt:3547;width:73pt'>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 width=226 style='height:15.0pt;width:170pt'><a
+  name="RANGE!A1" href="../2013RuleOverview.html" target="_parent">Rule
+  Overview</a></td>
+  <td class=xl74 width=95 style='width:71pt'></td>
+  <td class=xl75 width=61 style='width:46pt'></td>
+  <td width=349 style='width:262pt'></td>
+  <td width=246 style='width:185pt'></td>
+  <td width=409 style='width:307pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 colspan=4 style='height:15.0pt;mso-ignore:colspan'>TDD
+  Treatment Delivery Static Input Instances Scenario Rule Overview</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 colspan=4 style='height:15.0pt;mso-ignore:colspan'>Retrieve
+  Static Treatment Delivery Input Instances from OST [RO-59]</td>
+  <td colspan=2 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=21 style='mso-height-source:userset;height:15.75pt'>
+  <td height=21 style='height:15.75pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl77 style='height:15.0pt'>UPS C-MOVE-RQ</td>
+  <td class=xl78 style='border-left:none'>&nbsp;</td>
+  <td class=xl79 width=61 style='border-left:none;width:46pt'>&nbsp;</td>
+  <td class=xl80 width=349 style='border-left:none;width:262pt'>&nbsp;</td>
+  <td class=xl81 width=246 style='border-left:none;width:185pt'>&nbsp;</td>
+  <td></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl82 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl83 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl84 width=61 style='border-top:none;border-left:none;width:46pt'>IHE-Rule</td>
+  <td class=xl85 width=349 style='border-top:none;border-left:none;width:262pt'>Description</td>
+  <td class=xl86 width=246 style='border-top:none;border-left:none;width:185pt'>Code
+  Rule</td>
+  <td></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl87 style='height:15.0pt;border-top:none'>Query/Retrieve
+  Level</td>
+  <td class=xl88 style='border-top:none;border-left:none'>(0008,0052)</td>
+  <td class=xl89 width=61 style='border-top:none;border-left:none;width:46pt'>&nbsp;</td>
+  <td class=xl89 width=349 style='border-top:none;border-left:none;width:262pt'>IMAGE</td>
+  <td class=xl90 width=246 style='border-top:none;border-left:none;width:185pt'>ValueRule</td>
+  <td></td>
+ </tr>
+ <tr height=269 style='mso-height-source:userset;height:201.75pt'>
+  <td height=269 class=xl91 width=226 style='height:201.75pt;width:170pt'>SOP
+  Instance UID<br>
+    (VM is 1-n, that means there can be more then one SOP instance UID present)</td>
+  <td class=xl92 style='border-left:none'>(0008,0018)</td>
+  <td class=xl93 width=61 style='border-left:none;width:46pt'>&nbsp;</td>
+  <td class=xl94 width=349 style='border-left:none;width:262pt'>The SOP
+  Instance UID`s should be present in the Input Inf<font class="font14">ormation
+  sequence<span style='mso-spacerun:yes'>  </span>of the selected UPS. </font><font
+  class="font13"><br>
+    </font><font class="font14"><br>
+    &gt;Referenced Series Sequence<br>
+    &gt;&gt;Reference SOP Sequence<br>
+    &gt;&gt;&gt;Referenced SOP Class UID</font><font class="font0"><br>
+    <br>
+    Note: At least an RT-Plan should be requested, other objects are optional,
+  but all objects that are requested should be in the input information
+  sequence of the worklist<br>
+    (This can not be validated here this is validated in the<span
+  style='mso-spacerun:yes'>  </span>TMS Treatment Delivery Static
+  InputInstances Scenario)<br>
+    </font></td>
+  <td class=xl95 width=246 style='border-left:none;width:185pt'>RequestedCMoveSopInstanceUIDsRule<br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    </td>
+  <td class=xl96></td>
+ </tr>
+ <tr height=81 style='mso-height-source:userset;height:60.75pt'>
+  <td height=81 class=xl97 style='height:60.75pt;border-top:none'>Affected SOP
+  Instance UID</td>
+  <td class=xl98 style='border-top:none;border-left:none'>(0000,1000)</td>
+  <td class=xl99 width=61 style='border-top:none;border-left:none;width:46pt'>&nbsp;</td>
+  <td class=xl100 width=349 style='border-top:none;border-left:none;width:262pt'>The
+  Retrieve (Study Root – MOVE) SOP Class shall be supported.<br>
+    <br>
+    Value = &quot;1.2.840.10008.5.1.4.1.2.2.2&quot;</td>
+  <td class=xl101 width=246 style='border-top:none;border-left:none;width:185pt'>ValueRule<br>
+    IsRequiredRule</td>
+  <td></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl103></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl76 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl102 style='height:15.0pt'></td>
+  <td class=xl74></td>
+  <td class=xl75></td>
+  <td colspan=3 style='mso-ignore:colspan'></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=226 style='width:170pt'></td>
+  <td width=95 style='width:71pt'></td>
+  <td width=61 style='width:46pt'></td>
+  <td width=349 style='width:262pt'></td>
+  <td width=246 style='width:185pt'></td>
+  <td width=409 style='width:307pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>
