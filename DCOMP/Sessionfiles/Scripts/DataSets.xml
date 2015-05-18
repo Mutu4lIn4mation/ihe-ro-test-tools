@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<DataSet>
-    <DataSetPath>\..\Datasets</DataSetPath>
-    <CTImagePath>CT</CTImagePath>
-    <RTDosePath>RTDose</RTDosePath>
-    <RTStructureSetPath>RTStruct</RTStructureSetPath>
-    <SpatialRegistrationPath>SpatialRegistration</SpatialRegistrationPath>
-</DataSet>
