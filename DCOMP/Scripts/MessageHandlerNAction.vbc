@@ -8,8 +8,8 @@ Class MessageHandlerNAction
         responseMessage.Set(Tags.AffectedSOPInstanceUID, DvtkData.Dimse.VR.UI, value)
 
         ' Copy  Unified Procedure Step State  (0074,1000)
-        value = requestMessage(Tags.UnifiedProcedureStepState).Values.Item(0)
-        responseMessage.Set(Tags.UnifiedProcedureStepState, DvtkData.Dimse.VR.CS, value)
+        value = requestMessage(Tags.ProcedureStepState).Values.Item(0)
+        responseMessage.Set(Tags.ProcedureStepState, DvtkData.Dimse.VR.CS, value)
 
     End Sub
 
@@ -23,24 +23,27 @@ Class MessageHandlerNAction
 
             dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
 
-            Dim upsState As String = dicomMessage.DataSet.Item(Tags.UnifiedProcedureStepState).Values(0)
-            dicomMessageToSend.Set(Tags.UnifiedProcedureStepState, CS, upsState)
+            'Dim upsState As String = dicomMessage.DataSet.Item(Tags.ProcedureStepState).Values(0)
+            'dicomMessageToSend.Set(Tags.ProcedureStepState, CS, upsState)
 
-            If upsState = "COMPLETED" Then
-                dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, 100)
-            ElseIf upsState = "CANCELED" Then
-                dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, ReferenceDataSet.GetInstance.ReceivedProgress)
-            End If
+            'If upsState = "COMPLETED" Then
+            '    dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, 100)
+            'ElseIf upsState = "CANCELED" Then
+            '    dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, ReferenceDataSet.GetInstance.ReceivedProgress)
+            'End If
 
-            dicomMessageToSend.Set(Tags.TransactionUID, UI, getTransactionUID(dicomMessage)) 'TransactionUID
+            'dicomMessageToSend.Set(Tags.TransactionUID, UI, getTransactionUID(dicomMessage)) 'TransactionUID
             dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
 
-            CopyInterRelationAttributes(dicomMessage, dicomMessageToSend)
+            'CopyInterRelationAttributes(dicomMessage, dicomMessageToSend)
+            Dim value As String = dicomMessage(Tags.RequestedSOPInstanceUID).Values.Item(0)
+            dicomMessageToSend.Set(Tags.AffectedSOPInstanceUID, DvtkData.Dimse.VR.UI, value)
+
             Send(dicomMessageToSend, dicomMessage.EncodedPresentationContextID)
 
-            'The TDW-RO-3 request will allways send IN PROGRESS, TDW-RO-8 uses values COMPLETED en CANCELLED
-            If dicomMessage.DataSet(Tags.UnifiedProcedureStepState).Values(0).Equals("IN PROGRESS") Then
-                DataSetHandler.SaveDatasetToFile(dicomMessage.DataSet, DataSetHandler.UPSCacheXMLFileName, "N-ACTION-RSP-TDWRO3")
+            'The RO-60 request will allways send IN PROGRESS, RO-65 uses values COMPLETED en CANCELLED
+            If dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("IN PROGRESS") Then
+                DataSetHandler.SaveDatasetToFile(dicomMessage.DataSet, DataSetHandler.UPSCacheXMLFileName, "N-ACTION-REQ-RO60")
             End If
 
             Return True
@@ -59,8 +62,9 @@ Class MessageHandlerNAction
         'load C-Find-Rsp from refDataSet
         Dim cmpSopInstanceUID As String = DataSetHandler.GetAttributeValueFromDataSet(DataSetHandler.UPSMessagesXMLFileName, "C-FIND-RSP", Tags.SOPInstanceUID)
         If (rspSopInstanceUID = cmpSopInstanceUID) Then
-            retVal = DataSetHandler.GetAttributeValueFromDataSet(DataSetHandler.UPSMessagesXMLFileName, "N-ACTION-RSP-TDWRO3", Tags.TransactionUID)
+            retVal = DataSetHandler.GetAttributeValueFromDataSet(DataSetHandler.UPSMessagesXMLFileName, "N-ACTION-RSP-RO60", Tags.TransactionUID)
         End If
+
         Return retVal
 
     End Function

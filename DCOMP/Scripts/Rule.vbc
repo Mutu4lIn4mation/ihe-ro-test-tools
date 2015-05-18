@@ -83,8 +83,8 @@ Public Class Rule
         Dim groupNumber As Int64
         Dim ElementNumber As Int64
 
-        groupNumber = Convert.ToInt64(attribute.GroupNumber())
-        ElementNumber = Convert.ToInt64(attribute.ElementNumber())
+        groupNumber = System.Convert.ToInt64(attribute.GroupNumber())
+        ElementNumber = System.Convert.ToInt64(attribute.ElementNumber())
 
         theString = String.Format("({0},{1})", groupNumber.ToString("X"), ElementNumber.ToString("X"))
 
@@ -158,12 +158,12 @@ Public Class Rule
 
         stringDoubleEU = stringDouble.Replace(".", ",")
         Try
-            doubleValue = Convert.ToDouble(stringDouble)
+            doubleValue = System.Convert.ToDouble(stringDouble)
         Catch ex As System.Exception
             doubleValue = 100000.0
         End Try
         Try
-            doubleValueEU = Convert.ToDouble(stringDoubleEU)
+            doubleValueEU = System.Convert.ToDouble(stringDoubleEU)
         Catch ex As System.Exception
             doubleValueEU = 100000.0
         End Try

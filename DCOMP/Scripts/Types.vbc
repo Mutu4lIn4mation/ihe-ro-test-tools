@@ -18,6 +18,8 @@ Public Enum IODType
     RTPlanDosimetric
     UnifiedProcedureStepPull
     UnifiedProcedureStepPush
+    UnifiedProcedureStepWatch
+    UnifiedProcedureStepEvent
     StudyRootQueryRetrieveMOVE
     RTImage
     RTBeamsDeliveryInstruction
@@ -25,6 +27,15 @@ Public Enum IODType
     CStoreRequest
     NAction
     RTPlanGeometric
+    NCreate
+    NEventReport
+    NGet
+    BasicTextSR
+    EnhancedSR
+    RTIonPlan
+    RTIonBeamsTreatmentRecord
+    RTBrachyTreatmentRecord
+    RTTreatmentSummaryRecord
 
     ' Unknown  ' can be used when the SOP Class UID of a received message can not be identified
 
@@ -73,9 +84,13 @@ Public Enum ARTO_Scenario
     SlidingWindowBeam
     StaticElectronBeam
     StereotacticBeam
+    PhotonApplicatorBeam
     StereotacticArcBeam
+    PhotonApplicatorArcBeam
     BasicStaticMLCBeam
     MLCArcBeam
+    MLCFixedApertureArcBeam
+    MLCVariableApertureArcBeam
     'Insert New enum values BEFORE HERE!
     IMATVMATBeam
 End Enum
@@ -92,6 +107,14 @@ Public Enum DataDirSelector
     RTTreatmentRecordDir
     Unknown
 End Enum
+
+Public Enum ProcedureStep
+    Acquire = 1
+    Registration = 2
+    Adjust = 3
+    Deliver = 4
+End Enum
+
 
 
 

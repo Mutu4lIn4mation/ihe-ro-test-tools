@@ -100,7 +100,8 @@ Class ReferenceDataSet
             requestedDataset.DataSet.Read(fileName)
             Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (CT): '{0}'.", fileName))
         Catch ex As DvtkHighLevelInterface.Common.Other.HliException
-            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+            'Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+            Return Nothing
         End Try
         requestedDataset.CommandSet.Set(Tags.AffectedSOPClassUID, UI, SOPclass.CTImageSOPClassUID)
         Return requestedDataset

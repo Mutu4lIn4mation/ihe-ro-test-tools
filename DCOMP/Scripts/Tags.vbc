@@ -25,6 +25,10 @@ Public Class Tags
     Public Shared ReadOnly FinalCumulativeMetersetWeight As String = String.Format("{0}[1]/{1}", BeamSequence, "0x300A010E")
     Public Shared ReadOnly ReferencedToleranceTableNumber As String = String.Format("{0}[1]/{1}", BeamSequence, "0x300A00A0")
 
+    Public Shared ReadOnly PrimaryFluenceModeSequence As String = String.Format("{0}[1]/{1}", BeamSequence, "0x30020050")
+    Public Shared ReadOnly FluenceMode As String = String.Format("{0}[1]/{1}", PrimaryFluenceModeSequence, "0x30020051")
+    Public Shared ReadOnly FluenceModeID As String = String.Format("{0}[1]/{1}", PrimaryFluenceModeSequence, "0x30020052")
+
     Public Shared ReadOnly HighDoseTechniqueTypeTag As String = "0x300A00C7"
 
     Public Shared ReadOnly BeamLimitingDeviceSequenceTagSequence As String = "0x300A00B6"
@@ -139,18 +143,35 @@ Public Class Tags
     Public Shared ReadOnly IsocenterPositionTagSequence As String = "0x300A012C"
     Public Shared ReadOnly SurfaceEntryPointTagSequence As String = "0x300A012E"
     Public Shared ReadOnly SourcetoSurfaceDistanceTagSequence As String = "0x300A0130"
-
+    Public Shared ReadOnly TableTopPitchAngleTagSequence As String = "0x300A0140"
+    Public Shared ReadOnly TableTopRollAngleTagSequence As String = "0x300A0144"
+    Public Shared ReadOnly TableTopRollRotationDirectionTagSequence As String = "0x300A0146"
+    Public Shared ReadOnly TableTopPitchRotationDirectionTagSequence As String = "0x300A0142"
+    Public Shared ReadOnly LeafJawPositionsTagSequence As String = "0x300A011C"
+    Public Shared ReadOnly CumulativeDoseReferenceCoefficientTagSequence As String = "0x300A010C"
+    Public Shared ReadOnly BeamLimitingDevicePositionSequenceTagSequenceLeafJawPosition As String = BeamLimitingDevicePositionSequenceTagSequence + "[1]/" + LeafJawPositionsTagSequence
+    Public Shared ReadOnly ReferencedDoseReferenceSequenceTagSequenceCumulativeDoseReferenceCoefficient As String = ReferencedDoseReferenceSequenceTagSequence + "[1]/" + CumulativeDoseReferenceCoefficientTagSequence
 
     'wedge position in control points 'number of items the same as the number of wedges
     Public Shared ReadOnly WedgePositionSequence As String = String.Format("{0}[1]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence2 As String = String.Format("{0}[2]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence3 As String = String.Format("{0}[3]/{1}", ControlPointSequence, "0x300A0116")
+    Public Shared ReadOnly WedgePositionSequence4 As String = String.Format("{0}[4]/{1}", ControlPointSequence, "0x300A0116")
     Public Shared ReadOnly OnlyWedgePositionSequence As String = "0x300A0116"
     Public Shared ReadOnly WedgePosition As String = String.Format("{0}[1]/{1}", WedgePositionSequence, "0x300A0118")
+    Public Shared ReadOnly WedgePosition2 As String = String.Format("{0}[1]/{1}", WedgePositionSequence2, "0x300A0118")
+    Public Shared ReadOnly WedgePosition3 As String = String.Format("{0}[1]/{1}", WedgePositionSequence3, "0x300A0118")
+    Public Shared ReadOnly WedgePosition4 As String = String.Format("{0}[1]/{1}", WedgePositionSequence4, "0x300A0118")
 
     Public Shared ReadOnly Test As String = String.Format("{0}[1]/{1}", ControlPointSequence, "0x300A0112")
 
     'Applicator
     Public Shared ReadOnly ApplicatorID As String = String.Format("{0}[1]/{1}", ApplicatorSequence, "0x300A0108")
     Public Shared ReadOnly ApplicatorType As String = String.Format("{0}[1]/{1}", ApplicatorSequence, "0x300A0109")
+
+    Public Shared ReadOnly ApplicatorGeometrySequence As String = String.Format("{0}[1]/{1}", ApplicatorSequence, "0x300A0431")
+    Public Shared ReadOnly ApplicatorApertureShape As String = String.Format("{0}[1]/{1}", ApplicatorGeometrySequence, "0x300A0432")
+    Public Shared ReadOnly ApplicatorOpening As String = String.Format("{0}[1]/{1}", ApplicatorGeometrySequence, "0x300A0433")
 
     'PATIENT MODULE
     Public Shared ReadOnly PatientSetupSequence As String = "0x300A0180"
@@ -222,10 +243,37 @@ Public Class Tags
     'RT PRESCRIPTION MODULE
     Public Shared ReadOnly DoseReferenceSequence As String = "0x300A0010"
     Public Shared ReadOnly DoseReferenceUID As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0013")
+    Public Shared ReadOnly DoseReferenceStructureType As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0014")
     Public Shared ReadOnly DoseReferenceDescription As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0016")
+    Public Shared ReadOnly DoseReferencePointCoordinates As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0018")
+    Public Shared ReadOnly DoseReferenceType As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0020")
+    Public Shared ReadOnly ConstraintWeight As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0021")
+    Public Shared ReadOnly DeliveryWarningDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0022")
+    Public Shared ReadOnly DeliveryMaximumDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0023")
+    Public Shared ReadOnly TargetMinimumDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0025")
+    Public Shared ReadOnly TargetPrescriptionDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0026")
+    Public Shared ReadOnly TargetMaximumDose As String = String.Format("{0}[1]/{1}", DoseReferenceSequence, "0x300A0027")
 
     'RT FRACTION SCHEME MODULE
     Public Shared ReadOnly FractionGroupSequence As String = "0x300A0070"
+
+    Public Shared ReadOnly FractionGroupSequenceFractionGroupNumber As String = String.Format("{0}[1]/{1}", FractionGroupSequence, "0x300A0071")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseSequence As String = String.Format("{0}[1]/{1}", FractionGroupSequence, "0x300C0080")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequence As String = String.Format("{0}[1]/{1}", FractionGroupSequence, "0x300C0050")
+
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceRefDoseRefNumber As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300C0051")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceConstraintWeight As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0021")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceDeliveryWarningDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0022")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceDeliveryMaximumDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0023")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceTargetMinimumDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0025")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceTargetPrescriptionDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0026")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseReferenceSequenceTargetMaximumDose As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseReferenceSequence, "0x300A0027")
+
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseSequenceRefSopClassUID As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseSequence, "0x00081150")
+    Public Shared ReadOnly FractionGroupSequenceReferencedDoseSequenceRefSopInstanceUID As String = String.Format("{0}[1]/{1}", FractionGroupSequenceReferencedDoseSequence, "0x00081155")
+
+
+
     Public Shared ReadOnly FractionGroupNumber As String = "0x300A0071"
     Public Shared ReadOnly ReferencedBeamNumberItem As String = "0x300C0006"
     Public Shared ReadOnly ReferencedBeamSequenceItem As String = "0x300C0004"
@@ -273,6 +321,17 @@ Public Class Tags
     Public Shared ReadOnly InstanceCreationTime As String = "0x00080013"
     Public Shared ReadOnly InstanceCreatorUID As String = "0x00080014"
     Public Shared ReadOnly InstanceNumber As String = "0x00200013"
+    Public Shared ReadOnly ReceivingAE As String = "0x00741234"
+    Public Shared ReadOnly DeletionLock As String = "0x00741230"
+
+    Public Shared ReadOnly ContentDate As String = "0x00080023"
+    Public Shared ReadOnly ContentTime As String = "0x00080033"
+
+    Public Shared ReadOnly ReferencedPerformedProcedureStepSequence As String = "0x00081111"
+    Public Shared ReadOnly ReferencedPerformedProcedureStepReferencedSOPInstanceUID As String = String.Format("{0}[1]/{1}", ReferencedPerformedProcedureStepSequence, "0x00081155")
+
+    'OUTPUT INFORMATION SEQUENCE
+    Public Shared ReadOnly OutputInformationSequence As String = "0x00404033"
 
     'SCHEDULED STATION NAME CODE SEQUENCE
     Public Shared ReadOnly ScheduledStationNameCodeSequence As String = "0x00404025"
@@ -281,18 +340,55 @@ Public Class Tags
     Public Shared ReadOnly ScheduledStationCodeMeaning As String = String.Format("{0}[1]/{1}", ScheduledStationNameCodeSequence, "0x00080104")
 
     'UNIFIED PROCEDURE STEP
-    Public Shared ReadOnly UnifiedProcedureStepState As String = "0x00741000"
+    Public Shared ReadOnly ProcedureStepState As String = "0x00741000"
     Public Shared ReadOnly ProcedureStepLabel As String = "0x00741204"
     Public Shared ReadOnly ScheduledProcedureStepStartDateandTime As String = "0x00404005"
     Public Shared ReadOnly TransactionUID As String = "0x00081195"
 
+
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequence As String = "0x0074100E"
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequenceCodeValue As String = String.Format("{0}[1]/{1}", ProcedureStepDiscontinuationReasonCodeSequence, "0x00080100")
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", ProcedureStepDiscontinuationReasonCodeSequence, "0x00080102")
+    Public Shared ReadOnly ProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning As String = String.Format("{0}[1]/{1}", ProcedureStepDiscontinuationReasonCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly ContactURI As String = "0x0074100A"
+    Public Shared ReadOnly ContactDisplayName As String = "0x0074100C"
+    Public Shared ReadOnly ReasonForCancellation As String = "0x00741238"
+
     'Unified Procedure Step Progress Information Module
     Public Shared ReadOnly UPSProgressInformationSequence As String = "0x00741002"
     Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepProgress As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741004")
-    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepDiscontinuationReasonCodeSequence As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x0074100E")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepProgressDescription As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741006")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCancellationDateTime As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00404052")
+    Public Shared ReadOnly UPSProgressInformationUnifiedReasonForCancellation As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741238")
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x0074100E")
+
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeValue As String = String.Format("{0}[1]/{1}", UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning As String = String.Format("{0}[1]/{1}", UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741008")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCommunicationsURISequenceContactURI As String = String.Format("{0}[1]/{1}", UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence, "0x0074100A")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCommunicationsURISequenceContactDisplayName As String = String.Format("{0}[1]/{1}", UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence, "0x0074100C")
 
     'Unified Procedure Step Performed Procedure Information Module
     Public Shared ReadOnly UPSPerformedProcedureSequence As String = "0x00741216"
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404035")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformersName As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequence, "0x00404037")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformersOrganization As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequence, "0x00404036")
+
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequence, "0x00404009")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepEndDate As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400250")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepEndTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400251")
+
+    Public Shared ReadOnly AttributeIdentifierList As String = "0x00001005"
+
+    Public Shared ReadOnly UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404050")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceScheduledProcedureStepEndDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404051")
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcessingParametersSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00741212")
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcessingParametersValueType As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedProcessingParametersSequence, "0x0040A040")
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedProcessingParametersSequence, "0x0040A043")
@@ -301,19 +397,49 @@ Public Class Tags
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedProcessingParametersConceptNameCodeSequence, "0x00080104")
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcessingParametersTextValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedProcessingParametersSequence, "0x0040A160")
     Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404033")
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceTypeOfInstances As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequence, "0x0040E020")
+
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceStudyInstanceUID As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequence, "0x0020000D")
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceSerieInstanceUID As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequence, "0x0020000E")
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequence, "0x00081199")
+
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPClassUID As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequence, "0x00081150")
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPInstanceUID As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequence, "0x00081155")
+
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequence, "0x0040E021")
+
+    Public Shared ReadOnly UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequenceAETitle As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequence, "0x00080054")
+
     Public Shared ReadOnly UPSPerformedProcedureNonDICOMOutputInformationSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404032")
     Public Shared ReadOnly UPSPerformedProcedurePerformedStationNameCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404028")
     Public Shared ReadOnly UPSPerformedProcedurePerformedStationNameCodeCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationNameCodeSequence, "0x00080100")
     Public Shared ReadOnly UPSPerformedProcedurePerformedStationNameCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationNameCodeSequence, "0x00080102")
     Public Shared ReadOnly UPSPerformedProcedurePerformedStationNameCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationNameCodeSequence, "0x00080104")
 
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404029")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationClassCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationClassCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationClassCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404030")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence, "0x00080104")
+
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404019")
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080100")
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080102")
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080104")
 
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepStartDate As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400244")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepStartTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400245")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepDescription As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400254")
+    Public Shared ReadOnly UPSPerformedProcedureCommentsOnThePerformedProcedureStep As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400280")
+
     'Unified Procedure Step Scheduled Procedure Information Module
     Public Shared ReadOnly ScheduledProcedureStepModificationDateandTime As String = "0x00404010"
+
+    Public Shared ReadOnly InputReadinessState As String = "0x00404041"
 
     'Command Data
     Public Shared ReadOnly MessageID As String = "0x00000110"
@@ -334,15 +460,25 @@ Public Class Tags
 
     'INPUT INFORMATION SEQUENCE
     Public Shared ReadOnly InputInformationSequence As String = "0x00404021"
-    Public Shared ReadOnly IisReferencedSeriesSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x00081115")
-    Public Shared ReadOnly IisRssReferencedSOPSequence As String = String.Format("{0}[1]/{1}", IisReferencedSeriesSequence, "0x00081199")
+    'Public Shared ReadOnly IisReferencedSeriesSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x00081115")
+    Public Shared ReadOnly IisTypeOfInstances As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E020")
+    Public Shared ReadOnly IisRssReferencedSOPSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x00081199")
     Public Shared ReadOnly ReferencedSOPClassUID As String = "0x00081150"
     Public Shared ReadOnly IisRssRssReferencedSOPClassUID As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x00081150")
     'Public Shared ReadOnly ReferencedSOPInstanceUID As String = String.Format("0x00081155")
     Public Shared ReadOnly IisRssRssReferencedSOPInstanceUID As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x00081155")
+
+    Public Shared ReadOnly IisRssRssHL7InstanceIdentifier As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x0040E001")
+    Public Shared ReadOnly IisRssRssReferencedFrameNumber As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x00081160")
+    Public Shared ReadOnly IisRssRssReferencedSegmentNumber As String = String.Format("{0}[1]/{1}", IisRssReferencedSOPSequence, "0x0062000B")
+
     Public Shared ReadOnly IisStudyInstanceUID As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0020000D")
-    Public Shared ReadOnly IisRssSeriesInstanceUID As String = String.Format("{0}[1]/{1}", IisReferencedSeriesSequence, "0x0020000E")
+    Public Shared ReadOnly IisRssSeriesInstanceUID As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0020000E")
     'Public Shared ReadOnly IisRssRetrieveAeTitle As String = String.Format("{0}[1]/{1}", IisReferencedSeriesSequence, "0x00080054")
+
+    Public Shared ReadOnly IisMediaRetrievalSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E022")
+    Public Shared ReadOnly IisWADORetrievalSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E023")
+    Public Shared ReadOnly IisXDSRetrievalSequence As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E024")
 
     'SCHEDULED PROCESSING PARAMETERS SEQUENCE
     Public Shared ReadOnly ScheduledProcessingParametersSequence As String = "0x00741210"
@@ -399,23 +535,42 @@ Public Class Tags
     Public Shared ReadOnly ReferencedSOPSequenceMOVE As String = "0x00081199"
     Public Shared ReadOnly ReferencedSOPInstanceUIDMOVE As String = "0x00081155"
 
+    Public Shared ReadOnly RequestingAE As String = "0x00741236"
+
+
     Public Shared ReadOnly MediaStorageSOPClassUID As String = "0x00020002"
     Public Shared ReadOnly MediaStorageSOPInstanceUID As String = "0x00020003"
     Public Shared ReadOnly RequestedSOPClassUID As String = "0x00000003"
     Public Shared ReadOnly RequestedSOPInstanceUID As String = "0x00001001"
     Public Shared ReadOnly AffectedSOPClassUID As String = "0x00000002"
     Public Shared ReadOnly AffectedSOPInstanceUID As String = "0x00001000"
+    Public Shared ReadOnly EventTypeID As String = "0x00001002"
+
+    Public Shared ReadOnly CommandField As String = "0x00000100"
+    Public Shared ReadOnly CommandDataSetType As String = "0x00000800"
 
     Public Shared ReadOnly MoveDestination As String = "0x00000600"
 
     'specific tags needed to dynamically change the AE title of the C-FIND-RSPs
-    Public Shared ReadOnly IisReferencedSeriesSequence2 As String = String.Format("{0}[2]/{1}", InputInformationSequence, "0x00081115")
-    Public Shared ReadOnly retrieveAETitle1 As String = String.Format("{0}[1]/{1}", IisReferencedSeriesSequence, "0x00080054")
-    Public Shared ReadOnly retrieveAETitle2 As String = String.Format("{0}[1]/{1}", IisReferencedSeriesSequence2, "0x00080054")
+    'Public Shared ReadOnly IisReferencedSeriesSequence2 As String = String.Format("{0}[2]/{1}", InputInformationSequence, "0x00081115")
+
+    Public Shared ReadOnly DICOMRetrievalSequence As String = "0x0040E021"
+
+
+    Public Shared ReadOnly InputInformationSequenceDICOMRetrievalSequence1 As String = String.Format("{0}[1]/{1}", InputInformationSequence, "0x0040E021")
+    Public Shared ReadOnly InputInformationSequenceDICOMRetrievalSequence2 As String = String.Format("{0}[2]/{1}", InputInformationSequence, "0x0040E021")
+    Public Shared ReadOnly InputInformationSequenceDICOMRetrievalSequence3 As String = String.Format("{0}[3]/{1}", InputInformationSequence, "0x0040E021")
+
+    Public Shared ReadOnly retrieveAETitle1 As String = String.Format("{0}[1]/{1}", InputInformationSequenceDICOMRetrievalSequence1, "0x00080054")
+    Public Shared ReadOnly retrieveAETitle2 As String = String.Format("{0}[1]/{1}", InputInformationSequenceDICOMRetrievalSequence2, "0x00080054")
+    Public Shared ReadOnly retrieveAETitle3 As String = String.Format("{0}[1]/{1}", InputInformationSequenceDICOMRetrievalSequence3, "0x00080054")
+
     Public Shared ReadOnly MoveOriginatorApplicationEntity As String = "0x00001030"
     Public Shared ReadOnly MoveOriginatorMessageID As String = "0x00001031"
 
     Public Shared ReadOnly privateTransferSyntaxAttribute As String = "0x99998765"
+
+    Public Shared ReadOnly ReferencedSOPSequenceSOPClassUID As String = String.Format("{0}[1]/{1}", ReferencedSOPSequenceMOVE, "0x00081150")
 
     'RT Beam Delivery
     Public Shared ReadOnly BeamTaskSequence As String = "0x00741020"
@@ -424,13 +579,14 @@ Public Class Tags
     Public Shared ReadOnly ContinuationStartMeterset As String = "0x00740120"
     Public Shared ReadOnly ContinuationEndMeterset As String = "0x00740121"
     Public Shared ReadOnly ReferencedRTPlanSequence As String = "0x300C0002"
+    Public Shared ReadOnly RTPlanRelationship As String = "0x300A0055"
     Public Shared ReadOnly ReferencedFractionGroupSequence As String = String.Format("{0}[1]/{1}", ReferencedRTPlanSequence, "0x300C0020")
     Public Shared ReadOnly DoseComment As String = "0x30040006"
     Public Shared ReadOnly ReferencedFrameNumberTag As String = "0x00081160"
 
-    Public Shared ReadOnly TableTopVerticalAdjustedPosition As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x00740126")
-    Public Shared ReadOnly TableTopLongitudinalAdjustedPosition As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x00740127")
-    Public Shared ReadOnly TableTopLateralAdjustedPosition As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x00740128")
+    Public Shared ReadOnly TableTopVerticalAdjustedPosition As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x00741026")
+    Public Shared ReadOnly TableTopLongitudinalAdjustedPosition As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x00741027")
+    Public Shared ReadOnly TableTopLateralAdjustedPosition As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x00741028")
     Public Shared ReadOnly PatientSupportAdjustedAngle As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x0074102A")
     Public Shared ReadOnly TableTopEccentricAdjustedAngle As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x0074102B")
     Public Shared ReadOnly TableTopPitchAdjustedAngle As String = String.Format("{0}[1]/{1}", BeamTaskSequence, "0x0074102C")
@@ -463,6 +619,9 @@ Public Class Tags
     Public Shared ReadOnly BeamTaskSequenceReferencedRtPlanSequenceReferencedSeriesSequenceReferencedSOPSequence As String = String.Format("{0}[1]/{1}", BeamTaskSequenceReferencedRtPlanSequenceReferencedSeriesSequence, "0x00081199")
     Public Shared ReadOnly BeamTaskSequenceReferencedRtPlanSequenceRSSRSSReferencedSopClassUid As String = String.Format("{0}[1]/{1}", BeamTaskSequenceReferencedRtPlanSequenceReferencedSeriesSequenceReferencedSOPSequence, "0x00081150")
     Public Shared ReadOnly BeamTaskSequenceReferencedRtPlanSequenceRSSRSSReferencedSopInstanceUid As String = String.Format("{0}[1]/{1}", BeamTaskSequenceReferencedRtPlanSequenceReferencedSeriesSequenceReferencedSOPSequence, "0x00081155")
+
+    Public Shared ReadOnly ReferencedRtPlanSequenceRSSRSSReferencedSopInstanceUid As String = String.Format("{0}[1]/{1}", ReferencedRTPlanSequence, "0x00081155")
+    Public Shared ReadOnly ReferencedRtPlanSequenceRSSRSSReferencedSopClassUid As String = String.Format("{0}[1]/{1}", ReferencedRTPlanSequence, "0x00081150")
 
     'Spatial Registration Module 
     Public Shared ReadOnly RegistrationSequence As String = "0x00700308"

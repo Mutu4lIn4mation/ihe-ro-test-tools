@@ -98,13 +98,13 @@ Class MessageHandlerCFind
             End If
 
             'create sequence string for current reference series
-            Dim indexedRss As String = Tags.IisReferencedSeriesSequence + String.Format("[{0}]/", indexRss)
+            Dim indexedRss As String = Tags.InputInformationSequence + String.Format("[{0}]/", indexRss)
             Dim indexedRssSeriesInstanceUid As String = indexedRss + Tags.SeriesInstanceUID
-            Dim indexedRssApplicationEntityTitle As String = indexedRss + Tags.retrieveAETitleMOVE
+            'Dim indexedRssApplicationEntityTitle As String = indexedRss + Tags.retrieveAETitleMOVE
 
             'set current series instance uid
             responseMessage.Set(indexedRssSeriesInstanceUid, UI, currentRssSiuid)
-            responseMessage.Set(indexedRssApplicationEntityTitle, AE, aeTitle)
+            responseMessage.Set(Tags.retrieveAETitle1, AE, aeTitle)
 
             'storing dataset of current sop sequence - increment the index
             indexRsops = indexRsops + 1

@@ -231,6 +231,14 @@ Public Enum SUTActor
     
     '''<remarks/>
     Archive
+
+    '''<remarks/>
+    OST
+    '''<remarks/>
+    QCP
+
+    '''<remarks/>
+    QCR
 End Enum
 
 '''<remarks/>
@@ -291,6 +299,15 @@ Public Enum DVTKActor
     
     '''<remarks/>
     Archive
+
+    '''<remarks/>
+    OST
+
+    '''<remarks/>
+    QCP
+
+    '''<remarks/>
+    QCR
 End Enum
 
 '''<remarks/>

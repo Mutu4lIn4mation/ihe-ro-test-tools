@@ -3,8 +3,16 @@ Class Validator
     Protected m_logger As Logger = Logger.GetInstance()
     'the scenariorules it will apply
     Protected m_rules As ArrayList
+    Protected m_isDifferenceCheck As Boolean
 
     Private m_validationMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(ByVal isDifferenceCheck As Boolean)
+        m_isDifferenceCheck = isDifferenceCheck
+    End Sub
 
     'This method validates all received messages. It applies DICOM validation and checks for the specified IHE-RO scenario rules
     Public Sub ValidateMessages(ByRef receivedMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection, ByRef scenarioRules As ArrayList)
