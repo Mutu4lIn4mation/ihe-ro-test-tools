@@ -5554,6 +5554,17 @@ MODULE "General Study Module" M
 (0x00080020,2,DA,1) "Study Date" 
 (0x00080030,2,TM,1) "Study Time" 
 (0x00080050,2,SH,1) "Accession Number" 
+(0x00080051,3,SQ,1,
+>(0x00400031,1C,UT,1) "Local Namespace Entity ID" 
+>(0x00400032,1C,UT,1) "Universal Entity ID" 
+>(0x00400033,1C,CS,1,E,"DNS"
+					  |"EUI64"
+					  |"ISO"
+					  |"URI"
+					  |"UUID"
+					  |"X400"
+                      |"X500") "Universal Entity ID Type" 
+) "Issuer of Accession Number Sequence" 
 (0x00080090,2,PN,1) "Referring Physician's Name" 
 (0x00200010,2,SH,1) "Study ID" 
 (0x00081030,3,LO,1) "Study Description" 
@@ -5570,8 +5581,43 @@ MODULE "General Study Module" M
  >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
  >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
  >(0x0008010F,3,CS,1) "Context Identifier" 
+ >(0x00080119,1C,UT,1) "Long Code Value" 
+ >(0x00080120,1C,UT,1) "URN Code Value"
  >(0x00080117,3,UI,1) "Context UID" 
+ >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Reason For Performed Procedure Code Sequence" 
+ (0x00321034,3,SQ,1,
+ >(0x00080100,1,SH,1) "Code Value" 
+ >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+ >(0x00080104,1,LO,1) "Code Meaning" 
+ >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+ >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
+ >(0x00080106,1C,DT,1) "Context Group Version"  : PRESENT 0x0008010F
+ >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
+ >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
+ >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
+ >(0x0008010F,3,CS,1) "Context Identifier"
+ >(0x00080119,1C,UT,1) "Long Code Value" 
+ >(0x00080120,1C,UT,1) "URN Code Value"
+ >(0x00080117,3,UI,1) "Context UID" 
+ >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence" 
+ ) "Requesting Service Code Sequence" 
 (0x00081032,3,SQ,1,
  >(0x00080100,1,SH,1) "Code Value" 
  >(0x00080102,1,SH,1) "Coding Scheme Designator" 
@@ -5582,7 +5628,19 @@ MODULE "General Study Module" M
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
  >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
  >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
- >(0x0008010F,3,CS,1) "Context Identifier" 
+ >(0x0008010F,3,CS,1) "Context Identifier"
+ >(0x00080119,1C,UT,1) "Long Code Value" 
+ >(0x00080120,1C,UT,1) "URN Code Value"
+ >(0x00080117,3,UI,1) "Context UID" 
+ >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence" 
  ) "Procedure Code Sequence" 
 (0x00081110,3,SQ,1,
  >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
@@ -5604,6 +5662,18 @@ MODULE "General Study Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Person Identification Code Sequence" 
  >(0x00080082,1C,SQ,1,
    >(0x00080100,1,SH,1) "Code Value" 
@@ -5617,7 +5687,18 @@ MODULE "General Study Module" M
    >(0x0008010B,3,CS,1,E,"N"
                       |"Y") "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
    >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+   >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Institution Code Sequence"  : NOT PRESENT 0x00080080
  ) "Referring Physician Identification Sequence" 
 (0x00081049,3R,SQ,1,
@@ -5636,6 +5717,18 @@ MODULE "General Study Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Person Identification Code Sequence" 
  >(0x00080082,1C,SQ,1,
    >(0x00080100,1,SH,1) "Code Value" 
@@ -5649,7 +5742,18 @@ MODULE "General Study Module" M
    >(0x0008010B,3,CS,1,E,"N"
                       |"Y") "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
    >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence" 
  ) "Institution Code Sequence"  : NOT PRESENT 0x00080080
  ) "Physician(s) of Record Identification Sequence" 
 (0x00081062,3R,SQ,1,
@@ -5668,6 +5772,18 @@ MODULE "General Study Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Person Identification Code Sequence" 
  >(0x00080082,1C,SQ,1,
    >(0x00080100,1,SH,1) "Code Value" 
@@ -5681,7 +5797,18 @@ MODULE "General Study Module" M
    >(0x0008010B,3,CS,1,E,"N"
                       |"Y") "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
    >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence" 
  ) "Institution Code Sequence"  : NOT PRESENT 0x00080080
  ) "Physician(s) Reading Study Identification Sequence" 
 
@@ -5695,7 +5822,7 @@ MODULE "Patient Study Module" U
 (0x00101020,3,DS,1) "Patient's Size" 
 (0x00101030,3,DS,1) "Patient's Weight"
 (0x00101021,3,SQ,1,
- >(0x00080100,1,SH,1,D,"F-051E3"
+ >(0x00080100,1C,SH,1,D,"F-051E3"
                       |"F-051DF"
                       |"F-051E4"
                       |"F-051E8"
@@ -5706,7 +5833,7 @@ MODULE "Patient Study Module" U
                       |"113601"
                       |"113602"
                       |"113603") "Code Value" 
- >(0x00080102,1,SH,1,D,"SRT"
+ >(0x00080102,1C,SH,1,D,"SRT"
                       |"DCM") "Coding Scheme Designator"
  >(0x00080104,1,LO,1) "Code Meaning" 
  >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
@@ -5715,7 +5842,19 @@ MODULE "Patient Study Module" U
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
  >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
  >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
- >(0x0008010F,3,CS,1) "Context Identifier" 
+ >(0x0008010F,3,CS,1) "Context Identifier"
+ >(0x00080119,1C,UT,1) "Long Code Value" 
+ >(0x00080120,1C,UT,1) "URN Code Value"
+ >(0x00080117,3,UI,1) "Context UID" 
+ >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence" 
  ) "Patient's Size Code Sequence" 
 (0x00102180,3,SH,1) "Occupation" 
 (0x001021B0,3,LT,1) "Additional Patient History" 
@@ -5723,8 +5862,8 @@ MODULE "Patient Study Module" U
 (0x00380060,3,LO,1) "Service Episode ID" 
 (0x00380062,3,LO,1) "Service Episode Description" 
 (0x00081084,3,SQ,1,
- >(0x00080100,1,SH,1) "Code Value" 
- >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+ >(0x00080100,1C,SH,1) "Code Value" 
+ >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
  >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5732,7 +5871,19 @@ MODULE "Patient Study Module" U
  >(0x00080107,1C,DT,1) "Context Group Local Version"  : VALUE 0x0008010B="Y"
  >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
  >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
- >(0x0008010F,3,CS,1) "Context Identifier" 
+ >(0x0008010F,3,CS,1) "Context Identifier"
+ >(0x00080119,1C,UT,1) "Long Code Value" 
+ >(0x00080120,1C,UT,1) "URN Code Value"
+ >(0x00080117,3,UI,1) "Context UID" 
+ >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1,SH,1) "Code Value" 
+   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence" 
  ) "Admitting Diagnoses Code Sequence" 
 (0x00380014,3R,SQ,1,
  >(0x00400031,1C,UT,1) "Local Namespace Entity ID"  : WEAK (NOT PRESENT 0x00400032,TRUE)
@@ -5778,10 +5929,13 @@ MODULE "RT Series Module" M
 (0x00080060,1,CS,1,E,"RTPLAN") "Modality"
 (0x0020000E,1,UI,1) "Series Instance UID" 
 (0x00200011,2,IS,1) "Series Number" 
+(0x00080021,3,DA,1) "Series Date" 
+(0x00080031,3,TM,1) "Series Time" 
 (0x0008103E,3,LO,1) "Series Description" 
+(0x00081070,2,PN,1:n) "Operators' Name" 
 (0x0008103F,3,SQ,1,
- >(0x00080100,1,SH,1) "Code Value" 
- >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+ >(0x00080100,1C,SH,1) "Code Value" 
+ >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
  >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5790,7 +5944,18 @@ MODULE "RT Series Module" M
  >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
  >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
  >(0x0008010F,3,CS,1) "Context Identifier" 
+ >(0x00080119,1C,UT,1) "Long Code Value" 
+ >(0x00080120,1C,UT,1) "URN Code Value"
  >(0x00080117,3,UI,1) "Context UID" 
+ >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Series Description Code Sequence" 
 (0x00081111,3,SQ,1,
  >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
@@ -5828,9 +5993,12 @@ MODULE "RT Series Module" M
        >(0x0040A124,1C,UI,1) "UID"  : VALUE 0x0040A040 = "UIDREF"
        >(0x0040A160,1C,UT,1) "Text Value"  : VALUE 0x0040A040 = "TEXT"
        >(0x0040A30A,1C,DS,1:n) "Numeric Value"  : VALUE 0x0040A040 = "NUMERIC"
+	   >(0x0040A161,1C,FD,1:n) "Floating Point Value" 
+	   >(0x0040A162,1C,SL,1:n) "Rational Numerator Value" 
+	   >(0x0040A163,1C,UL,1:n) "Rational Denominator Value" 
        >(0x0040A043,1,SQ,1,
-         >(0x00080100,1,SH,1) "Code Value" 
-         >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+         >(0x00080100,1C,SH,1) "Code Value" 
+         >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
          >(0x00080104,1,LO,1) "Code Meaning" 
          >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
          >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5839,6 +6007,18 @@ MODULE "RT Series Module" M
          >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
          >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
          >(0x0008010F,3,CS,1) "Context Identifier" 
+		 >(0x00080119,1C,UT,1) "Long Code Value" 
+		 >(0x00080120,1C,UT,1) "URN Code Value"
+		 >(0x00080117,3,UI,1) "Context UID" 
+		 >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Concept Name Code Sequence" 
        >(0x00081199,1C,SQ,1,
          >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : NOT PRESENT 0x0062000B
@@ -5847,13 +6027,13 @@ MODULE "RT Series Module" M
          >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced SOP Sequence"  : VALUE 0x0040A040="COMPOSITE" OR VALUE 0x0040A040="IMAGE"
        >(0x004008EA,1C,SQ,1,
-         >(0x00080100,1,SH,1,D,"[hnsf'U]"
+         >(0x00080100,1C,SH,1,D,"[hnsf'U]"
                       |"{counts}"
                       |"{counts}/s"
                       |"{SUVbsa}cm2/ml"
                       |"{SUVbw}g/ml"
                       |"{SUVlbm}g/ml") "Code Value" 
-         >(0x00080102,1,SH,1,D,"UCUM") "Coding Scheme Designator" 
+         >(0x00080102,1C,SH,1,D,"UCUM") "Coding Scheme Designator" 
          >(0x00080104,1,LO,1,D,"Counts"
                       |"Counts per second"
                       |"Hounsfield unit"
@@ -5867,10 +6047,22 @@ MODULE "RT Series Module" M
          >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
          >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
          >(0x0008010F,3,CS,1) "Context Identifier" 
+		 >(0x00080119,1C,UT,1) "Long Code Value" 
+		 >(0x00080120,1C,UT,1) "URN Code Value"
+		 >(0x00080117,3,UI,1) "Context UID" 
+		 >(0x00080118,3,UI,1) "Mapping Resource UID" 
+			>(0x00080121,3,SQ,1,
+			>(0x00080100,1C,SH,1) "Code Value" 
+			>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+			>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+			>(0x00080104,1,LO,1) "Code Meaning" 
+			>(0x00080119,1C,UT,1) "Long Code Value" 
+			>(0x00080120,1C,UT,1) "URN Code Value" 
+			) "Equivalent Code Sequence"
  ) "Measurement Units Code Sequence"  : VALUE 0x0040A040 = "NUMERIC"
        >(0x0040A168,1C,SQ,1,
-         >(0x00080100,1,SH,1) "Code Value" 
-         >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+         >(0x00080100,1C,SH,1) "Code Value" 
+         >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
          >(0x00080104,1,LO,1) "Code Meaning" 
          >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
          >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5879,6 +6071,18 @@ MODULE "RT Series Module" M
          >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
          >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
          >(0x0008010F,3,CS,1) "Context Identifier" 
+		 >(0x00080119,1C,UT,1) "Long Code Value" 
+		 >(0x00080120,1C,UT,1) "URN Code Value"
+		 >(0x00080117,3,UI,1) "Context UID" 
+		 >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		 >(0x00080121,3,SQ,1,
+		 >(0x00080100,1C,SH,1) "Code Value" 
+		 >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		 >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		 >(0x00080104,1,LO,1) "Code Meaning" 
+		 >(0x00080119,1C,UT,1) "Long Code Value" 
+		 >(0x00080120,1C,UT,1) "URN Code Value" 
+		 ) "Equivalent Code Sequence"
  ) "Concept Code Sequence"  : VALUE 0x0040A040 = "CODE"
  ) "Content Item Modifier Sequence" 
      >(0x0040A040,1,CS,1,D,"CODE"
@@ -5898,9 +6102,12 @@ MODULE "RT Series Module" M
      >(0x0040A124,1C,UI,1) "UID"  : VALUE 0x0040A040 = "UIDREF"
      >(0x0040A160,1C,UT,1) "Text Value"  : VALUE 0x0040A040 = "TEXT"
      >(0x0040A30A,1C,DS,1:n) "Numeric Value"  : VALUE 0x0040A040 = "NUMERIC"
+	 >(0x0040A161,1C,FD,1:n) "Floating Point Value" 
+	 >(0x0040A162,1C,SL,1:n) "Rational Numerator Value" 
+	 >(0x0040A163,1C,UL,1:n) "Rational Denominator Value" 
      >(0x0040A043,1,SQ,1,
-       >(0x00080100,1,SH,1) "Code Value" 
-       >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+       >(0x00080100,1C,SH,1) "Code Value" 
+       >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
        >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5909,6 +6116,18 @@ MODULE "RT Series Module" M
        >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
        >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
        >(0x0008010F,3,CS,1) "Context Identifier" 
+	   >(0x00080119,1C,UT,1) "Long Code Value" 
+	   >(0x00080120,1C,UT,1) "URN Code Value"
+       >(0x00080117,3,UI,1) "Context UID" 
+	   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Concept Name Code Sequence" 
      >(0x00081199,1C,SQ,1,
        >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : NOT PRESENT 0x0062000B
@@ -5917,13 +6136,13 @@ MODULE "RT Series Module" M
        >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced SOP Sequence"  : VALUE 0x0040A040="COMPOSITE" OR VALUE 0x0040A040="IMAGE"
      >(0x004008EA,1C,SQ,1,
-       >(0x00080100,1,SH,1,D,"[hnsf'U]"
+       >(0x00080100,1C,SH,1,D,"[hnsf'U]"
                       |"{counts}"
                       |"{counts}/s"
                       |"{SUVbsa}cm2/ml"
                       |"{SUVbw}g/ml"
                       |"{SUVlbm}g/ml") "Code Value" 
-       >(0x00080102,1,SH,1,D,"UCUM") "Coding Scheme Designator" 
+       >(0x00080102,1C,SH,1,D,"UCUM") "Coding Scheme Designator" 
        >(0x00080104,1,LO,1,D,"Counts"
                       |"Counts per second"
                       |"Hounsfield unit"
@@ -5937,10 +6156,22 @@ MODULE "RT Series Module" M
        >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
        >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
        >(0x0008010F,3,CS,1) "Context Identifier" 
+	   >(0x00080119,1C,UT,1) "Long Code Value" 
+	   >(0x00080120,1C,UT,1) "URN Code Value"
+	   >(0x00080117,3,UI,1) "Context UID" 
+	   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Measurement Units Code Sequence"  : VALUE 0x0040A040 = "NUMERIC"
      >(0x0040A168,1C,SQ,1,
-       >(0x00080100,1,SH,1) "Code Value" 
-       >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+       >(0x00080100,1C,SH,1) "Code Value" 
+       >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
        >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5949,10 +6180,22 @@ MODULE "RT Series Module" M
        >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
        >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
        >(0x0008010F,3,CS,1) "Context Identifier" 
+	   >(0x00080119,1C,UT,1) "Long Code Value" 
+	   >(0x00080120,1C,UT,1) "URN Code Value"
+	   >(0x00080117,3,UI,1) "Context UID" 
+	   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Concept Code Sequence"  : VALUE 0x0040A040 = "CODE"
  ) "Protocol Context Sequence" 
-   >(0x00080100,1,SH,1) "Code Value" 
-   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
    >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5961,10 +6204,22 @@ MODULE "RT Series Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+   >(0x00080121,3,SQ,1,
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Scheduled Protocol Code Sequence" 
  >(0x0040100A,3,SQ,1,
-   >(0x00080100,1,SH,1) "Code Value" 
-   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
    >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5973,6 +6228,18 @@ MODULE "RT Series Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+   >(0x00080121,3,SQ,1,
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Reason for Requested Procedure Code Sequence" 
  >(0x00080051,3R,SQ,1,
    >(0x00400031,1C,UT,1) "Local Namespace Entity ID"  : WEAK (NOT PRESENT 0x00400032,TRUE)
@@ -5986,8 +6253,8 @@ MODULE "RT Series Module" M
                       |"X500") "Universal Entity ID Type"  : PRESENT 0x00400032
  ) "Issuer of Accession Number Sequence" 
  >(0x00321064,3R,SQ,1,
-   >(0x00080100,1,SH,1) "Code Value" 
-   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
    >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -5996,10 +6263,24 @@ MODULE "RT Series Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+   >(0x00080121,3,SQ,1,
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Requested Procedure Code Sequence" 
  ) "Request Attributes Sequence" 
 (0x00400244,3,DA,1) "Performed Procedure Step Start Date" 
 (0x00400245,3,TM,1) "Performed Procedure Step Start Time" 
+(0x00400250,3,DA,1) "Performed Procedure Step End Date" 
+(0x00400251,3,TM,1) "Performed Procedure Step End Time" 
 (0x00400253,3,SH,1) "Performed Procedure Step ID" 
 (0x00400254,3,LO,1) "Performed Procedure Step Description" 
 (0x00400280,3,ST,1) "Comments on the Performed Procedure Step" 
@@ -6023,9 +6304,12 @@ MODULE "RT Series Module" M
      >(0x0040A124,1C,UI,1) "UID"  : VALUE 0x0040A040 = "UIDREF"
      >(0x0040A160,1C,UT,1) "Text Value"  : VALUE 0x0040A040 = "TEXT"
      >(0x0040A30A,1C,DS,1:n) "Numeric Value"  : VALUE 0x0040A040 = "NUMERIC"
+	 >(0x0040A161,1C,FD,1) "Floating Point Value" 
+	 >(0x0040A162,1C,SL,1) "Rational Numerator Value" 
+	 >(0x0040A163,1C,UL,1) "Rational Denominator Value" 
      >(0x0040A043,1,SQ,1,
-       >(0x00080100,1,SH,1) "Code Value" 
-       >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+       >(0x00080100,1C,SH,1) "Code Value" 
+       >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
        >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6034,6 +6318,18 @@ MODULE "RT Series Module" M
        >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
        >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
        >(0x0008010F,3,CS,1) "Context Identifier" 
+	   >(0x00080119,1C,UT,1) "Long Code Value" 
+	   >(0x00080120,1C,UT,1) "URN Code Value"
+	   >(0x00080117,3,UI,1) "Context UID" 
+	   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Concept Name Code Sequence" 
      >(0x00081199,1C,SQ,1,
        >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : NOT PRESENT 0x0062000B
@@ -6042,13 +6338,13 @@ MODULE "RT Series Module" M
        >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced SOP Sequence"  : VALUE 0x0040A040="COMPOSITE" OR VALUE 0x0040A040="IMAGE"
      >(0x004008EA,1C,SQ,1,
-       >(0x00080100,1,SH,1,D,"[hnsf'U]"
+       >(0x00080100,1C,SH,1,D,"[hnsf'U]"
                       |"{counts}"
                       |"{counts}/s"
                       |"{SUVbsa}cm2/ml"
                       |"{SUVbw}g/ml"
                       |"{SUVlbm}g/ml") "Code Value" 
-       >(0x00080102,1,SH,1,D,"UCUM") "Coding Scheme Designator" 
+       >(0x00080102,1C,SH,1,D,"UCUM") "Coding Scheme Designator" 
        >(0x00080104,1,LO,1,D,"Counts"
                       |"Counts per second"
                       |"Hounsfield unit"
@@ -6062,10 +6358,22 @@ MODULE "RT Series Module" M
        >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
        >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
        >(0x0008010F,3,CS,1) "Context Identifier" 
+	   >(0x00080119,1C,UT,1) "Long Code Value" 
+	   >(0x00080120,1C,UT,1) "URN Code Value"
+	   >(0x00080117,3,UI,1) "Context UID" 
+	   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Measurement Units Code Sequence"  : VALUE 0x0040A040 = "NUMERIC"
      >(0x0040A168,1C,SQ,1,
-       >(0x00080100,1,SH,1) "Code Value" 
-       >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+       >(0x00080100,1C,SH,1) "Code Value" 
+       >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
        >(0x00080104,1,LO,1) "Code Meaning" 
        >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
        >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6074,6 +6382,18 @@ MODULE "RT Series Module" M
        >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
        >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
        >(0x0008010F,3,CS,1) "Context Identifier" 
+	   >(0x00080119,1C,UT,1) "Long Code Value" 
+	   >(0x00080120,1C,UT,1) "URN Code Value"
+	   >(0x00080117,3,UI,1) "Context UID" 
+	   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Concept Code Sequence"  : VALUE 0x0040A040 = "CODE"
  ) "Content Item Modifier Sequence" 
    >(0x0040A040,1,CS,1,D,"CODE"
@@ -6093,9 +6413,12 @@ MODULE "RT Series Module" M
    >(0x0040A124,1C,UI,1) "UID"  : VALUE 0x0040A040 = "UIDREF"
    >(0x0040A160,1C,UT,1) "Text Value"  : VALUE 0x0040A040 = "TEXT"
    >(0x0040A30A,1C,DS,1:n) "Numeric Value"  : VALUE 0x0040A040 = "NUMERIC"
+   >(0x0040A161,1C,FD,1) "Floating Point Value" 
+   >(0x0040A162,1C,SL,1) "Rational Numerator Value" 
+   >(0x0040A163,1C,UL,1) "Rational Denominator Value" 
    >(0x0040A043,1,SQ,1,
-     >(0x00080100,1,SH,1) "Code Value" 
-     >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+     >(0x00080100,1C,SH,1) "Code Value" 
+     >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
      >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6104,6 +6427,18 @@ MODULE "RT Series Module" M
      >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
      >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
      >(0x0008010F,3,CS,1) "Context Identifier" 
+	 >(0x00080119,1C,UT,1) "Long Code Value" 
+     >(0x00080120,1C,UT,1) "URN Code Value"
+     >(0x00080117,3,UI,1) "Context UID" 
+     >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100C,1,SH,1) "Code Value" 
+		>(0x00080102C,1,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Concept Name Code Sequence" 
    >(0x00081199,1C,SQ,1,
      >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : NOT PRESENT 0x0062000B
@@ -6112,13 +6447,13 @@ MODULE "RT Series Module" M
      >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced SOP Sequence"  : VALUE 0x0040A040="COMPOSITE" OR VALUE 0x0040A040="IMAGE"
    >(0x004008EA,1C,SQ,1,
-     >(0x00080100,1,SH,1,D,"[hnsf'U]"
+     >(0x00080100,1C,SH,1,D,"[hnsf'U]"
                       |"{counts}"
                       |"{counts}/s"
                       |"{SUVbsa}cm2/ml"
                       |"{SUVbw}g/ml"
                       |"{SUVlbm}g/ml") "Code Value" 
-     >(0x00080102,1,SH,1,D,"UCUM") "Coding Scheme Designator" 
+     >(0x00080102,1C,SH,1,D,"UCUM") "Coding Scheme Designator" 
      >(0x00080104,1,LO,1,D,"Counts"
                       |"Counts per second"
                       |"Hounsfield unit"
@@ -6132,10 +6467,22 @@ MODULE "RT Series Module" M
      >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
      >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
      >(0x0008010F,3,CS,1) "Context Identifier" 
+	 >(0x00080119,1C,UT,1) "Long Code Value" 
+	 >(0x00080120,1C,UT,1) "URN Code Value"
+	 >(0x00080117,3,UI,1) "Context UID" 
+	 >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Measurement Units Code Sequence"  : VALUE 0x0040A040 = "NUMERIC"
    >(0x0040A168,1C,SQ,1,
-     >(0x00080100,1,SH,1) "Code Value" 
-     >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+     >(0x00080100,1C,SH,1) "Code Value" 
+     >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
      >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6144,10 +6491,22 @@ MODULE "RT Series Module" M
      >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
      >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
      >(0x0008010F,3,CS,1) "Context Identifier" 
+	 >(0x00080119,1C,UT,1) "Long Code Value" 
+	 >(0x00080120,1C,UT,1) "URN Code Value"
+	 >(0x00080117,3,UI,1) "Context UID" 
+	 >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Concept Code Sequence"  : VALUE 0x0040A040 = "CODE"
  ) "Protocol Context Sequence" 
- >(0x00080100,1,SH,1) "Code Value" 
- >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+ >(0x00080100,1C,SH,1) "Code Value" 
+ >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
  >(0x00080104,1,LO,1) "Code Meaning" 
  >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
  >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6156,6 +6515,18 @@ MODULE "RT Series Module" M
  >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
  >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
  >(0x0008010F,3,CS,1) "Context Identifier" 
+ >(0x00080119,1C,UT,1) "Long Code Value" 
+ >(0x00080120,1C,UT,1) "URN Code Value"
+ >(0x00080117,3,UI,1) "Context UID" 
+ >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Performed Protocol Code Sequence" 
 
 
@@ -6217,8 +6588,7 @@ MODULE "RT General Plan Module" M
                       |"CONCURRENT"
                       |"PREDECESSOR"
                       |"PRIOR"
-                      |"VERIFIED_PLAN"
-					  |"QAPV_EQUIVALENT") "RT Plan Relationship" 
+                      |"VERIFIED_PLAN") "RT Plan Relationship" 
  >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
  >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced RT Plan Sequence" 
@@ -6261,7 +6631,7 @@ MODULE "RT Prescription Module" U
 
 MODULE "RT Tolerance Tables Module" U
 (0x300A0040,3,SQ,1,
- >(0x300A0042,1C,IS,1) "Tolerance Table Number"  : PRESENT ../0x300A0040
+ >(0x300A0042,1,IS,1) "Tolerance Table Number"  : PRESENT ../0x300A0040
  >(0x300A0043,3,SH,1) "Tolerance Table Label" 
  >(0x300A0044,3,DS,1) "Gantry Angle Tolerance" 
  >(0x300A0046,3,DS,1) "Beam Limiting Device Angle Tolerance" 
@@ -6274,8 +6644,8 @@ MODULE "RT Tolerance Tables Module" U
  >(0x300A0053,3,DS,1) "Table Top Lateral Position Tolerance" 
  >(0x300A014E,3,FL,1) "Gantry Pitch Angle Tolerance" 
  >(0x300A0048,3,SQ,1,
-   >(0x300A004A,1C,DS,1) "Beam Limiting Device Position Tolerance"  : PRESENT ../0x300A0048
-   >(0x300A00B8,1C,CS,1,E,"ASYMX"
+   >(0x300A004A,1,DS,1) "Beam Limiting Device Position Tolerance"  : PRESENT ../0x300A0048
+   >(0x300A00B8,1,CS,1,E,"ASYMX"
                       |"ASYMY"
                       |"MLCX"
                       |"MLCY"
@@ -6310,7 +6680,7 @@ MODULE "RT Patient Setup Module" U
  >(0x300A01D4,3,DS,1) "Table Top Longitudinal Setup Displacement" 
  >(0x300A01D6,3,DS,1) "Table Top Lateral Setup Displacement" 
  >(0x300A0190,3,SQ,1,
-   >(0x300A0192,1C,CS,1,D,"BITEBLOCK"
+   >(0x300A0192,1,CS,1,D,"BITEBLOCK"
                       |"BODY_FRAME"
                       |"BREAST_BOARD"
                       |"CAST"
@@ -6321,7 +6691,7 @@ MODULE "RT Patient Setup Module" U
                       |"RECTAL_BALLOON"
                       |"VACUUM_MOLD"
                       |"WHOLE_BODY_POD") "Fixation Device Type"  : PRESENT ../0x300A0190
-   >(0x300A0194,2C,SH,1) "Fixation Device Label"  : PRESENT ../0x300A0190
+   >(0x300A0194,2,SH,1) "Fixation Device Label"  : PRESENT ../0x300A0190
    >(0x300A00F9,3,LO,1) "Accessory Code" 
    >(0x300A0196,3,ST,1) "Fixation Device Description" 
    >(0x300A0198,3,SH,1) "Fixation Device Position" 
@@ -6329,22 +6699,22 @@ MODULE "RT Patient Setup Module" U
    >(0x300A019A,3,FL,1) "Fixation Device Roll Angle" 
  ) "Fixation Device Sequence" 
  >(0x300A01A0,3,SQ,1,
-   >(0x300A01A2,1C,CS,1,D,"EYE"
+   >(0x300A01A2,1,CS,1,D,"EYE"
                       |"GONAD"
                       |"GUM") "Shielding Device Type"  : PRESENT ../0x300A01A0
-   >(0x300A01A4,2C,SH,1) "Shielding Device Label"  : PRESENT ../0x300A01A0
+   >(0x300A01A4,2,SH,1) "Shielding Device Label"  : PRESENT ../0x300A01A0
    >(0x300A00F9,3,LO,1) "Accessory Code" 
    >(0x300A01A6,3,ST,1) "Shielding Device Description" 
    >(0x300A01A8,3,SH,1) "Shielding Device Position" 
  ) "Shielding Device Sequence" 
  >(0x300A01B4,3,SQ,1,
-   >(0x300A01B6,1C,CS,1,D,"ARC"
+   >(0x300A01B6,1,CS,1,D,"ARC"
                       |"DISTANCE_METER"
                       |"LASER_POINTER"
                       |"MECHANICAL_PTR"
                       |"TABLE_HEIGHT") "Setup Device Type"  : PRESENT ../0x300A01B4
-   >(0x300A01B8,2C,SH,1) "Setup Device Label"  : PRESENT ../0x300A01B4
-   >(0x300A01BC,2C,DS,1) "Setup Device Parameter"  : PRESENT ../0x300A01B4
+   >(0x300A01B8,2,SH,1) "Setup Device Label"  : PRESENT ../0x300A01B4
+   >(0x300A01BC,2,DS,1) "Setup Device Parameter"  : PRESENT ../0x300A01B4
    >(0x300A00F9,3,LO,1) "Accessory Code" 
    >(0x300A01BA,3,ST,1) "Setup Device Description" 
    >(0x300A01D0,3,ST,1) "Setup Reference Description" 
@@ -6353,6 +6723,8 @@ MODULE "RT Patient Setup Module" U
    >(0x300A0402,3,ST,1) "Setup Image Comment" 
    >(0x00081160,1C,IS,1:n) "Referenced Frame Number"  : "INFO(Required if the Referenced SOP Instance is a multi-frame image and the reference does not apply to all frames, and Referenced Segment Number (0062,000B) is not present.)"
    >(0x0062000B,1C,US,1:n) "Referenced Segment Number"  : "INFO(Required if the Referenced SOP Instance is a Segmentation or Surface Segmentation and the reference does not apply to all segments and Referenced Frame Number (0008,1160) is not present.)"
+   >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
+   >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced Setup Image Sequence" 
  >(0x300A0410,3,SQ,1,
    >(0x00189170,1,CS,1,D,"BREATH_HOLD"
@@ -6393,23 +6765,30 @@ MODULE "RT Fraction Scheme Module" U
  >(0x300A0072,3,LO,1) "Fraction Group Description" 
  >(0x300A0079,3,IS,1) "Number of Fraction Pattern Digits Per Day" 
  >(0x300A007A,3,IS,1) "Repeat Fraction Cycle Length" 
- >(0x300A007B,3,LT,1) "Fraction Pattern" 
+ >(0x300A007B,3,LT,1) "Fraction Pattern"
+ >(0x300A008B,3,CS,1,E,"BEAM_LEVEL"
+					   |"FRACTION_LEVEL") "Beam Dose Meaning"  
  >(0x300C0004,1C,SQ,1,
-   >(0x300C0006,1C,IS,1) "Referenced Beam Number"  : PRESENT ../0x300C0004
+   >(0x300C0006,1,IS,1) "Referenced Beam Number"  : PRESENT ../0x300C0004
    >(0x300A0082,3,DS,3) "Beam Dose Specification Point" 
-   >(0x300A0084,3,DS,1) "Beam Dose" 
+   >(0x300A0084,3,DS,1) "Beam Dose"
+    >(0x300A008C,3,SQ,1,
+	>(0x300A0134,1,DS,1) ">>>Cumulative Meterset Weight" 
+	>(0x300C00F0,1C,IS,1) ">>>Referenced Control Point Index" 
+	>(0x300A008D,2C,FL,1) ">>>Average Beam Dose Point Depth" 
+	>(0x300A008E,2C,FL,1) ">>>Average Beam Dose Point Equivalent Depth" 
+	>(0x300A008F,2C,FL,1) ">>>Average Beam Dose Point SSD" 
+	) "Beam Dose Verification Control Point Sequence" 
    >(0x300A0086,3,DS,1) "Beam Meterset" 
-   >(0x300A0088,3,FL,1) "Beam Dose Point Depth" 
-   >(0x300A0089,3,FL,1) "Beam Dose Point Equivalent Depth" 
-   >(0x300A008A,3,FL,1) "Beam Dose Point SSD" 
+   >(0x300A00C5,3,FD,1) "Beam Delivery Duration Limit" 
  ) "Referenced Beam Sequence"  : VALUE 0x300A0080 > "0"
  >(0x300C000A,1C,SQ,1,
-   >(0x300C000C,1C,IS,1) "Referenced Brachy Application Setup Number"  : PRESENT ../0x300C000A
+   >(0x300C000C,1,IS,1) "Referenced Brachy Application Setup Number"  : PRESENT ../0x300C000A
    >(0x300A00A2,3,DS,3) "Brachy Application Setup Dose Specification Point" 
    >(0x300A00A4,3,DS,1) "Brachy Application Setup Dose" 
  ) "Referenced Brachy Application Setup Sequence"  : VALUE 0x300A00A0 > "0"
  >(0x300C0050,3,SQ,1,
-   >(0x300C0051,1C,IS,1) "Referenced Dose Reference Number"  : PRESENT ../0x300C0050
+   >(0x300C0051,1,IS,1) "Referenced Dose Reference Number"  : PRESENT ../0x300C0050
    >(0x300A0021,3,DS,1) "Constraint Weight" 
    >(0x300A0022,3,DS,1) "Delivery Warning Dose" 
    >(0x300A0023,3,DS,1) "Delivery Maximum Dose" 
@@ -6638,9 +7017,9 @@ MODULE "RT Beams Module" C
    >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
  ) "Referenced Dose Sequence" 
  >(0x30020050,3R,SQ,1,
-   >(0x30020051,1,CS,1,E,"NON_STANDARD"
+   >(0x30020051,1,CS,1,E,"NON STANDARD"
                       |"STANDARD") "Fluence Mode" 
-   >(0x30020052,1C,SH,1) "Fluence Mode ID"
+   >(0x30020052,1C,SH,1) "Fluence Mode ID"  : VALUE 0x30020051 ="NON STANDARD"
  ) "Primary Fluence Mode Sequence" 
  >(0x300A0107,3R,SQ,1,
    >(0x300A0108,1C,SH,1) "Applicator ID"  : PRESENT ../0x300A0107
@@ -6693,6 +7072,9 @@ MODULE "RT Brachy Application Setups Module" C
  ) "Treatment Machine Sequence" 
 (0x300A0210,1,SQ,1,
  >(0x300A0212,1,IS,1) "Source Number" 
+ >(0x30080105,3,LO,1) "Source Serial Number" 
+ >(0x300A021B,3,SH,1) "Source Model ID" 
+ >(0x300A021C,3,LO,1) "Source Description" 
  >(0x300A0214,1,CS,1,D,"CYLINDER"
                       |"LINE"
                       |"POINT"
@@ -6767,14 +7149,14 @@ MODULE "RT Brachy Application Setups Module" C
      >(0x300A02D4,3,DS,3) "Control Point 3D Position" 
      >(0x300A0412,3,FL,3) "Control Point Orientation" 
      >(0x300C0055,3,SQ,1,
-       >(0x300A010C,1C,DS,1) "Cumulative Dose Reference Coefficient"  : PRESENT ../0x300C0055
-       >(0x300C0051,1C,IS,1) "Referenced Dose Reference Number"  : PRESENT ../0x300C0055
+       >(0x300A010C,1,DS,1) "Cumulative Dose Reference Coefficient"  : PRESENT ../0x300C0055
+       >(0x300C0051,1,IS,1) "Referenced Dose Reference Number"  : PRESENT ../0x300C0055
  ) "Brachy Referenced Dose Reference Sequence" 
  ) "Brachy Control Point Sequence" 
    >(0x300A02B0,3,SQ,1,
-     >(0x300A02B2,1C,IS,1) "Channel Shield Number"  : PRESENT ../0x300A02B0
-     >(0x30060084,2C,IS,1) "Referenced ROI Number"  : PRESENT ../0x300A02B0
-     >(0x300A02B3,2C,SH,1) "Channel Shield ID"  : PRESENT ../0x300A02B0
+     >(0x300A02B2,1,IS,1) "Channel Shield Number"  : PRESENT ../0x300A02B0
+     >(0x30060084,2,IS,1) "Referenced ROI Number"  : PRESENT ../0x300A02B0
+     >(0x300A02B3,2,SH,1) "Channel Shield ID"  : PRESENT ../0x300A02B0
      >(0x300A00E1,3,SH,1) "Material ID" 
      >(0x300A02B4,3,LO,1) "Channel Shield Name" 
      >(0x300A02B8,3,DS,1) "Channel Shield Nominal Thickness" 
@@ -6782,14 +7164,14 @@ MODULE "RT Brachy Application Setups Module" C
  ) "Channel Shield Sequence" 
  ) "Channel Sequence" 
  >(0x300A0260,3,SQ,1,
-   >(0x300A0264,1C,CS,1,D,"DILATATION"
+   >(0x300A0264,1,CS,1,D,"DILATATION"
                       |"FLAB"
                       |"MOLD"
                       |"PLAQUE"
                       |"SHIELD") "Brachy Accessory Device Type"  : PRESENT ../0x300A0260
-   >(0x30060084,2C,IS,1) "Referenced ROI Number"  : PRESENT ../0x300A0260
-   >(0x300A0262,2C,IS,1) "Brachy Accessory Device Number"  : PRESENT ../0x300A0260
-   >(0x300A0263,2C,SH,1) "Brachy Accessory Device ID"  : PRESENT ../0x300A0260
+   >(0x30060084,2,IS,1) "Referenced ROI Number"  : PRESENT ../0x300A0260
+   >(0x300A0262,2,IS,1) "Brachy Accessory Device Number"  : PRESENT ../0x300A0260
+   >(0x300A0263,2,SH,1) "Brachy Accessory Device ID"  : PRESENT ../0x300A0260
    >(0x300A00E1,3,SH,1) "Material ID" 
    >(0x300A0266,3,LO,1) "Brachy Accessory Device Name" 
    >(0x300A026A,3,DS,1) "Brachy Accessory Device Nominal Thickness" 
@@ -6816,6 +7198,11 @@ MODULE "Approval Module" U
 MODULE "SOP Common Module" M
 (0x00080016,1,UI,1) "SOP Class UID" 
 (0x00080018,1,UI,1) "SOP Instance UID" 
+(0x00189004,3,CS,1,E,"PRODUCT"
+                    |"RESEARCH"
+                    |"SERVICE") "Content Qualification" 
+(0x00080053,1C,CS,1,E,"CLASSIC"
+                     |"ENHANCED") "Query/Retrieve View"
 (0x00080005,1C,CS,1:n,DL,"GB18030"
                       |"ISO 2022 IR 100"
                       |"ISO 2022 IR 101"
@@ -6895,7 +7282,7 @@ MODULE "SOP Common Module" M
  >(0x0018A002,3,DT,1) "Contribution Date Time" 
  >(0x0018A003,3,ST,1) "Contribution Description" 
  >(0x0040A170,1,SQ,1,
-   >(0x00080100,1,SH,1,D,"109101"
+   >(0x00080100,1C,SH,1,D,"109101"
                       |"109102"
                       |"109103"
                       |"109104"
@@ -6903,7 +7290,7 @@ MODULE "SOP Common Module" M
                       |"FILMD"
                       |"MEDIM"
                       |"VIDD") "Code Value" 
-   >(0x00080102,1,SH,1,D,"DCM") "Coding Scheme Designator" 
+   >(0x00080102,1C,SH,1,D,"DCM") "Coding Scheme Designator" 
    >(0x00080104,1,LO,1,D,"Acquisition Equipment"
                       |"De-identifying Equipment"
                       |"Document Digitizer Equipment"
@@ -6919,6 +7306,18 @@ MODULE "SOP Common Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+  >(0x00080121,3,SQ,1,
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+   >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+   >(0x00080104,1,LO,1) "Code Meaning" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value" 
+  ) "Equivalent Code Sequence"
  ) "Purpose of Reference Code Sequence" 
  >(0x00081072,3,SQ,1,
    >(0x00080080,1C,LO,1) "Institution Name"  : NOT PRESENT 0x00080082
@@ -6926,8 +7325,8 @@ MODULE "SOP Common Module" M
    >(0x00401102,3,ST,1) "Person's Address" 
    >(0x00401103,3,LO,1:n) "Person's Telephone Numbers" 
    >(0x00401101,1,SQ,1,
-     >(0x00080100,1,SH,1) "Code Value" 
-     >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+     >(0x00080100,1C,SH,1) "Code Value" 
+     >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
      >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6936,11 +7335,22 @@ MODULE "SOP Common Module" M
      >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
      >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
      >(0x0008010F,3,CS,1) "Context Identifier" 
-     >(0x00080117,3,UI,1) "Context UID" 
+	 >(0x00080119,1C,UT,1) "Long Code Value" 
+	 >(0x00080120,1C,UT,1) "URN Code Value"
+	 >(0x00080117,3,UI,1) "Context UID" 
+	 >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Person Identification Code Sequence" 
    >(0x00080082,1C,SQ,1,
-     >(0x00080100,1,SH,1) "Code Value" 
-     >(0x00080102,1,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
+     >(0x00080100,1C,SH,1) "Code Value" 
+     >(0x00080102,1C,SH,1,D,"ISO_OID") "Coding Scheme Designator" 
      >(0x00080104,1,LO,1) "Code Meaning" 
      >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
      >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6950,7 +7360,18 @@ MODULE "SOP Common Module" M
      >(0x0008010B,3,CS,1,E,"N"
                       |"Y") "Context Group Extension Flag" 
      >(0x0008010F,3,CS,1) "Context Identifier" 
+	 >(0x00080119,1C,UT,1) "Long Code Value" 
+     >(0x00080120,1C,UT,1) "URN Code Value"
      >(0x00080117,3,UI,1) "Context UID" 
+     >(0x00080118,3,UI,1) "Mapping Resource UID" 
+		>(0x00080121,3,SQ,1,
+		>(0x00080100,1C,SH,1) "Code Value" 
+		>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+		>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+		>(0x00080104,1,LO,1) "Code Meaning" 
+		>(0x00080119,1C,UT,1) "Long Code Value" 
+		>(0x00080120,1C,UT,1) "URN Code Value" 
+		) "Equivalent Code Sequence"
  ) "Institution Code Sequence"  : NOT PRESENT 0x00080080
  ) "Operator Identification Sequence" 
  ) "Contributing Equipment Sequence" 
@@ -6984,8 +7405,8 @@ MODULE "SOP Common Module" M
  >(0x04000305,1C,CS,1,D,"CMS_TSP") "Certified Timestamp Type"  : PRESENT 0x04000310
  >(0x04000310,3,OB,1) "Certified Timestamp" 
  >(0x04000401,3R,SQ,1,
-   >(0x00080100,1,SH,1) "Code Value" 
-   >(0x00080102,1,SH,1) "Coding Scheme Designator" 
+   >(0x00080100,1C,SH,1) "Code Value" 
+   >(0x00080102,1C,SH,1) "Coding Scheme Designator" 
    >(0x00080104,1,LO,1) "Code Meaning" 
    >(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
    >(0x00080105,1C,CS,1) "Mapping Resource"  : PRESENT 0x0008010F
@@ -6994,11 +7415,51 @@ MODULE "SOP Common Module" M
    >(0x0008010D,1C,UI,1) "Context Group Extension Creator UID"  : VALUE 0x0008010B="Y"
    >(0x0008010B,3,CS,1) "Context Group Extension Flag" 
    >(0x0008010F,3,CS,1) "Context Identifier" 
+   >(0x00080119,1C,UT,1) "Long Code Value" 
+   >(0x00080120,1C,UT,1) "URN Code Value"
+   >(0x00080117,3,UI,1) "Context UID" 
+   >(0x00080118,3,UI,1) "Mapping Resource UID" 
+	>(0x00080121,3,SQ,1,
+	>(0x00080100,1C,SH,1) "Code Value" 
+	>(0x00080102,1C,SH,1) "Coding Scheme Designator" 
+	>(0x00080103,1C,SH,1) "Coding Scheme Version"    : "INFO(Required if the value of Coding Scheme Designator (0008,0102) is not sufficient to identify the Code Value (0008,0100)  unambiguously. May be present otherwise.)"
+	>(0x00080104,1,LO,1) "Code Meaning" 
+	>(0x00080119,1C,UT,1) "Long Code Value" 
+	>(0x00080120,1C,UT,1) "URN Code Value" 
+	) "Equivalent Code Sequence"   
  ) "Digital Signature Purpose Code Sequence" 
  ) "Digital Signatures Sequence" 
 (0x00280303,3,CS,1,E,"UNMODIFIED"
                     |"MODIFIED"
                     |"REMOVED") "Longitudinal Temporal Information Modified"
+ (0x00209172,1C,SQ,1,
+ >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
+ >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
+ >(0x00081160,1C,IS,1) "Referenced Frame Number" 
+ >(0x0062000B,1C,US,1) "Referenced Segment Number"  
+ ) "Conversion Source Attributes Sequence" 
+
+
+
+
+MODULE "Common Instance Reference Module" U
+(0x00081115,1C,SQ,1,
+ >(0x0020000E,1,UI,1) "Series Instance UID" 
+ >(0x0008114A,1,SQ,1,
+   >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
+   >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
+ ) "Referenced Instance Sequence" 
+ ) "Referenced Series Sequence" : "INFO(Required if this Instance references Instances in this Study.)"
+(0x00081200,1C,SQ,1,
+ >(0x0020000D,1,UI,1) "Study Instance UID" 
+ >(0x00081115,1,SQ,1,
+   >(0x0020000E,1,UI,1) "Series Instance UID" 
+   >(0x0008114A,1,SQ,1,
+     >(0x00081150,1,UI,1) "Referenced SOP Class UID" 
+     >(0x00081155,1,UI,1) "Referenced SOP Instance UID" 
+ ) "Referenced Instance Sequence" 
+ ) "Referenced Series Sequence" 
+ ) "Studies Containing Other Referenced Instances Sequence"  : "INFO(Required if this Instance references Instances in other Studies.)"
 
 
 
