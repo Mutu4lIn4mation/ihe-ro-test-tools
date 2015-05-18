@@ -28,6 +28,17 @@ Class ValidateScenarioStep
 
     End Sub
 
+    Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer, ByVal countFromBack As Boolean, ByVal countMinus As Integer, ByVal isDifferenceCheck As Boolean)
+
+        m_ReceivedMessagesContainer = receivedMessagesContainer
+        m_validator = New Validator(isDifferenceCheck)
+        m_countFromBack = countFromBack
+        m_countMinus = countMinus
+        m_dimseCommand = UNDEFINED
+
+    End Sub
+
+
     Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer, ByVal messageIndex As Integer, ByVal countMinus As Integer)
 
         m_ReceivedMessagesContainer = receivedMessagesContainer
@@ -43,6 +54,15 @@ Class ValidateScenarioStep
 
         m_ReceivedMessagesContainer = receivedMessagesContainer
         m_validator = New Validator()
+        m_MessageIndex = messageIndex
+        m_dimseCommand = UNDEFINED
+
+    End Sub
+
+    Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer, ByVal messageIndex As Integer, ByVal isDifferenceCheck As Boolean)
+
+        m_ReceivedMessagesContainer = receivedMessagesContainer
+        m_validator = New Validator(isDifferenceCheck)
         m_MessageIndex = messageIndex
         m_dimseCommand = UNDEFINED
 

@@ -29,6 +29,10 @@ Class IODReceivedRule
                     If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.RTBeamsTreatmentRecordSTOREOPClassUID Then
                         nrOffSoppClassUIDsFound = nrOffSoppClassUIDsFound + 1
                     End If
+                ElseIf m_atLeastPresent = IODType.BasicTextSR Then
+                    If dicomMessage.DataSet(Tags.SOPClassUID).Values(0) = SOPclass.BasicTextSRSOPClassUID Then
+                        nrOffSoppClassUIDsFound = nrOffSoppClassUIDsFound + 1
+                    End If
                 Else
                     errorMessage = "Wrong IOD requested for validation. Only RTPLan and BeamDeliveryInstructions can be validated"
                     errorEncountered = True
@@ -41,8 +45,10 @@ Class IODReceivedRule
                 errorMessage = "No RT Plan received"
             ElseIf m_atLeastPresent = IODType.RTBeamsDeliveryInstruction Then
                 errorMessage = "No RT Beams Delivery Instruction received"
-            Else
+            ElseIf m_atLeastPresent = IODType.RTBeamsTreatmentRecordSTORE Then
                 errorMessage = "No RT Beams Treatement Record received"
+            Else
+                errorMessage = "No Base Text Structured Report received"
             End If
             errorEncountered = True
         Else
@@ -50,8 +56,10 @@ Class IODReceivedRule
                 errorMessage = nrOffSoppClassUIDsFound.ToString() + " RTPlan(s) is/are received"
             ElseIf m_atLeastPresent = IODType.RTBeamsDeliveryInstruction Then
                 errorMessage = nrOffSoppClassUIDsFound.ToString() + " RT Beams Delivery Instruction(s) is/are received"
-            Else
+            ElseIf m_atLeastPresent = IODType.RTBeamsTreatmentRecordSTORE Then
                 errorMessage = nrOffSoppClassUIDsFound.ToString() + " RT Beams Treatment Record(s) is/are received"
+            Else
+                errorMessage = nrOffSoppClassUIDsFound.ToString() + " Base Text Structured Report(s) is/are received"
             End If
         End If
 

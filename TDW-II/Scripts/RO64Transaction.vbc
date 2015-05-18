@@ -138,8 +138,8 @@ Class RO64Transaction
             m_rules.Add(New ConditionalSequenceRule(Tags.UPSPerformedProcedurePerformedStationNameCodeSequence, New InterOperabilityRule(Tags.ScheduledStationCodeMeaning, Tags.UPSPerformedProcedurePerformedStationNameCodeCodeMeaning, DataSetHandler.UPSMessagesXMLFileName, createCFindRespString(), ro64IODType, ErrorSeverity.RuleError)))
 
             ' (0x00404050) Scheduled Procedure Step Start Date and Time
-            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureSequenceScheduledProcedureStepStartDateTime, ro64IODType, ErrorSeverity.RuleError))
-            m_rules.Add(New HasValueRule(Tags.UPSPerformedProcedureSequenceScheduledProcedureStepStartDateTime, ro64IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime, ro64IODType, ErrorSeverity.RuleError))
+            m_rules.Add(New HasValueRule(Tags.UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime, ro64IODType, ErrorSeverity.RuleError))
 
             ' (0x00404051) Scheduled Procedure Step End Date and Time
             m_rules.Add(New IsRequiredRule(Tags.UPSPerformedProcedureSequenceScheduledProcedureStepEndDateTime, ro64IODType, ErrorSeverity.RuleError))

@@ -28,6 +28,8 @@ Public Enum IODType
     NCreate
     NEventReport
     NGet
+    BasicTextSR
+
 
     ' Unknown  ' can be used when the SOP Class UID of a received message can not be identified
 

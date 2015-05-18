@@ -305,6 +305,11 @@ Public Class Tags
     Public Shared ReadOnly ReceivingAE As String = "0x00741234"
     Public Shared ReadOnly DeletionLock As String = "0x00741230"
 
+    Public Shared ReadOnly ContentDate As String = "0x00080023"
+    Public Shared ReadOnly ContentTime As String = "0x00080033"
+
+    Public Shared ReadOnly ReferencedPerformedProcedureStepSequence As String = "0x00081111"
+    Public Shared ReadOnly ReferencedPerformedProcedureStepReferencedSOPInstanceUID As String = String.Format("{0}[1]/{1}", ReferencedPerformedProcedureStepSequence, "0x00081155")
 
     'OUTPUT INFORMATION SEQUENCE
     Public Shared ReadOnly OutputInformationSequence As String = "0x00404033"
@@ -324,11 +329,35 @@ Public Class Tags
     'Unified Procedure Step Progress Information Module
     Public Shared ReadOnly UPSProgressInformationSequence As String = "0x00741002"
     Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepProgress As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741004")
-    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepDiscontinuationReasonCodeSequence As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x0074100E")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepProgressDescription As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741006")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCancellationDateTime As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00404052")
+    Public Shared ReadOnly UPSProgressInformationUnifiedReasonForCancellation As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741238")
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x0074100E")
+
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeValue As String = String.Format("{0}[1]/{1}", UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning As String = String.Format("{0}[1]/{1}", UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence As String = String.Format("{0}[1]/{1}", UPSProgressInformationSequence, "0x00741008")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCommunicationsURISequenceContactURI As String = String.Format("{0}[1]/{1}", UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence, "0x0074100A")
+    Public Shared ReadOnly UPSProgressInformationUnifiedProcedureStepCommunicationsURISequenceContactDisplayName As String = String.Format("{0}[1]/{1}", UPSProgressInformationUnifiedProcedureStepCommunicationsURISequence, "0x0074100C")
 
     'Unified Procedure Step Performed Procedure Information Module
     Public Shared ReadOnly UPSPerformedProcedureSequence As String = "0x00741216"
-    Public Shared ReadOnly UPSPerformedProcedureSequenceScheduledProcedureStepStartDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404050")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404035")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformersName As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequence, "0x00404037")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformersOrganization As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequence, "0x00404036")
+
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequence, "0x00404009")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequenceCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequenceActualHumanPerformersSequenceHumanPerformerCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepEndDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400250")
+
+    Public Shared ReadOnly AttributeIdentifierList As String = "0x00001005"
+
+    Public Shared ReadOnly UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404050")
     Public Shared ReadOnly UPSPerformedProcedureSequenceScheduledProcedureStepEndDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404051")
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcessingParametersSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00741212")
     Public Shared ReadOnly UPSPerformedProcedurePerformedProcessingParametersValueType As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedProcessingParametersSequence, "0x0040A040")
@@ -357,10 +386,24 @@ Public Class Tags
     Public Shared ReadOnly UPSPerformedProcedurePerformedStationNameCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationNameCodeSequence, "0x00080102")
     Public Shared ReadOnly UPSPerformedProcedurePerformedStationNameCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationNameCodeSequence, "0x00080104")
 
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404029")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationClassCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationClassCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationClassCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationClassCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404030")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence, "0x00080100")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence, "0x00080102")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedStationGeographicLocationCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedStationGeographicLocationCodeSequence, "0x00080104")
+
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeSequence As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00404019")
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodeValue As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080100")
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080102")
     Public Shared ReadOnly UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning As String = String.Format("{0}[1]/{1}", UPSPerformedProcedurePerformedWorkitemCodeSequence, "0x00080104")
+
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepStartDateTime As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400244")
+    Public Shared ReadOnly UPSPerformedProcedurePerformedProcedureStepDescription As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400254")
+    Public Shared ReadOnly UPSPerformedProcedureCommentsOnThePerformedProcedureStep As String = String.Format("{0}[1]/{1}", UPSPerformedProcedureSequence, "0x00400280")
 
     'Unified Procedure Step Scheduled Procedure Information Module
     Public Shared ReadOnly ScheduledProcedureStepModificationDateandTime As String = "0x00404010"
@@ -467,6 +510,10 @@ Public Class Tags
     Public Shared ReadOnly RequestedSOPInstanceUID As String = "0x00001001"
     Public Shared ReadOnly AffectedSOPClassUID As String = "0x00000002"
     Public Shared ReadOnly AffectedSOPInstanceUID As String = "0x00001000"
+    Public Shared ReadOnly EventTypeID As String = "0x00001002"
+
+    Public Shared ReadOnly CommandField As String = "0x00000100"
+    Public Shared ReadOnly CommandDataSetType As String = "0x00000800"
 
     Public Shared ReadOnly MoveDestination As String = "0x00000600"
 
