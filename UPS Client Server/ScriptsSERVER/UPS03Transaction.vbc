@@ -1,0 +1,93 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPS03Transaction
+    Inherits Transaction
+
+    Private ups03IODType As IODType = Nothing
+    Private countSelectedUPSes As Integer = 0
+    'Constructor
+    Public Sub New()
+        MyClass.New(True)
+    End Sub
+
+    'Constructor
+    Public Sub New(ByVal clearMessageDataAfterSend As Boolean)
+        MyBase.New("UPS-03", "UPS in progress", IODType.UnifiedProcedureStepPull, clearMessageDataAfterSend)
+        ups03IODType = IODType.UnifiedProcedureStepPull
+    End Sub
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+            For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+
+                If (DataRow.Selected) Then
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                    If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+                        ' Make the N-ACTION-RQ message
+                        Dim message As DicomMessage = New DicomMessage(NACTIONRQ)
+
+                        ' Set the Requested SOPClassUID 
+                        message.Set(Tags.RequestedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                        ' Set the Requested SOP Instance UID
+                        message.Set(Tags.RequestedSOPInstanceUID, UI, SOPInstanceUID)
+
+                        ' ActionType ID
+                        message.Set(Tags.ActionTypeID, US, "1")
+
+                        'Set Unified Procedure Step State to "IN PROGRESS"
+                        message.Set(Tags.ProcedureStepState, CS, "IN PROGRESS")
+
+                        ' Transactuion ID
+                        message.Set(Tags.TransactionUID, UI, DvtkHighLevelInterface.Dicom.Other.UID.Create())
+
+                        'ReferenceDataSet.GetInstance.UpdateCacheCFind_Response(SOPInstanceUID, message)
+
+                        datasetMessages.Add(message)
+
+                    Else
+                        Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                    End If
+
+                End If
+
+            Next
+        Else
+            ' cancel scenario
+        End If
+
+
+        Return datasetMessages
+
+    End Function
+
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        ' Some rules need the dicomMessage send in the request
+        Dim msg As ArrayList = DirectCast(TransactionDataMessages, ArrayList)
+
+        '(0x00000900)  Status
+        m_rules.Add(New UpdateClientUPSRule(Tags.StatusCommandElement, "0", msg, ups03IODType, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+End Class

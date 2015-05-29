@@ -1,0 +1,124 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPS09Transaction
+    Inherits Transaction
+
+    Private ups09IODType As IODType = Nothing
+    Private countSelectedUPSes As Integer = 0
+    Private _globalSubOrUnsub As Boolean = Nothing
+
+    'Constructor
+    Public Sub New(ByVal globalSubOrUnsub As Boolean)
+        MyClass.New(True, globalSubOrUnsub)
+    End Sub
+
+    'Constructor
+    Public Sub New(ByVal clearMessageDataAfterSend As Boolean, ByVal globalSubOrUnsub As Boolean)
+        MyBase.New("UPS-09", "Unsubscribe on UPS", IODType.UnifiedProcedureStepPush, clearMessageDataAfterSend)
+        ups09IODType = IODType.UnifiedProcedureStepPush
+        _globalSubOrUnsub = globalSubOrUnsub
+    End Sub
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        Dim giveAETitleDialog As GiveAETitleDialog = New GiveAETitleDialog()
+
+
+        If Not _globalSubOrUnsub Then
+            selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+            selectUPSForm.DataGridUPS.MultiSelect = False
+            selectUPSForm.SetUPSInProgress.Text = "Send N-Action-RQ to unsubscribe on selected UPS"
+            selectUPSForm.ShowDialog()
+
+            If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                giveAETitleDialog.ShowDialog()
+
+                If giveAETitleDialog.DialogResult = Windows.Forms.DialogResult.OK Then
+
+
+                    For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+
+                        If (DataRow.Selected) Then
+
+                            Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                            If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+                                ' Make the N-ACTION-RQ message
+                                Dim message As DicomMessage = New DicomMessage(NACTIONRQ)
+
+                                ' Set the Requested SOPClassUID 
+                                message.Set(Tags.RequestedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                                ' Set the Requested SOP Instance UID
+                                message.Set(Tags.RequestedSOPInstanceUID, UI, SOPInstanceUID)
+
+                                ' ActionType ID
+                                message.Set(Tags.ActionTypeID, US, "4")
+
+                                ' Set the Receiving AE
+                                message.DataSet.Set(Tags.ReceivingAE, AE, giveAETitleDialog.AETitle)
+
+                                datasetMessages.Add(message)
+
+                            Else
+                                Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                            End If
+
+                        End If
+
+                    Next
+                End If
+            Else
+                ' cancel scenario
+            End If
+
+        Else
+
+            giveAETitleDialog.ShowDialog()
+
+            If giveAETitleDialog.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                ' Make the N-ACTION-RQ message
+                Dim message As DicomMessage = New DicomMessage(NACTIONRQ)
+
+                ' Set the Requested SOPClassUID 
+                message.Set(Tags.RequestedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                ' Set the Requested SOP Instance UID
+                message.Set(Tags.RequestedSOPInstanceUID, UI, "1.2.840.10008.5.1.4.34.5")
+
+                ' ActionType ID
+                message.Set(Tags.ActionTypeID, US, "4")
+
+                ' Set the Receiving AE
+                message.DataSet.Set(Tags.ReceivingAE, AE, giveAETitleDialog.AETitle)
+
+                datasetMessages.Add(message)
+            End If
+        End If
+
+
+
+
+            Return datasetMessages
+
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        '(0x00000900)  Status
+        m_rules.Add(New HexadecimalValueRule(Tags.StatusCommandElement, "0", ups09IODType, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+End Class

@@ -1,0 +1,24 @@
+﻿
+Public Class GetInformationContent
+
+
+    Private Sub GetInformationContent_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+    End Sub
+
+
+    Private Sub btnConfirm_Click(sender As System.Object, e As System.EventArgs) Handles btnConfirm.Click
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.Close()
+    End Sub
+
+    Private Sub btnAddTag_Click(sender As System.Object, e As System.EventArgs) Handles btnAddTag.Click
+
+        Try
+            DataGridViewNGet.Rows.Add(tbAddTag.Text, Tags.GetTagName("0x" + tbAddTag.Text.Substring(0, 8)))
+        Catch ex As Exception
+            DataGridViewNGet.Rows.Add(tbAddTag.Text, "")
+        End Try
+
+    End Sub
+End Class

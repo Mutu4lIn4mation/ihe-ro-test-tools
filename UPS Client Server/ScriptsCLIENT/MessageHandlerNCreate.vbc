@@ -1,0 +1,124 @@
+Class MessageHandlerNCreate
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    Private Shared threadId As Integer = 1
+
+    'DimseCommand.NCREATE
+    Public Overrides Function HandleNCreateRequest(ByVal theDicomMessage As DicomMessage) As Boolean
+
+        Dim affectedSOPClassUID As String = theDicomMessage.CommandSet.Item(Tags.AffectedSOPClassUID).Values(0)
+        Dim ProcedureStepState As String = theDicomMessage.DataSet(Tags.ProcedureStepState).Values(0)
+
+        If affectedSOPClassUID = SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString() Then
+
+            If ProcedureStepState = "SCHEDULED" Then
+
+                ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+                Dim newUPSDirectoryInfo As DirectoryInfo = New DirectoryInfo(ReferenceDataSet.GetInstance.m_datasetPath + "\SERVER")
+
+                Dim fileName As String = ReferenceDataSet.GetInstance.m_datasetPath + "\SERVER\NewUps" + newUPSDirectoryInfo.GetFiles.Length.ToString() + ".dcm"
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                If Not fileName = "" Then
+                    Try
+                        'Write the dataset to file
+                        dicomFile.DataSet = theDicomMessage.DataSet
+
+                        dicomFile.DataSet.Set(Tags.SOPClassUID, UI, theDicomMessage(Tags.AffectedSOPClassUID).Values(0))
+                        dicomFile.DataSet.Set(Tags.SOPInstanceUID, UI, theDicomMessage(Tags.AffectedSOPInstanceUID).Values(0))
+
+                        dicomFile.Write(fileName)
+
+                        sendNEventReportStatusUpdate(theDicomMessage, theDicomMessage(Tags.AffectedSOPInstanceUID).Values(0))
+
+                    Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                        Throw New System.Exception("Error writing the Dataset to file: " + fileName, ex)
+                    End Try
+                End If
+
+                Dim responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NCREATERSP)
+
+                responseMessage.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status = Success
+
+                ' send the response message
+                Send(responseMessage, theDicomMessage.EncodedPresentationContextID)
+                'Next
+
+                Return (True)
+
+            Else
+                Dim responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NCREATERSP)
+                Dim n As Integer = &HC309
+                responseMessage.Set(Tags.StatusCommandElement, US, n) ' Status
+
+                Send(responseMessage, theDicomMessage.EncodedPresentationContextID)
+                Return True
+            End If
+
+
+        Else
+            Throw New Exception(String.Format("Handling N-CREATE RQ of Affected SOP Class UID '{0}' not supported", affectedSOPClassUID))
+        End If
+
+    End Function
+
+    Private Sub sendNEventReportStatusUpdate(ByVal receivedUpdate As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal SOPInstanceUID As String)
+
+        'start the N-EVENT-REPORT action
+        Dim scenarioName As String = TestToolConfiguration.GetInstance.GetCurrentScenario().GetType().Name
+        Dim neventreportThreadName As String = String.Format("NEVENTREPORT Sender ({0}) {1}", scenarioName, threadId.ToString())
+        threadId = threadId + 1
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        'Retrieve the settings from configuration
+
+        ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+        Dim AEtitlesSubscribers As New List(Of String)
+        If File.Exists(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt") Then
+            Dim lines As String() = System.IO.File.ReadAllLines(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+            For Each line As String In lines
+                If (line.Contains(SOPInstanceUID) Or line.Contains("1.2.840.10008.5.1.4.34.5")) Then
+
+                    Dim split As String() = line.Split(" ")
+
+                    AEtitlesSubscribers.Add(split(split.Length() - 3))
+                End If
+            Next
+        Else
+            Logger.GetInstance().LogErrorMessage("Error Reading the subscribers file: " + ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+        End If
+
+        For Each subscriber As String In AEtitlesSubscribers
+
+            Dim subscriberSetting As SubscriberConfiguration = TestToolConfiguration.GetInstance().GetSubscriberConfiguration(subscriber)
+
+            If (String.IsNullOrEmpty(subscriberSetting.AETitle)) Then
+                Logger.GetInstance().LogErrorMessage(String.Format("No subscriber configuration for AE-title '{0}' present in the configuration", subscriber))
+            Else
+
+
+                Dim neventSenderThread As SenderThread = New SenderThread(neventreportThreadName, subscriberSetting, config.GetDVTKAEConfiguration(New TMSActor().Id, DvtkData.Dimse.DimseCommand.NACTIONRQ))
+
+                Dim messageToSend As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NEVENTREPORTRQ)
+
+                messageToSend.Set(Tags.AffectedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString())
+                messageToSend.Set(Tags.AffectedSOPInstanceUID, UI, SOPInstanceUID)
+                messageToSend.Set(Tags.EventTypeID, US, "1")
+
+
+                messageToSend.DataSet.Set(Tags.ProcedureStepState, CS, receivedUpdate.DataSet(Tags.ProcedureStepState).Values(0))
+
+                If (receivedUpdate.DataSet.Exists(Tags.InputReadinessState)) Then
+                    messageToSend.DataSet.Set(Tags.InputReadinessState, CS, receivedUpdate.DataSet(Tags.InputReadinessState).Values(0))
+                End If
+
+                neventSenderThread.AddMessageToSend(messageToSend)
+                neventSenderThread.Start()
+                neventSenderThread.WaitForCompletion()
+            End If
+
+        Next
+
+    End Sub
+
+End Class

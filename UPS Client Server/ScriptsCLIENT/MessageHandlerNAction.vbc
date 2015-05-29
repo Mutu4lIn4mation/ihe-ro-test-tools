@@ -1,0 +1,459 @@
+Class MessageHandlerNAction
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+    Dim count As Integer
+    Private Shared threadId As Integer = 1
+
+    Private Sub CopyInterRelationAttributes(ByVal requestMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+
+        ' Fill Affected SOP Instance UID  (0000,1000)
+        Dim value As String = requestMessage(Tags.RequestedSOPInstanceUID).Values.Item(0)
+        responseMessage.Set(Tags.AffectedSOPInstanceUID, DvtkData.Dimse.VR.UI, value)
+
+        ' Copy  Unified Procedure Step State  (0074,1000)
+        value = requestMessage(Tags.ProcedureStepState).Values.Item(0)
+        responseMessage.Set(Tags.ProcedureStepState, DvtkData.Dimse.VR.CS, value)
+
+    End Sub
+
+    'DimseCommand.NACTIONRSP
+    Public Overrides Function HandleNActionRequest(ByVal dicomMessage As DicomMessage) As Boolean
+
+        Dim requestedSOPClassUID As String = dicomMessage.CommandSet.Item(Tags.RequestedSOPClassUID).Values(0)
+        If requestedSOPClassUID = SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString() Then
+
+            Dim dicomMessageToSend As DicomMessage = MessageHandlerHelper.CreateResponseMessage(DvtkData.Dimse.DimseCommand.NACTIONRSP, dicomMessage)
+            'CopyInterRelationAttributes(dicomMessage, dicomMessageToSend)
+            Dim value As String = dicomMessage(Tags.RequestedSOPInstanceUID).Values.Item(0)
+            dicomMessageToSend.Set(Tags.AffectedSOPInstanceUID, DvtkData.Dimse.VR.UI, value)
+
+            Dim UPSdicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = Nothing
+
+            If dicomMessage(Tags.ActionTypeID).Values(0) = "3" Then
+                If dicomMessage(Tags.ReceivingAE).Exists() Then
+                    If Not dicomMessage(Tags.ReceivingAE).Values(0).ToString() = "" Then
+
+                        ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+                        If File.Exists(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt") Then
+
+                            Dim objWriter As New System.IO.StreamWriter(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt", True)
+                            objWriter.WriteLine(value + " AETitle: " + dicomMessage(Tags.ReceivingAE).Values(0).ToString() + " Deletionlock: " + dicomMessage(Tags.DeletionLock).Values.Item(0).ToString())
+                            objWriter.Close()
+                        Else
+                            Dim objWriter As New System.IO.StreamWriter(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt", False)
+                            objWriter.WriteLine(value + " AETitle: " + dicomMessage(Tags.ReceivingAE).Values(0).ToString() + " Deletionlock: " + dicomMessage(Tags.DeletionLock).Values.Item(0).ToString())
+                            objWriter.Close()
+                        End If
+
+                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "3")
+                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
+                    Else
+                        Dim n As Integer = &HC308
+                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "3")
+                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                    End If
+                Else
+                    Dim n As Integer = &HC308
+                    dicomMessageToSend.Set(Tags.ActionTypeID, US, "3")
+                    dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                End If
+
+            ElseIf dicomMessage(Tags.ActionTypeID).Values(0) = "4" Then
+                If dicomMessage(Tags.ReceivingAE).Exists() Then
+                    If Not dicomMessage(Tags.ReceivingAE).Values(0).ToString() = "" Then
+                        Dim subscriberFound As Boolean = False
+                        ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+                        If File.Exists(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt") Then
+                            Dim lines As String() = System.IO.File.ReadAllLines(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+                            Dim newFile As New List(Of String)
+                            For Each line As String In lines
+                                If (line.Contains(value) And line.Contains(dicomMessage(Tags.ReceivingAE).Values(0))) Then
+                                    subscriberFound = True
+                                Else
+                                    newFile.Add(line)
+                                End If
+                            Next
+                            System.IO.File.WriteAllLines(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt", newFile.ToArray())
+                        Else
+                            Logger.GetInstance().LogErrorMessage("Error Reading the subscribers file: " + ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+                        End If
+
+                        If Not subscriberFound Then
+                            Logger.GetInstance().LogMessage("Subscriber was not found on selected UPS, nothing is changed")
+                            'Receiving AE-TITLE is Unknown to this SCP
+                            Dim n As Integer = &HC308
+                            dicomMessageToSend.Set(Tags.ActionTypeID, US, "4")
+                            dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                        Else
+                            Logger.GetInstance().LogMessage("Unsubscribe on selected UPS successfully")
+                            dicomMessageToSend.Set(Tags.ActionTypeID, US, "4")
+                            dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
+                        End If
+                    Else
+                        Dim n As Integer = &HC308
+                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "4")
+                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                    End If
+                Else
+                    Dim n As Integer = &HC308
+                    dicomMessageToSend.Set(Tags.ActionTypeID, US, "4")
+                    dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                End If
+
+
+            ElseIf dicomMessage(Tags.ActionTypeID).Values(0) = "5" Then
+                If dicomMessage(Tags.ReceivingAE).Exists() Then
+                    If Not dicomMessage(Tags.ReceivingAE).Values(0).ToString() = "" Then
+                        Dim subscriberFound As Boolean = False
+                        ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+                        If File.Exists(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt") Then
+                            Dim lines As String() = System.IO.File.ReadAllLines(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+                            Dim newFile As New List(Of String)
+                            For Each line As String In lines
+                                If (line.Contains(value) And line.Contains(dicomMessage(Tags.ReceivingAE).Values(0))) Then
+                                    subscriberFound = True
+                                Else
+                                    newFile.Add(line)
+                                End If
+                            Next
+                            System.IO.File.WriteAllLines(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt", newFile.ToArray())
+                        Else
+                            Logger.GetInstance().LogErrorMessage("Error Reading the subscribers file: " + ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+                        End If
+
+                        If Not subscriberFound Then
+                            Logger.GetInstance().LogErrorMessage("Global subscriber was not found , nothing is changed")
+
+                            'Receiving AE-TITLE is Unknown to this SCP
+                            Dim n As Integer = &HC308
+                            dicomMessageToSend.Set(Tags.ActionTypeID, US, "5")
+                            dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+
+                        Else
+
+
+                            Dim AllServerUPSSES As DvtkHighLevelInterface.Dicom.Other.DataSetCollection = ReferenceDataSet.GetInstance().GetAllUPSes()
+                            Dim objWriter As New System.IO.StreamWriter(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt", True)
+
+                            For Each dataset As DvtkHighLevelInterface.Dicom.Other.DataSet In AllServerUPSSES
+
+                                If (dataset(Tags.ProcedureStepState).Values(0).Equals("IN PROGRESS") Or dataset(Tags.ProcedureStepState).Values(0).Equals("SCHEDULED")) Then
+
+                                    objWriter.WriteLine(dataset(Tags.SOPInstanceUID).Values(0).ToString() + " AETitle: " + dicomMessage(Tags.ReceivingAE).Values(0).ToString() + " Deletionlock: False")
+                                End If
+                            Next
+
+                            objWriter.Close()
+
+                            dicomMessageToSend.Set(Tags.ActionTypeID, US, "5")
+                            dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
+                        End If
+
+                    Else
+                        Dim n As Integer = &HC308
+                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "4")
+                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                    End If
+                Else
+                    Dim n As Integer = &HC308
+                    dicomMessageToSend.Set(Tags.ActionTypeID, US, "4")
+                    dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                End If
+
+            Else
+                If Not dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("IN PROGRESS") Then
+                    If (dicomMessage.DataSet.Exists(Tags.TransactionUID)) Then
+                        Dim TransactionUID As String = dicomMessage.DataSet(Tags.TransactionUID).Values.Item(0)
+                        UPSdicomFile = ReferenceDataSet.GetInstance().GetAvailebleUPS(value, TransactionUID)
+                    Else
+                        Dim n As Integer = &HC301
+                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                    End If
+                Else
+                    UPSdicomFile = ReferenceDataSet.GetInstance().GetAvailebleUPS(value)
+                End If
+
+                If UPSdicomFile Is Nothing And Not (dicomMessageToSend.Exists(Tags.StatusCommandElement)) Then
+                    Dim n As Integer = &HC307
+                    dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                    dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                End If
+
+            End If
+
+                    If Not UPSdicomFile Is Nothing Then
+
+                        If dicomMessage(Tags.ActionTypeID).Values(0) = "2" Then
+
+                            If UPSdicomFile.DataSet(Tags.ProcedureStepState).Values(0).Equals("CANCELED") Then
+                                Dim n As Integer = &HB304
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                            ElseIf UPSdicomFile.DataSet(Tags.ProcedureStepState).Values(0).Equals("COMPLETED") Then
+                                Dim n As Integer = &HC311
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                            Else
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
+                                'DataSetHandler.SetCacheUPS_NewStatus(dicomMessage, "CANCELED")
+                                sendNEventReportStatusUpdate(dicomMessage, value, "Cancel Requested", UPSdicomFile)
+                            End If
+
+
+                        ElseIf UPSdicomFile.DataSet(Tags.ProcedureStepState).Values(0).Equals("SCHEDULED") Then
+
+                            If dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("IN PROGRESS") Then
+                                'DataSetHandler.SaveDatasetToFile(dicomMessage.DataSet, DataSetHandler.UPSCacheXMLFileName, "N-ACTION-REQ-RO-19-" + (count + 1).ToString())
+                                count = count + 1
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
+                                DataSetHandler.SetCacheUPS_NewStatus(dicomMessage, "IN PROGRESS")
+                                'dicomMessageToSend.Set(Tags.ProcedureStepState, CS, "IN PROGRESS")
+
+
+                                sendNEventReportStatusUpdate(dicomMessage, value, "IN PROGRESS", UPSdicomFile)
+
+                            Else
+
+                                Dim n As Integer = &HC310
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+
+                            End If
+
+                        ElseIf (UPSdicomFile.DataSet(Tags.ProcedureStepState).Values(0).Equals("IN PROGRESS")) Then
+
+                            If dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("IN PROGRESS") Then
+                                'UPS already IN PROGRESS, Send error status back
+                                Dim n As Integer = &HC302
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+
+                            ElseIf dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("COMPLETED") Then
+
+                                'check all Completed attributes are present
+
+                                If (UPSdicomFile.DataSet.Exists(Tags.UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime) _
+                                   And UPSdicomFile.DataSet.Exists(Tags.UPSPerformedProcedureSequenceScheduledProcedureStepEndDateTime) _
+                                   And UPSdicomFile.DataSet.Exists(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence)) Then
+
+                                    If Not (UPSdicomFile.DataSet(Tags.UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime).Values(0) = "" _
+                                        And Not UPSdicomFile.DataSet(Tags.UPSPerformedProcedureSequenceScheduledProcedureStepEndDateTime).Values(0) = "" _
+                                        And UPSdicomFile.DataSet(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0).ToString() = "100") Then
+
+                                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
+                                        If (UPSdicomFile.DataSet.Exists(Tags.UPSProgressInformationUnifiedProcedureStepProgress)) Then
+                                            'dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, UPSdicomFile.DataSet(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0))
+                                        Else
+                                            'dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, "")
+                                        End If
+                                        'dicomMessageToSend.Set(Tags.ProcedureStepState, CS, "COMPLETED")
+                                        DataSetHandler.SetCacheUPS_NewStatus(dicomMessage, "COMPLETED")
+
+                                        sendNEventReportStatusUpdate(dicomMessage, value, "COMPLETED", UPSdicomFile)
+
+                                    Else
+                                        Dim n As Integer = &HC304
+                                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                                    End If
+
+                                Else
+                                    Dim n As Integer = &HC304
+                                    dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                    dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                                End If
+
+
+
+                            ElseIf dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("CANCELED") Then
+
+                                'check all Canceled attributes are present
+                                If (UPSdicomFile.DataSet.Exists(Tags.UPSProgressInformationUnifiedProcedureStepCancellationDateTime) _
+                                   And UPSdicomFile.DataSet.Exists(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeValue) _
+                                   And UPSdicomFile.DataSet.Exists(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator) _
+                                   And UPSdicomFile.DataSet.Exists(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning)) Then
+
+                                    If Not (UPSdicomFile.DataSet(Tags.UPSProgressInformationUnifiedProcedureStepCancellationDateTime).Values(0) = "" _
+                                        And Not UPSdicomFile.DataSet(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeValue).Values(0) = "" _
+                                        And Not UPSdicomFile.DataSet(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator).Values(0) = "" _
+                                        And Not UPSdicomFile.DataSet(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning).Values(0) = "") Then
+
+                                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, 0) ' Status 
+                                        'dicomMessageToSend.Set(Tags.ProcedureStepState, CS, "CANCELED")
+                                        If (UPSdicomFile.DataSet.Exists(Tags.UPSProgressInformationUnifiedProcedureStepProgress)) Then
+                                            'dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, UPSdicomFile.DataSet(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0))
+                                        Else
+                                            'dicomMessageToSend.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, "")
+                                        End If
+
+                                        DataSetHandler.SetCacheUPS_NewStatus(dicomMessage, "CANCELED")
+                                        sendNEventReportStatusUpdate(dicomMessage, value, "CANCELED", UPSdicomFile)
+
+                                    Else
+                                        Dim n As Integer = &HC304
+                                        dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                        dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                                    End If
+
+                                Else
+                                    Dim n As Integer = &HC304
+                                    dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                    dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                                End If
+
+                            End If
+
+                        ElseIf (UPSdicomFile.DataSet(Tags.ProcedureStepState).Values(0).Equals("COMPLETED")) Then
+
+                            If dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("COMPLETED") Then
+                                'UPS already COMPLETED, Send warning status back
+                                Dim n As Integer = &HB306
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                            Else
+                                Dim n As Integer = &HC300
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                            End If
+
+                        ElseIf (UPSdicomFile.DataSet(Tags.ProcedureStepState).Values(0).Equals("CANCELED")) Then
+
+                            If dicomMessage.DataSet(Tags.ProcedureStepState).Values(0).Equals("CANCELED") Then
+                                'UPS already CANCELED, Send warning status back
+                                Dim n As Integer = &HB304
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status 
+                            Else
+                                Dim n As Integer = &HC300
+                                dicomMessageToSend.Set(Tags.ActionTypeID, US, "1")
+                                dicomMessageToSend.Set(Tags.StatusCommandElement, US, n) ' Status
+                            End If
+
+                        End If
+
+                        'dicomMessageToSend.Set(Tags.TransactionUID, UI, dicomMessage(Tags.TransactionUID).Values.Item(0))
+                    End If
+
+                    Send(dicomMessageToSend, dicomMessage.EncodedPresentationContextID)
+
+                    Return True
+
+                Else
+                    Throw New Exception(String.Format("Handling N-ACTION RQ of Requested SOP Class UID '{0}' not supported", requestedSOPClassUID))
+                End If
+
+    End Function
+
+    Private Function getTransactionUID(ByVal rspMessage As DicomMessage) As String
+
+        Dim retVal As String = ""
+        Dim rspSopInstanceUID As String = rspMessage.CommandSet(Tags.RequestedSOPInstanceUID).Values(0)
+
+        For i As Integer = 1 To 4
+            'load C-Find-Rsp from refDataSet
+            Dim cmpSopInstanceUID As String = DataSetHandler.getAttributeValueFromDataSet(DataSetHandler.UPSMessagesXMLFileName, "C-FIND-RSP" + i.ToString, Tags.SOPInstanceUID)
+            If (rspSopInstanceUID = cmpSopInstanceUID) Then
+                retVal = DataSetHandler.getAttributeValueFromDataSet(DataSetHandler.UPSMessagesXMLFileName, "N-ACTION-RSP" + i.ToString, Tags.TransactionUID)
+                Exit For
+            End If
+        Next
+        Return retVal
+
+    End Function
+
+
+    Private Sub sendNEventReportStatusUpdate(ByVal receivedUpdate As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal SOPInstanceUID As String, ByVal status As String, selectedUPS As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+
+        'start the N-EVENT-REPORT action
+        Dim scenarioName As String = TestToolConfiguration.GetInstance.GetCurrentScenario().GetType().Name
+        Dim neventreportThreadName As String = String.Format("NEVENTREPORT Sender ({0}) {1}", scenarioName, threadId.ToString())
+        threadId = threadId + 1
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        'Retrieve the settings from configuration
+
+        ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+        Dim AEtitlesSubscribers As New List(Of String)
+        If File.Exists(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt") Then
+            Dim lines As String() = System.IO.File.ReadAllLines(ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+            For Each line As String In lines
+                If (line.Contains(SOPInstanceUID) Or line.Contains("1.2.840.10008.5.1.4.34.5")) Then
+
+                    Dim split As String() = line.Split(" ")
+
+                    AEtitlesSubscribers.Add(split(split.Length() - 3))
+                End If
+            Next
+        Else
+            Logger.GetInstance().LogErrorMessage("Error Reading the subscribers file: " + ReferenceDataSet.GetInstance.m_datasetPath + "\SUBSCRIBERS\subscribers.txt")
+        End If
+
+        For Each subscriber As String In AEtitlesSubscribers
+
+            Dim subscriberSetting As SubscriberConfiguration = TestToolConfiguration.GetInstance().GetSubscriberConfiguration(subscriber)
+
+            If (String.IsNullOrEmpty(subscriberSetting.AETitle)) Then
+                Logger.GetInstance().LogErrorMessage(String.Format("No subscriber configuration for AE-title '{0}' present in the configuration", subscriber))
+            Else
+
+
+                Dim neventSenderThread As SenderThread = New SenderThread(neventreportThreadName, subscriberSetting, config.GetDVTKAEConfiguration(New TMSActor().Id, DvtkData.Dimse.DimseCommand.NACTIONRQ))
+
+                Dim messageToSend As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NEVENTREPORTRQ)
+
+                messageToSend.Set(Tags.AffectedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString())
+                messageToSend.Set(Tags.AffectedSOPInstanceUID, UI, SOPInstanceUID)
+                messageToSend.Set(Tags.EventTypeID, US, "1")
+
+                If (status = "Cancel Requested") Then
+                    messageToSend.Set(Tags.EventTypeID, US, "2")
+
+                    If (receivedUpdate.DataSet.Exists(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeValue)) Then
+                        messageToSend.DataSet.Set(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeValue, SH, receivedUpdate.DataSet(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeValue).Values(0))
+                    End If
+                    If (receivedUpdate.DataSet.Exists(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator)) Then
+                        messageToSend.DataSet.Set(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator, SH, receivedUpdate.DataSet(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator).Values(0))
+                    End If
+                    If (receivedUpdate.DataSet.Exists(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning)) Then
+                        messageToSend.DataSet.Set(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning, LO, receivedUpdate.DataSet(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning).Values(0))
+                    End If
+
+                    If (receivedUpdate.DataSet.Exists(Tags.ContactURI)) Then
+                        messageToSend.DataSet.Set(Tags.ContactURI, LO, receivedUpdate.DataSet(Tags.ContactURI).Values(0)) 'VR moet UR zijn
+                    End If
+
+                    If (receivedUpdate.DataSet.Exists(Tags.ContactDisplayName)) Then
+                        messageToSend.DataSet.Set(Tags.ContactDisplayName, LO, receivedUpdate.DataSet(Tags.ContactDisplayName).Values(0))
+                    End If
+
+                    If (receivedUpdate.DataSet.Exists(Tags.ReasonForCancellation)) Then
+                        messageToSend.DataSet.Set(Tags.ReasonForCancellation, LT, receivedUpdate.DataSet(Tags.ReasonForCancellation).Values(0))
+                    End If
+
+                    messageToSend.DataSet.Set(Tags.RequestingAE, AE, subscriberSetting.AETitle)
+
+                Else
+                    messageToSend.DataSet.Set(Tags.ProcedureStepState, CS, status)
+
+                    If (receivedUpdate.DataSet.Exists(Tags.InputReadinessState)) Then
+                        messageToSend.DataSet.Set(Tags.InputReadinessState, CS, receivedUpdate.DataSet(Tags.InputReadinessState).Values(0))
+                    ElseIf (selectedUPS.DataSet.Exists(Tags.InputReadinessState)) Then
+                        messageToSend.DataSet.Set(Tags.InputReadinessState, CS, selectedUPS.DataSet(Tags.InputReadinessState).Values(0))
+                    End If
+
+                End If
+
+                neventSenderThread.AddMessageToSend(messageToSend)
+                neventSenderThread.Start()
+                neventSenderThread.WaitForCompletion()
+            End If
+
+        Next
+
+    End Sub
+
+End Class

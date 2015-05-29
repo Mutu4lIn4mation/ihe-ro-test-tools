@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSet>
+    <DataSetPath>\..\Datasets\CLIENTSERVER\UPSMessages</DataSetPath>
+    <C-FIND-RQ>Temp C-FIND-RQ.dcm</C-FIND-RQ>
+	<N-SET-RQ-RO21>N-SET-RQ[RO21].dcm</N-SET-RQ-RO21>
+	<N-SET-RQ-RO26>N-SET-RQ[RO26].dcm</N-SET-RQ-RO26>
+</DataSet>

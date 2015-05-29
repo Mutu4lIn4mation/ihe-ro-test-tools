@@ -1,0 +1,121 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPS11Transaction
+    Inherits Transaction
+
+    Private m_procedureStep As ProcedureStep
+    Private ups11IODType As IODType = Nothing
+
+    'Constructor
+    Public Sub New(ByVal clearMessageDataAfterSend As Boolean)
+
+        MyBase.New("UPS-11", "UPS Cancel", IODType.UnifiedProcedureStepPush, clearMessageDataAfterSend)
+        ups11IODType = IODType.UnifiedProcedureStepPush
+    End Sub
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        Dim UPSCancelNAction As UPSCancelNAction = New UPSCancelNAction()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Send N-Action-RQ with CANCEL status to selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+            UPSCancelNAction.ShowDialog()
+
+            If UPSCancelNAction.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+
+                    If (DataRow.Selected) Then
+
+                        Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                        If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+
+
+                            ' Make the N-ACTION-RQ message
+                            Dim message As DicomMessage = New DicomMessage(NACTIONRQ)
+
+                            ' Set the Requested SOPClassUID 
+                            message.Set(Tags.RequestedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                            ' Set the Requested SOP Instance UID
+                            message.Set(Tags.RequestedSOPInstanceUID, UI, SOPInstanceUID)
+
+                            ' ActionType ID
+                            message.Set(Tags.ActionTypeID, US, "2")
+
+
+                            If Not (String.IsNullOrEmpty(UPSCancelNAction.tbReasonForCancellation.Text)) Then
+                                message.Set(Tags.ReasonForCancellation, LT, UPSCancelNAction.tbReasonForCancellation.Text)
+                            End If
+
+                            If Not (String.IsNullOrEmpty(UPSCancelNAction.tbDiscontinuationReasonCodeValue.Text)) Then
+                                message.Set(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeValue, SH, UPSCancelNAction.tbDiscontinuationReasonCodeValue.Text)
+                            End If
+
+                            If Not (String.IsNullOrEmpty(UPSCancelNAction.tbDiscontinuationReasonCodingSchemeDesignator.Text)) Then
+                                message.Set(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator, SH, UPSCancelNAction.tbDiscontinuationReasonCodingSchemeDesignator.Text)
+                            End If
+
+                            If Not (String.IsNullOrEmpty(UPSCancelNAction.tbDiscontinuationReasonCodeMeaning.Text)) Then
+                                message.Set(Tags.ProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning, LO, UPSCancelNAction.tbDiscontinuationReasonCodeMeaning.Text)
+                            End If
+
+                            If Not (String.IsNullOrEmpty(UPSCancelNAction.tbContactURI.Text)) Then
+                                message.Set(Tags.ContactURI, LO, UPSCancelNAction.tbContactURI.Text) 'VR moet UR zijn
+                            End If
+
+                            If Not (String.IsNullOrEmpty(UPSCancelNAction.tbContactDisplayName.Text)) Then
+                                message.Set(Tags.ContactDisplayName, LO, UPSCancelNAction.tbContactDisplayName.Text)
+                            End If
+
+                            If Not (String.IsNullOrEmpty(ReferenceDataSet.GetInstance.getTrainsactionUIDUPS(SOPInstanceUID))) Then
+                                ' Transactuion ID
+                                message.DataSet.Set(Tags.TransactionUID, UI, ReferenceDataSet.GetInstance.getTrainsactionUIDUPS(SOPInstanceUID))
+                            End If
+
+                            datasetMessages.Add(message)
+
+                        Else
+                            Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                        End If
+                    End If
+                Next
+
+            Else
+                ' cancel scenario
+            End If
+        End If
+
+
+
+        Return datasetMessages
+
+
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        ' Some rules need the dicomMessage send in the request
+        Dim msg As ArrayList = DirectCast(TransactionDataMessages, ArrayList)
+
+        '(0x00000900)  Status
+        m_rules.Add(New UpdateClientUPSRule(Tags.StatusCommandElement, "0", msg, ups11IODType, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+
+End Class

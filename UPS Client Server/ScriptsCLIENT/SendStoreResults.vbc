@@ -1,0 +1,29 @@
+Class SendStoreResults
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim pdsActor As PDSActor = New PDSActor
+        Dim OSTActor As OSTActor = New OSTActor
+
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = DataSetHandler.UPSDataXMLFileName
+
+        Dim ro22transaction As UPSStoreResultsToOST_Transaction = New UPSStoreResultsToOST_Transaction(OSTActor, pdsActor)
+
+        ' RO-22 or RO-23 or RO-24
+        Dim send As SendScenarioStep = New SendScenarioStep(pdsActor, OSTActor, True)
+        send.AddTransaction(ro22transaction)  ' RO-22 or RO-23 or RO-24: Store Results
+
+        'Add the steps to the list
+        m_scenarioSteps.Add(send)
+
+        Dim validate1 As ValidateScenarioStep = New ValidateScenarioStep(send)
+
+        ' apply rules for C-FIND Response 1
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        validate1.AddRules(m_rules)
+
+        m_scenarioSteps.Add(validate1)
+    End Sub
+End Class

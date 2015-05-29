@@ -1,0 +1,30 @@
+Class ReceiveUPSTransactions
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim ostActor As OSTActor = New OSTActor()
+        Dim pdsActor As PDSActor = New PDSActor()
+        Dim tmsActor As TMSActor = New TMSActor()
+
+
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = DataSetHandler.UPSMessagesXMLFileName
+
+
+        'Configure the receive step: set the cstore thread as part of the C-Move command
+        Dim receive As ReceiveScenarioStep = New ReceiveScenarioStep(tmsActor, pdsActor, True, ostActor, DvtkData.Dimse.DimseCommand.NSETRQ)
+
+        Dim ups01Transaction As UPS01Transaction = New UPS01Transaction()
+        receive.AddTransaction(ups01Transaction)
+
+        'Add the steps to the list
+        m_scenarioSteps.Add(receive)
+
+        Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(receive)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        validateResponseStep.AddRules(m_rules)
+        m_scenarioSteps.Add(validateResponseStep)
+
+    End Sub
+End Class

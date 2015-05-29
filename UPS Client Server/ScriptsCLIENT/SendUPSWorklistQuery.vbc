@@ -1,0 +1,61 @@
+Class SendUPSWorklistQuery
+    Inherits Scenario
+    'Constructor
+    Public Sub New()
+        Dim pdsActor As PDSActor = New PDSActor
+        Dim ups02transaction As UPS02Transaction = New UPS02Transaction()
+
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = DataSetHandler.UPSMessagesXMLFileName
+
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance
+        referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+        'Configure the send step
+        Dim send As SendScenarioStep = New SendScenarioStep(pdsActor, New TMSActor(), True)
+
+        Dim queryForm As EditQueryForm = New EditQueryForm()
+
+        If (String.IsNullOrEmpty(queryForm.selectedFile)) Then
+            queryForm.selectedFile = referenceData.m_datasetPath + "\C-FIND-RQ.dcm"
+        End If
+
+        Dim C_FIND_REQ As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DicomMessage(CFINDRQ)
+        'Read the Response
+        C_FIND_REQ.DataSet.Read(queryForm.selectedFile)
+
+        'Dim dataset As DvtkHighLevelInterface.Dicom.Other.DataSet = DataSetHandler.LoadDatasetFromFile(m_scenarioDatasetXmlFileName, "C-FIND-RQ")
+        queryForm.addMessage(C_FIND_REQ.DataSet)
+
+        queryForm.ShowDialog()
+
+        If queryForm.DialogResult = Windows.Forms.DialogResult.OK Then
+            'query is known, now add values to dicom message
+
+            'datetime range to usable DICOM string
+            DataSetHandler.SaveDatasetToFile(queryForm.m_requestDataset, m_scenarioDatasetXmlFileName, "Temp C-FIND-RQ")
+        Else
+            ' cancel scenario
+        End If
+        send.AddTransaction(ups02transaction)
+
+        'Add the steps to the list
+        m_scenarioSteps.Add(send)
+
+        Dim saveStep As SaveScenarioStep = New SaveScenarioStep(send, "C-FIND-RSP")
+
+        'step 1
+        m_scenarioSteps.Add(saveStep)
+
+
+        Dim validate1 As ValidateScenarioStep = New ValidateScenarioStep(send)
+
+        ' apply rules for C-FIND Response 1
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        validate1.AddRules(m_rules)
+
+        m_scenarioSteps.Add(validate1)
+    End Sub
+
+
+End Class

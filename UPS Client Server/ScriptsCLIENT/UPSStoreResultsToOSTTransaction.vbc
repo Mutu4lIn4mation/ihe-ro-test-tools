@@ -1,0 +1,76 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPSStoreResultsToOST_Transaction
+    Inherits Transaction
+
+    'Constructor
+    Public Sub New(ByVal SUTActor As Actor, ByVal storeActor As Actor)
+
+        MyBase.New("RO-22 or RO-23 or RO-24", "Store Results to OST", IODType.NotSpecified, True)
+        m_sutActorId = SUTActor.Id 'for IPDW: OST
+        m_storeActorId = storeActor.Id
+    End Sub
+
+    Private m_sutActorId As String
+    Private m_storeActorId As String
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+
+        Dim datasetMessages As ArrayList = New ArrayList()
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance()
+
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Create C-Store-Req from selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+            For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+                If (DataRow.Selected) Then
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                    Dim selectedUPS As Dicom.Other.DataSet = referenceData.GetSelectedCFindRsp(SOPInstanceUID)
+
+                    Dim chooseStorageFiles As ChooseStorageObjects = New ChooseStorageObjects()
+                    chooseStorageFiles.ShowDialog()
+
+                    If chooseStorageFiles.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                        Dim messages As DicomMessageCollection = referenceData.createCStoreRqFromChosenFiles(m_sutActorId, m_storeActorId, chooseStorageFiles.selectedFiles)
+                        If (chooseStorageFiles.cbSendObjectsToOST.Checked = True) Then
+                            If messages.Count = 0 Then
+                                'NO correct dicom object selected
+                                Dim log As String = "No files selected or selected DICOM object(s) are not valid."
+                                Logger.GetInstance().LogErrorMessage(log)
+                                Return Nothing
+                            Else
+                                'add the structure set message to the arraylist
+                                For Each message As DicomMessage In messages
+                                    datasetMessages.Add(message)
+                                Next
+
+                            End If
+                        End If
+
+                        referenceData.UpdateCacheCFind_ResponseWithOutputSequence(SOPInstanceUID, m_sutActorId, m_storeActorId, messages)
+
+                    End If
+
+                    Return datasetMessages
+
+                End If
+            Next
+
+        End If
+        Return datasetMessages
+    End Function
+
+End Class

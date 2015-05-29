@@ -1,0 +1,56 @@
+﻿Public Class ChooseSubscribeDialog
+    Private m_Subscribe As Integer = 0
+
+    Public ReadOnly Property Subscribe() As Integer
+        Get
+            Return m_Subscribe
+        End Get
+    End Property
+
+    Private Sub OK_Button_Click(sender As System.Object, e As System.EventArgs) Handles OK_Button.Click
+        If radioSubscribe.Checked Then
+            m_Subscribe = 1
+        ElseIf radioUnsubscribe.Checked Then
+            m_Subscribe = 2
+        Else
+            m_Subscribe = 3
+        End If
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.Close()
+    End Sub
+
+    Private Sub radioSubscribe_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles radioSubscribe.CheckedChanged
+        If radioSubscribe.Checked Then
+            radioUnsubscribe.Checked = False
+            radioSuspendSubscription.Checked = False
+
+            cbDeletionLock.Visible = True
+            cbSubscription.Visible = True
+            OK_Button.Enabled = True
+        End If
+    End Sub
+
+    Private Sub radioUnsubscribe_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles radioUnsubscribe.CheckedChanged
+        If radioUnsubscribe.Checked Then
+            radioSubscribe.Checked = False
+            radioSuspendSubscription.Checked = False
+
+            cbDeletionLock.Visible = False
+            cbSubscription.Visible = True
+            OK_Button.Enabled = True
+        End If
+    End Sub
+
+    Private Sub radioSuspendSubscription_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles radioSuspendSubscription.CheckedChanged
+        If radioSuspendSubscription.Checked Then
+            radioSubscribe.Checked = False
+            radioUnsubscribe.Checked = False
+
+            cbDeletionLock.Visible = False
+            cbSubscription.Visible = False
+
+            OK_Button.Enabled = True
+        End If
+
+    End Sub
+End Class

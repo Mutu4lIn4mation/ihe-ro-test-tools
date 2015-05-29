@@ -1,0 +1,123 @@
+
+
+' This acts as a Storage SCP emulator
+' The MessageHandler1 handles C-STORE-RQ messages
+'====================
+' This acts as a Storage SCP emulator
+' The MessageHandler1 handles C-STORE-RQ messages
+'====================
+Class ReceiverThread
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageIterator
+
+    '!!!!!!!!!!!!!!!!!
+    Public m_inAssociation As Boolean = False
+    Private presentationContexts As DvtkHighLevelInterface.Dicom.Other.PresentationContextCollection = New DvtkHighLevelInterface.Dicom.Other.PresentationContextCollection()
+
+    Public Sub New(ByVal name As String)
+
+        Initialize(TestToolConfiguration.GetInstance.GetMainThread)
+
+        Options.CopyFrom(TestToolConfiguration.GetInstance.GetMainThread.Options)
+
+        Options.Name = name
+        Options.AutoValidate = False
+        Options.LogThreadStartingAndStoppingInParent = False
+        Options.StartAndStopResultsGatheringEnabled = True
+        ResultsGatheringStarted = False
+
+    End Sub
+
+    Public Sub New(ByVal name As String, ByVal DVTKAEConfiguration As DVTKAEConfiguration)
+
+        MyClass.New(name)
+
+        Options.LocalAeTitle = DVTKAEConfiguration.AETitle
+        Options.LocalPort = CUShort(DVTKAEConfiguration.Port)
+
+    End Sub
+
+    Public Overrides Sub AfterHandlingAssociateRequest(ByVal associateRq As DvtkHighLevelInterface.Dicom.Messages.AssociateRq)
+
+        m_inAssociation = True
+        'MyBase.AfterHandlingAssociateRequest(associateRq)
+        'Confirm Explicit little endian transfer syntaxes only
+        If Not Me.IsMessageHandled Then
+            Me.Options.RemoteAeTitle = associateRq.CallingAETitle
+            'determine supported transfer syntaxes
+            Dim supportedTransferSyntaxes(TestToolConfiguration.GetInstance.SupportedTransferSyntaxesReceiver.Count - 1) As [String]
+            TestToolConfiguration.GetInstance.SupportedTransferSyntaxesReceiver.CopyTo(supportedTransferSyntaxes, 0)
+
+            'respond with the supported transfer syntaxes
+            'SendAssociateAc(New DvtkHighLevelInterface.Dicom.Other.TransferSyntaxes("1.2.840.10008.1.2.1"))
+            Dim associateAc As AssociateAc = SendAssociateAc(New DvtkHighLevelInterface.Dicom.Other.TransferSyntaxes(supportedTransferSyntaxes))
+
+            ' Fill used presentation contexts
+            presentationContexts.Clear()
+            For Each presentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext In associateAc.PresentationContexts
+                presentationContexts.Add(presentationContext)
+            Next
+
+            IsMessageHandled = True
+
+        End If
+
+    End Sub
+
+    Public Overrides Sub AfterHandlingReleaseRequest(ByVal releaseRq As DvtkHighLevelInterface.Dicom.Messages.ReleaseRq)
+
+        MyBase.AfterHandlingReleaseRequest(releaseRq)
+        m_inAssociation = False
+
+    End Sub
+    'Public Overrides Sub AfterHandlingAssociateAccept(ByVal associateAc As DvtkHighLevelInterface.Dicom.Messages.AssociateAc)
+    '    MyBase.AfterHandlingAssociateAccept(associateAc)
+    '    presentationContexts.Clear()
+    '    For Each presentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext In associateAc.PresentationContexts
+    '        presentationContexts.Add(presentationContext)
+    '    Next
+    'End Sub
+    Protected Overrides Sub AfterHandlingCFindRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingCFindRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingCStoreRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingCStoreRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingCmoveRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingCMoveRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingNSetRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingNSetRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingNActionRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingNActionRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingHandleNGetRequest(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingHandleNGetRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingNEventReportRequest(dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingNEventReportRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+    Protected Overrides Sub AfterHandlingNCreateRequest(dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        MyBase.AfterHandlingNCreateRequest(dicomMessage)
+        dicomMessage.Set(Tags.privateTransferSyntaxAttribute, UI, GetTransferSyntax(dicomMessage))
+    End Sub
+
+    Private Function GetTransferSyntax(ByVal dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage) As String
+        Dim presentationContextIdDicomMessage As Byte = dicomMessage.EncodedPresentationContextID
+        If Not presentationContexts Is Nothing Then
+            For Each presentationContext As DvtkHighLevelInterface.Dicom.Other.PresentationContext In presentationContexts
+                If presentationContext.ID = presentationContextIdDicomMessage Then
+                    Return presentationContext.TransferSyntax
+                End If
+            Next
+        End If
+        Return ""
+    End Function
+End Class

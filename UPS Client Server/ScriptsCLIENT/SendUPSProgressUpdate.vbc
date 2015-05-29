@@ -1,0 +1,23 @@
+Class SendUPSProgressUpdate
+    Inherits Scenario
+
+    Public Sub New()
+
+        Dim TMSActor As TMSActor = New TMSActor()
+        Dim PDSActor As PDSActor = New PDSActor()
+        Dim ups05Transaction As UPS05Transaction = New UPS05Transaction()
+
+        'Send N-Set REQ (UPS final update)
+        Dim sendNSetReq As SendScenarioStep = New SendScenarioStep(PDSActor, TMSActor, True)
+        sendNSetReq.AddTransaction(ups05Transaction)
+        m_scenarioSteps.Add(sendNSetReq)
+
+        ' Response validation step
+        Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(sendNSetReq)
+        validateResponseStep.AddRules(ups05Transaction.GetCommonTransactionRulesForResponse())
+
+        m_scenarioSteps.Add(validateResponseStep)
+
+    End Sub
+
+End Class

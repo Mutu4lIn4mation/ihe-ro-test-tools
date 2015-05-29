@@ -1,0 +1,11 @@
+
+Class OSTActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("OST", "OST actor")
+
+    End Sub
+
+End Class

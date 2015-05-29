@@ -1,0 +1,120 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPS04Transaction
+    Inherits Transaction
+
+    Private NGetIODType As IODType = Nothing
+    'Private m_isStartProcedure As Boolean
+
+    'Constructor
+    Public Sub New()
+
+        MyBase.New("UPS N-Get", "UPS get information", IODType.UnifiedProcedureStepPush, True)
+        NGetIODType = IODType.UnifiedProcedureStepPush
+        'm_isStartProcedure = isStartProcedure
+
+    End Sub
+
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+
+        ' Some rules need the dataset used in the request.
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance
+        referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim NGetRQ As DicomMessage
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        Dim getInformationContent As GetInformationContent = New GetInformationContent()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Send N-Get-RQ for information of selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+
+            For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+                If (DataRow.Selected) Then
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                    If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+
+                        Dim selectedUPS As DvtkHighLevelInterface.Dicom.Other.DataSet = referenceData.GetSelectedCFindRsp(SOPInstanceUID)
+
+                        referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+                        Dim NGetTagFile As String = referenceData.m_datasetPath + "\N-Get-Tags.txt"
+
+                        Try
+                            Using sr As New StreamReader(NGetTagFile)
+                                Do While sr.Peek() >= 0
+                                    Dim line As String
+                                    line = sr.ReadLine()
+                                    Try
+                                        getInformationContent.DataGridViewNGet.Rows.Add(line, Tags.GetTagName("0x" + line.Substring(0, 8)))
+                                    Catch ex As Exception
+                                        getInformationContent.DataGridViewNGet.Rows.Add(line, "")
+                                    End Try
+
+                                Loop
+
+
+                            End Using
+                        Catch e As Exception
+                            Console.WriteLine("The file could not be read:")
+                            Console.WriteLine(e.Message)
+                        End Try
+
+                        getInformationContent.ShowDialog()
+
+                        If getInformationContent.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                            NGetRQ = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NGETRQ)
+
+                            NGetRQ.Set(Tags.RequestedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+                            NGetRQ.Set(Tags.RequestedSOPInstanceUID, DvtkData.Dimse.VR.UI, SOPInstanceUID)
+
+                            'Dim givenTags As String() = getInformationContent.TextBox1.Text.Split(", ")
+
+                            Dim hexTags(getInformationContent.DataGridViewNGet.Rows.Count - 1) As Object
+                            Dim count As Integer = 0
+
+
+                            For Each row As DataGridViewRow In getInformationContent.DataGridViewNGet.Rows
+
+                                Dim trimTag As Integer = row.Cells("Tag").Value.ToString().Trim()
+                                Dim i As Integer = Convert.ToInt32(trimTag, 16)
+                                hexTags(count) = i
+
+                                count = count + 1
+                                'End If
+
+                            Next
+
+                            NGetRQ.Set(Tags.AttributeIdentifierList, DvtkData.Dimse.VR.AT, hexTags)
+
+                            'NGetRQ.Set(Tags.AttributeIdentifierList, DvtkData.Dimse.VR.AT, &H741000, &H741002, &H741216)
+
+                            datasetMessages.Add(NGetRQ)
+                        End If
+                        'Else
+                        '    Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an Transaction UID"))
+                        'End If
+                    Else
+                        Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                    End If
+                End If
+            Next
+
+        End If
+        Return datasetMessages
+    End Function
+
+End Class

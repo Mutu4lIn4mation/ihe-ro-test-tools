@@ -1,0 +1,143 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPS05Transaction
+    Inherits Transaction
+
+    Private ups05IODType As IODType = Nothing
+    'Private m_isStartProcedure As Boolean
+
+    'Constructor
+    Public Sub New()
+
+        MyBase.New("UPS-05", "UPS Progress update", IODType.UnifiedProcedureStepPull, False)
+        ups05IODType = IODType.UnifiedProcedureStepPull
+        'm_isStartProcedure = isStartProcedure
+
+    End Sub
+
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+
+        ' Some rules need the dataset used in the request.
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance
+        referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim message As DicomMessage
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        Dim progressUpdateContent As ProgressUpdateContent = New ProgressUpdateContent()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Send N-Set-RQ with progress update to selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+            For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+                If (DataRow.Selected) Then
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                    If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+
+                        Dim selectedUPS As DvtkHighLevelInterface.Dicom.Other.DataSet = referenceData.GetSelectedCFindRsp(SOPInstanceUID)
+
+                        If Not (String.IsNullOrEmpty(selectedUPS(Tags.TransactionUID).Values(0))) Then
+
+                            If (selectedUPS(Tags.ScheduledWorkitemCodeValue).Values(0) = "121726") Then
+
+                            Else
+                                progressUpdateContent.Label3.Visible = False
+                                progressUpdateContent.tbTextValue.Visible = False
+                                progressUpdateContent.tbTextValue.Text = ""
+
+                            End If
+                            referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+                            If (String.IsNullOrEmpty(progressUpdateContent.selectedFile)) Then
+                                referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+                                progressUpdateContent.selectedFile = referenceData.m_datasetPath + "\N-SET-RQ[RO26].dcm"
+                            End If
+
+                            progressUpdateContent.OpenFileDialog1.InitialDirectory = progressUpdateContent.selectedFile
+                            progressUpdateContent.ShowDialog()
+
+                            If progressUpdateContent.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                                message = ReferenceDataSet.GetInstance().GetUnifiedProcedureStepPush_NSET_REQ_RO26(progressUpdateContent.selectedFile)
+
+                                Dim NSetRQ As DicomMessage = referenceData.createNSetRqUPSProgressUpdate(DataSetHandler.UPSCacheXMLFileName, SOPInstanceUID, message)
+                                ' Set the Requested SOPClassUID 
+                                NSetRQ.Set(Tags.RequestedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                                ' Set Unified Procedure Step Progress
+                                NSetRQ.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, progressUpdateContent.numProcudureStepProgress.Value.ToString())
+
+
+                                If Not (progressUpdateContent.tbTextValue.Text = "") Then
+                                    NSetRQ.Set(Tags.UPSPerformedProcedurePerformedProcessingParametersTextValue, UT, progressUpdateContent.tbTextValue.Text)
+                                Else
+                                    NSetRQ.DataSet.Delete(Tags.UPSPerformedProcedurePerformedProcessingParametersSequence)
+                                End If
+
+                                If NSetRQ.Exists(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence) Then
+                                    If NSetRQ(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue).Values(0).ToString() = "" Then
+                                        ' Fill > (0x00404019)  Performed Workitem Code Sequence
+                                        If selectedUPS.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                                            ' Fill >> (0x00080100)  Code Value
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, selectedUPS(Tags.ScheduledWorkitemCodeValue).Values(0))
+                                            ' Fill >> (0x00080102)  Coding Scheme Designator
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, selectedUPS(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                                            ' Fill >> (0x00080104)  Code Meaning
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, selectedUPS(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                                        End If
+                                    End If
+                                Else
+                                    ' Fill > (0x00404019)  Performed Workitem Code Sequence
+                                    If selectedUPS.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                                        ' Fill >> (0x00080100)  Code Value
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, selectedUPS(Tags.ScheduledWorkitemCodeValue).Values(0))
+                                        ' Fill >> (0x00080102)  Coding Scheme Designator
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, selectedUPS(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                                        ' Fill >> (0x00080104)  Code Meaning
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, selectedUPS(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                                    End If
+                                End If
+
+
+
+                                datasetMessages.Add(NSetRQ)
+                            End If
+                        Else
+                            Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an Transaction UID"))
+                        End If
+                    Else
+                        Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                    End If
+                End If
+            Next
+
+        End If
+        Return datasetMessages
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        ' Some rules need the dicomMessage send in the request
+        Dim msg As ArrayList = DirectCast(TransactionDataMessages, ArrayList)
+
+        '(0x00000900)  Status
+        m_rules.Add(New UpdateClientUPSRule(Tags.StatusCommandElement, "0", msg, ups05IODType, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+End Class

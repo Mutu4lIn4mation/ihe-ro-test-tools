@@ -1,0 +1,37 @@
+Class UpdateCacheScenarioStep
+    Inherits ScenarioStep
+
+    Private m_ReceivedMessagesContainer As IReceivedMessagesContainer
+    Private m_MessageIndex As Integer
+
+    Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer)
+        MyClass.New(receivedMessagesContainer, 0)
+    End Sub
+
+    Public Sub New(ByVal receivedMessagesContainer As IReceivedMessagesContainer, ByVal messageIndex As Integer)
+        m_ReceivedMessagesContainer = receivedMessagesContainer
+        m_MessageIndex = messageIndex
+    End Sub
+
+    Public Overrides Sub Execute()
+
+        If m_ReceivedMessagesContainer.ReceivedMessages.Count > 0 Then
+
+            If (m_MessageIndex < 0) Or (m_MessageIndex >= m_ReceivedMessagesContainer.ReceivedMessages.Count) Then
+                Throw New Exception(String.Format("Message index '{0}' must be between 0 and the number " & _
+                                    "of received messages '{1}'", m_MessageIndex, m_ReceivedMessagesContainer.ReceivedMessages.Count))
+            End If
+
+            For Each message As DicomMessage In m_ReceivedMessagesContainer.ReceivedMessages
+
+                If message(Tags.StatusCommandElement).Values(0) = 0 Then
+
+                    ReferenceDataSet.GetInstance.UpdateCacheCFind_Responses_InProgress(message(Tags.AffectedSOPInstanceUID).Values(0).ToString())
+                End If
+
+            Next
+
+        End If
+
+    End Sub
+End Class

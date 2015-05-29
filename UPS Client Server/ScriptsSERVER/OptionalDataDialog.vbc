@@ -1,0 +1,81 @@
+Public Class SendOptionalDataDialog
+    Inherits OptionalDataDialog
+
+    Public Sub New()
+
+        MyBase.New("Send Optional Data", _
+            "The Test Tool can send the optional Structure Set and CT Set data alongside the RT Plan. " & _
+            "Please select whether the Test Tool should send these optional data.", _
+            "Click 'Yes' to also send the Structure Set and CT Set with the RT Plan, or 'No' to send the RT Plan only.", _
+            "Sending.bmp")
+
+    End Sub
+
+End Class
+
+Public Class ReceiveOptionalDataDialog
+    Inherits OptionalDataDialog
+
+    Public Sub New()
+
+        MyBase.New("Receive Optional Data", "The Test Tool can receive the optional Position Acquisition Results. " & _
+            "Please select whether the Test Tool should receive the optional data.", _
+            "Click 'Yes' to also receive the Position Acquisition Results.", _
+            "Listening.bmp")
+
+    End Sub
+
+End Class
+
+Public Class OptionalDataDialog
+
+    Private m_ImageFileName As String
+
+    Public Sub New(ByVal caption As String, ByVal text1 As String, ByVal text2 As String, ByVal imageFileName As String)
+
+        MyClass.New()
+
+        Me.Text = caption
+        Me.Label1.Text = text1
+        Me.Label2.Text = text2
+
+        m_ImageFileName = imageFileName
+
+    End Sub
+
+    Private Sub OptionalDataDialog_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+        Try
+
+            LoadBitmap()
+
+        Catch ex As System.Exception
+            'Bitmap could not be loaded. Do nothing however.
+        End Try
+
+    End Sub
+
+    Private Sub LoadBitmap()
+
+        If Not String.IsNullOrEmpty(m_ImageFileName) Then
+
+            Dim fileName As String = TestToolConfiguration.GetInstance.GetScriptPath() + m_ImageFileName
+            Me.PictureBox1.Image = New System.Drawing.Bitmap(fileName)
+
+        End If
+
+    End Sub
+
+    Private Sub buttonYes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonYes.Click
+        Me.DialogResult = Windows.Forms.DialogResult.Yes
+        Me.Close()
+    End Sub
+
+    Private Sub buttonNo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonNo.Click
+        Me.DialogResult = Windows.Forms.DialogResult.No
+        Me.Close()
+    End Sub
+
+
+
+End Class

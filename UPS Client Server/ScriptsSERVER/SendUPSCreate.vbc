@@ -1,0 +1,24 @@
+Class SendUPSCreate
+    Inherits Scenario
+
+    Public Sub New()
+
+        Dim TMSActor As TMSActor = New TMSActor()
+        Dim PDSActor As PDSActor = New PDSActor()
+        Dim ups01Transaction As UPS01Transaction = New UPS01Transaction()
+
+        'Send N-Set REQ (UPS final update)
+        Dim sendNCreateReq As SendScenarioStep = New SendScenarioStep(PDSActor, TMSActor, True)
+        sendNCreateReq.AddTransaction(ups01Transaction)
+        m_scenarioSteps.Add(sendNCreateReq)
+
+        Dim validate1 As ValidateScenarioStep = New ValidateScenarioStep(sendNCreateReq)
+
+        ' apply rules for C-FIND Response 1
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        validate1.AddRules(m_rules)
+
+        m_scenarioSteps.Add(validate1)
+    End Sub
+
+End Class

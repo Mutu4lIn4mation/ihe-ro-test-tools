@@ -1,0 +1,27 @@
+Class SendUPSFinalUpdate
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim pdsActor As PDSActor = New PDSActor
+        Dim tmsActor As TMSActor = New TMSActor
+
+        'scenario dataset
+        m_scenarioDatasetXmlFileName = DataSetHandler.UPSDataXMLFileName
+
+        Dim ups06transaction As UPS06Transaction = New UPS06Transaction(False)
+
+        ' RO-21
+        Dim send As SendScenarioStep = New SendScenarioStep(pdsActor, tmsActor, True)
+
+        send.AddTransaction(ups06transaction)  ' RO-21: UPS Final Update  (N-SET)
+        'Add the steps to the list
+        m_scenarioSteps.Add(send)
+
+        ' Response validation step
+        Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(send)
+        validateResponseStep.AddRules(ups06transaction.GetCommonTransactionRulesForResponse())
+
+        m_scenarioSteps.Add(validateResponseStep)
+    End Sub
+End Class

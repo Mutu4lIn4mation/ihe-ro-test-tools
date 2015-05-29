@@ -1,0 +1,53 @@
+Class SendUPSSubscribeOrUnsubscribe
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+
+        'Configure the send step
+        Dim sendStep As SendScenarioStep = New SendScenarioStep(New PDSActor(), New TMSActor(), True)
+
+        Dim chooseSubscribeDialog As ChooseSubscribeDialog = New ChooseSubscribeDialog()
+        Dim Subscribe As Integer
+        Dim DeletionLock As Boolean
+        Dim GlobalSubOrUnsub As Boolean
+
+        chooseSubscribeDialog.ShowDialog()
+
+        If chooseSubscribeDialog.DialogResult = Windows.Forms.DialogResult.OK Then
+            Subscribe = chooseSubscribeDialog.Subscribe
+            DeletionLock = chooseSubscribeDialog.cbDeletionLock.Checked
+            GlobalSubOrUnsub = chooseSubscribeDialog.cbSubscription.Checked
+        End If
+
+        If Subscribe = 1 Or Subscribe = 3 Then
+            Dim Suspend As Boolean = False
+            If Subscribe = 3 Then
+                Suspend = True
+            End If
+            Dim ups08transaction As UPS08Transaction = New UPS08Transaction(DeletionLock, GlobalSubOrUnsub, Suspend)
+            sendStep.AddTransaction(ups08transaction)
+
+            m_scenarioSteps.Add(sendStep)
+
+            ' Response validation step
+            Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(sendStep)
+            validateResponseStep.AddRules(ups08transaction.GetCommonTransactionRulesForResponse())
+
+            m_scenarioSteps.Add(validateResponseStep)
+
+        Else
+            Dim ups09transaction As UPS09Transaction = New UPS09Transaction(GlobalSubOrUnsub)
+            sendStep.AddTransaction(ups09transaction)
+
+            m_scenarioSteps.Add(sendStep)
+
+            ' Response validation step
+            Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(sendStep)
+            validateResponseStep.AddRules(ups09transaction.GetCommonTransactionRulesForResponse())
+
+            m_scenarioSteps.Add(validateResponseStep)
+        End If
+
+    End Sub
+End Class

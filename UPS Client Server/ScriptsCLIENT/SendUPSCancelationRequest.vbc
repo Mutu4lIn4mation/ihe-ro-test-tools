@@ -1,0 +1,24 @@
+Class SendUPSCancelationRequest
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim TMSActor As TMSActor = New TMSActor()
+        Dim PDSActor As PDSActor = New PDSActor()
+
+        Dim ups11Transaction As UPS11Transaction = New UPS11Transaction(False)
+
+        ' Send N-Action REQ (UPS Completed/Cancelled)
+        Dim sendNActionReq As SendScenarioStep = New SendScenarioStep(PDSActor, TMSActor, True)
+        sendNActionReq.AddTransaction(ups11Transaction)
+
+        m_scenarioSteps.Add(sendNActionReq)
+
+        ' Response validation step
+        Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(sendNActionReq)
+        validateResponseStep.AddRules(ups11Transaction.GetCommonTransactionRulesForResponse())
+
+        m_scenarioSteps.Add(validateResponseStep)
+
+    End Sub
+End Class

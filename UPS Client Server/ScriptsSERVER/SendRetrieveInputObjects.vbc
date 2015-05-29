@@ -1,0 +1,117 @@
+Class SendRetrieveInputObjects
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim pdsActor As PDSActor = New PDSActor
+        Dim tmsActor As TMSActor = New TMSActor
+        Dim ostActor As OSTActor = New OSTActor
+
+        Dim sutSettingOST As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(ostActor.Id, CMOVERQ)
+        Dim sutSettingTMS As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(tmsActor.Id, CMOVERQ)
+
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Create C-Move-Req from selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+        Dim validate As ValidateScenarioStep
+        Dim validate2 As ValidateScenarioStep
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+            'scenario dataset
+            m_scenarioDatasetXmlFileName = DataSetHandler.UPSMessagesXMLFileName
+
+            For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+                If (DataRow.Selected) Then
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+                    Dim dataSet = ReferenceDataSet.GetInstance.GetSelectedCFindRsp(SOPInstanceUID)
+
+                    If dataSet.Exists(Tags.InputInformationSequence) And dataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUID Then
+                        'loop trough items in the input information sequence
+
+                        Dim nrOfIisItems As Integer = dataSet.Item(Tags.InputInformationSequence).ItemCount
+                        If nrOfIisItems > 0 Then
+
+                            For iisItem As Integer = 1 To nrOfIisItems
+                                Dim sqIisItem As Dicom.Other.SequenceItem = dataSet.Item(Tags.InputInformationSequence).GetItem(iisItem)
+
+                                If sqIisItem.Exists(Tags.DICOMRetrievalSequence) Then
+                                    Dim sqDICOMRetrievalItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.DICOMRetrievalSequence, 1)
+
+                                    If sqDICOMRetrievalItem.Exists(Tags.retrieveAETitleMOVE) Then
+                                        Dim retrieveAeTitle = sqDICOMRetrievalItem.GetValues(Tags.retrieveAETitleMOVE).Item(0)
+
+                                        If (sutSettingOST.AETitle = retrieveAeTitle) Then
+                                            ' begin RO-18
+
+                                            Dim ro18transaction As UPSRetrievalOfWorklistInputObjects_Transaction = New UPSRetrievalOfWorklistInputObjects_Transaction(ostActor, pdsActor, selectUPSForm)
+
+                                            Dim send As SendScenarioStep = New SendScenarioStep(pdsActor, ostActor, True)
+                                            send.AddTransaction(ro18transaction)
+
+
+                                            'Add the steps to the list
+                                            m_scenarioSteps.Add(send)
+
+                                            ' einde RO-18
+
+                                        ElseIf (sutSettingTMS.AETitle = retrieveAeTitle) Then
+                                            ' begin RO-20
+
+                                            Dim ro20transaction As UPSRetrievalOfWorklistInputObjects_Transaction = New UPSRetrievalOfWorklistInputObjects_Transaction(tmsActor, pdsActor, selectUPSForm)
+
+                                            ' RO-20
+                                            Dim send2 As SendScenarioStep = New SendScenarioStep(pdsActor, tmsActor, True)
+                                            send2.AddTransaction(ro20transaction)
+
+
+                                            'Add the steps to the list
+                                            m_scenarioSteps.Add(send2)
+
+                                            Dim upsIsTreatmentAndContinuation As Boolean = False
+
+                                            Dim selectedUPS As DvtkHighLevelInterface.Dicom.Other.DataSet = ReferenceDataSet.GetInstance.GetSelectedCFindRsp(SOPInstanceUID)
+
+                                            If (selectedUPS(Tags.ScheduledWorkitemCodeValue).Values(0) = "121726") Then
+                                                If (selectedUPS.Exists(Tags.ScheduledProcessingParametersTextValue)) Then
+                                                    If (selectedUPS(Tags.ScheduledProcessingParametersTextValue).Values(0) = "CONTINUATION") Then
+                                                        upsIsTreatmentAndContinuation = True
+                                                    End If
+
+                                                End If
+
+                                            End If
+
+                                            ' einde RO-20
+
+                                        Else
+                                            Logger.GetInstance().LogErrorMessage("AEtitle in input information sequence (" + retrieveAeTitle + ") doesn't match with AEtitle of SUT OST (" + sutSettingOST.AETitle + ") or TMS (" + sutSettingTMS.AETitle + ") in the test tool configuration editor")
+                                        End If
+                                    Else
+                                        Logger.GetInstance().LogErrorMessage(Tags.GetTagName(Tags.retrieveAETitleMOVE) + " " + Tags.retrieveAETitleMOVE + " doesn't exist in the input information sequence")
+                                    End If
+                                Else
+                                    Logger.GetInstance().LogErrorMessage(Tags.GetTagName(Tags.DICOMRetrievalSequence) + " " + Tags.DICOMRetrievalSequence + " doesn't exist in the input information sequence")
+                                End If
+
+                            Next
+                        Else
+                            Logger.GetInstance().LogErrorMessage("The input information sequence has no items")
+                        End If
+                    Else
+                        Logger.GetInstance().LogErrorMessage("The input information sequence doesn't exist in the dataset")
+                    End If
+                End If
+
+            Next
+
+        End If
+
+    End Sub
+End Class

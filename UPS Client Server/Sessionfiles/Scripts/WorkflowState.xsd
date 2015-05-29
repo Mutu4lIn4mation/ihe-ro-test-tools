@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2009 (http://www.altova.com) by Roi (ICT) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="WorkflowState">
+		<!--<xs:complexType>
+			<xs:sequence>
+				<xs:element name="PDSWorkflowState">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="RetrievalOfWorkList" type="xs:boolean"/>
+							<xs:element name="RetrievalOfWorkitemInputObjects" type="xs:boolean"/>
+							<xs:element name="AcquisitionProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="AcquisitionProcedureStepFinished" type="xs:boolean"/>
+							<xs:element name="PositionRegistrationProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="PositionRegistrationProcedureStepFinished" type="xs:boolean"/>
+							<xs:element name="AdjustPatientPositionProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="AdjustPatientPositionProcedureStepFinished" type="xs:boolean"/>
+							<xs:element name="DeliverTreatmentProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="DeliverTreatmentProcedureStepFinished" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="TMSWorkflowState">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="RetrievalOfWorkList" type="xs:boolean"/>
+							<xs:element name="AcquisitionProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="AcquisitionProcedureStepFinished" type="xs:boolean"/>
+							<xs:element name="PositionRegistrationProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="PositionRegistrationProcedureStepFinished" type="xs:boolean"/>
+							<xs:element name="AdjustPatientPositionProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="AdjustPatientPositionProcedureStepFinished" type="xs:boolean"/>
+							<xs:element name="DeliverTreatmentProcedureStepStart" type="xs:boolean"/>
+							<xs:element name="DeliverTreatmentProcedureStepFinished" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				-->
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="PDS" type="WorkflowScenarioStateList"/>
+				<xs:element name="TMS" type="WorkflowScenarioStateList"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="WorkflowScenarioStateList">
+		<xs:sequence>
+			<xs:element name="WorkflowScenarioState" type="WorkflowScenarioState" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="WorkflowScenarioState">
+		<xs:sequence>
+			<xs:element name="UPS_Scenario" type="UPS_Scenario"/>
+			<xs:element name="Executed" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="UPS_Scenario">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="WorklistQuery"/>
+			<xs:enumeration value="UpsInProgress"/>
+			<xs:enumeration value="RetrieveInputObjects"/>
+			<xs:enumeration value="UpsProgressUpdate"/>
+			<xs:enumeration value="StoreResults"/>
+			<xs:enumeration value="UpsFinalUpdate"/>
+			<xs:enumeration value="UpsCompletedOrCancelled"/>
+			<xs:enumeration value="UpsCreate"/>
+			<xs:enumeration value="UpsGet"/>
+			<xs:enumeration value="UpsSubscribe"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

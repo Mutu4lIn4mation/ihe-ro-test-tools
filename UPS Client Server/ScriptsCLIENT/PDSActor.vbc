@@ -1,0 +1,11 @@
+
+Class PDSActor
+    Inherits Actor
+
+    Public Sub New()
+
+        MyBase.New("PDS", "PDS actor")
+
+    End Sub
+
+End Class

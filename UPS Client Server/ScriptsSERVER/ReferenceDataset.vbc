@@ -1,0 +1,1369 @@
+
+
+Class ReferenceDataSet
+
+#Region "Private Fields"
+
+    'Contains all the loaded XML files which contain the paths to the dicomfiles of the Dataset
+    Private m_DataSetXML As System.Xml.XmlDocument = Nothing
+
+    'the actual instance of the ReferenceDataSet class
+    Private Shared m_instance As ReferenceDataSet = Nothing
+    Public m_datasetPath As String
+
+#End Region
+
+    'we hide the constructor from the outside
+    Private Sub New()
+    End Sub
+
+    'Static method for creating one single instance
+    Public Shared Function GetInstance() As ReferenceDataSet
+        ' initialize if not already done
+        If m_instance Is Nothing Then
+            m_instance = New ReferenceDataSet
+        End If
+        ' return the initialized instance of the ReferenceDataSet Class
+        Return m_instance
+    End Function 'Instance    
+
+    'Make the ReferenceDataSet class aware of a dataset on a given location. Returns false when failed, true when succeeded.
+    Public Function LoadNewDataSet(ByVal XMLFileName As String) As Boolean
+
+        Dim loadingSucceeded As Boolean = False
+        Dim XMLFilePath As String = TestToolConfiguration.GetInstance.GetScriptPath
+        'Reset Member Variables
+        m_DataSetXML = New System.Xml.XmlDocument
+
+        Try 'loading the XML file
+            m_DataSetXML.Load(XMLFilePath + XMLFileName)
+            loadingSucceeded = True
+        Catch ex As System.Exception
+            'Debug.WriteLine("Failed reading: " + XMLFilePath + ". Make sure the file is present, formatted correctly and you have readaccess")
+        End Try
+
+        If loadingSucceeded Then
+            'check whether the path in the xml file exists
+            Dim relativeTestDataPath As String
+            relativeTestDataPath = m_DataSetXML.SelectSingleNode("/DataSet/DataSetPath").InnerText
+
+            m_datasetPath = TestToolConfiguration.GetInstance.SessionPath + relativeTestDataPath
+            If Not Directory.Exists(m_datasetPath) Then
+                loadingSucceeded = False
+                'Debug.WriteLine("Could not find the directory of the testdata in the XML system.io.File.")
+                Return loadingSucceeded
+            End If
+        End If
+
+        Return loadingSucceeded
+    End Function
+
+    'Returns the structure set in the ReferenceDataSet
+    Public Function GetStructureSet() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+
+        Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/StructureSet").InnerText
+        Dim RTStructureSet As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+        Try
+            'Read the RTPlan Dosimetric
+            RTStructureSet.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (structure set): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+
+        RTStructureSet.CommandSet.Set(Tags.AffectedSOPClassUID, UI, SOPclass.RTStructureSetSOPClassUID)
+        Return RTStructureSet
+
+    End Function
+
+    Public Function GetComputedTomography(ByVal index As Integer) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+
+        Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/CTimage").InnerText + index.ToString + ".dcm"
+        Dim requestedDataset As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+        'Check if the CT Image has been loaded already, zijn er 111
+        Try
+            'Read the RTPlan Dosimetric
+            requestedDataset.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (CT): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+        requestedDataset.CommandSet.Set(Tags.AffectedSOPClassUID, UI, SOPclass.CTImageSOPClassUID)
+        Return requestedDataset
+
+    End Function
+
+
+    'Returns the DataSet of the RTPlan Dosimetric Object in the ReferenceDataSet
+    Public Function GetRTPlanDosimetric(ByVal scenario As ARTO_Scenario) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/" + scenario.ToString).InnerText
+        Dim requestedData As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+        Try
+            'Read the RTPlan Dosimetric
+            requestedData.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (RTPlanDosimetric): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+        requestedData.Set(Tags.AffectedSOPClassUID, UI, requestedData.Item(Tags.SOPClassUID).Values(0))
+        Return requestedData
+    End Function
+
+    'Returns the DataSet of the Unified Procedure Step Pull Object in the ReferenceDataSet
+    Public Function GetUnifiedProcedureStepPull_CFIND_REQ() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/C-FIND-RQ").InnerText
+        Dim UnifiedProcedureStepPull_CFIND_REQ As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CFINDRQ)
+        UnifiedProcedureStepPull_CFIND_REQ.CommandSet.Set(Tags.AffectedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPullSOPClassUID)
+        Try
+            'Read the Response
+            UnifiedProcedureStepPull_CFIND_REQ.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (UnifiedProcedureStepPull CFIND RQ): '{0}'.", fileName))
+
+            UnifiedProcedureStepPull_CFIND_REQ.DataSet.Delete("0x00080000")
+            UnifiedProcedureStepPull_CFIND_REQ.DataSet.Delete("0x00100000")
+            UnifiedProcedureStepPull_CFIND_REQ.DataSet.Write(fileName)
+
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+
+
+
+        Return UnifiedProcedureStepPull_CFIND_REQ
+    End Function
+
+    Public Function GetCacheCFind_Responses() As DvtkHighLevelInterface.Dicom.Other.DataSetCollection
+        Dim responseDataSets As DvtkHighLevelInterface.Dicom.Other.DataSetCollection = New DvtkHighLevelInterface.Dicom.Other.DataSetCollection
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                responseDataSets.Add(dicomFile.DataSet)
+
+            End If
+        Next
+
+        Return responseDataSets
+
+    End Function
+
+    Public Sub SetCacheCFind_ResponsesTransactionUID(SOPInstanceUID As String, TransactionUID As String)
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm") And File.Name.StartsWith("C-FIND-RSP")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0).ToString() = SOPInstanceUID) Then
+
+                    dicomFile.Set(Tags.TransactionUID, UI, TransactionUID)
+                    dicomFile.Write(File.FullName)
+                End If
+
+            End If
+        Next
+
+    End Sub
+
+    Public Sub UpdateCacheCFind_Response(SOPInstanceUID As String, MessageToSend As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+                If (dicomFile.DataSet.Exists(Tags.SOPInstanceUID)) Then
+
+
+                    If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0).ToString() = SOPInstanceUID) Then
+
+                        For i As Integer = 0 To MessageToSend.DataSet.Count - 1
+
+                            If (MessageToSend.DataSet.Item(i).VR = DvtkData.Dimse.VR.SQ) Then
+
+                                If (MessageToSend.DataSet.Item(i).ItemCount = 0) Then
+                                    dicomFile.DataSet.Set(MessageToSend.DataSet.Item(i).TagSequenceString, MessageToSend.DataSet.Item(i).VR)
+                                Else
+                                    dicomFile = DataSetHandler.copySeqAttributeFromInputToOutput(MessageToSend.DataSet.Item(i), dicomFile, MessageToSend)
+                                End If
+
+                            Else
+
+                                dicomFile.DataSet.Set(MessageToSend.DataSet.Item(i).TagSequenceString, MessageToSend.DataSet.Item(i).VR, MessageToSend.DataSet.Item(i).Values(0))
+                            End If
+
+                        Next
+                        'dicomFile.FileMetaInformation.TransferSyntax = TransferSyntaxes
+                        dicomFile.Write(File.FullName)
+                    End If
+                End If
+            End If
+        Next
+
+    End Sub
+
+    Public Function GetAllUPSes() As DvtkHighLevelInterface.Dicom.Other.DataSetCollection
+        Dim responseDataSets As DvtkHighLevelInterface.Dicom.Other.DataSetCollection = New DvtkHighLevelInterface.Dicom.Other.DataSetCollection
+
+        If (String.IsNullOrEmpty(m_datasetPath)) Then
+            LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+        End If
+
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\SERVER")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                responseDataSets.Add(dicomFile.DataSet)
+
+            End If
+        Next
+
+        Return responseDataSets
+
+    End Function
+
+    Public Function GetAvailebleUPS(SOPInstanceUID As String) As DvtkHighLevelInterface.Dicom.Files.DicomFile
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\SERVER")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUID) Then
+                    Return dicomFile
+                End If
+
+            End If
+        Next
+
+        Return Nothing
+
+    End Function
+
+    Public Function GetAvailebleUPS(SOPInstanceUID As String, TransactionUID As String) As DvtkHighLevelInterface.Dicom.Files.DicomFile
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\SERVER")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUID And dicomFile.DataSet(Tags.TransactionUID).Values(0) = TransactionUID) Then
+                    Return dicomFile
+                End If
+
+            End If
+        Next
+
+        Return Nothing
+
+    End Function
+
+    Public Function GetSelectedCFindRsp(SOPInstanceUID As String) As DvtkHighLevelInterface.Dicom.Other.DataSet
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                dicomFile.Read(File.FullName)
+
+                If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUID) Then
+                    Return dicomFile.DataSet
+                End If
+
+            End If
+        Next
+
+        Return Nothing
+
+    End Function
+
+    Public Sub UpdateCacheCFind_Responses_NGet(SOPInstanceUID As String, receivedMessage As DicomMessage)
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUID) Then
+
+                    For i As Integer = 0 To receivedMessage.DataSet.Count - 1
+
+                        If (receivedMessage.DataSet.Item(i).VR = DvtkData.Dimse.VR.SQ) Then
+
+                            If (receivedMessage.DataSet.Item(i).ItemCount = 0) Then
+                                dicomFile.DataSet.Set(receivedMessage.DataSet.Item(i).TagSequenceString, receivedMessage.DataSet.Item(i).VR)
+                            Else
+                                dicomFile = DataSetHandler.copySeqAttributeFromInputToOutput(receivedMessage.DataSet.Item(i), dicomFile, receivedMessage)
+                            End If
+
+                        Else
+
+                            dicomFile.DataSet.Set(receivedMessage.DataSet.Item(i).TagSequenceString, receivedMessage.DataSet.Item(i).VR, receivedMessage.DataSet.Item(i).Values(0))
+                        End If
+
+                    Next
+
+                    dicomFile.Write(File.FullName)
+                End If
+
+            End If
+        Next
+
+    End Sub
+
+    Public Sub UpdateCacheCFind_Responses_InProgress(SOPInstanceUID As String)
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUID) Then
+                    dicomFile.DataSet.Set(Tags.ProcedureStepState, CS, "IN PROGRESS")
+                    dicomFile.Write(File.FullName)
+                End If
+
+            End If
+        Next
+
+    End Sub
+
+    Public Sub deletePDSCacheFiles()
+        For Each foundFile As String In My.Computer.FileSystem.GetFiles(m_datasetPath + "\..\Cache\CLIENT", _
+            Microsoft.VisualBasic.FileIO.SearchOption.SearchAllSubDirectories, "*.*")
+            File.Delete(foundFile)
+        Next
+    End Sub
+
+    'Returns the DataSets of the Unified Procedure Step Pull Response
+    Public Function GetUnifiedProcedureStepPull_Responses(dicomMessageCFindReq As DicomMessage) As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+        Dim responseMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection()
+        Dim index As Integer = 0
+        Dim CFindRspCount As Integer = 0
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        'used to retrieve correct AE Titles
+        'Dim dvtkSettingTMS As DVTKAEConfiguration = config.GetDVTKAEConfiguration(New TMSActor().Id)
+        'Dim dvtkSettingOST As DVTKAEConfiguration = config.GetDVTKAEConfiguration(New OSTActor().Id)
+
+        'dicomMessageCFindReq.DataSet.Write("C:\Projecten\ASTRO\IHE_RO2013\03-Code\DVtkProject\IPDW\Datasets\IPDW\Cache\CFindRequest.dcm")
+        For Each foundFile As String In My.Computer.FileSystem.GetFiles(m_datasetPath + "\..\Cache\SERVER", _
+            Microsoft.VisualBasic.FileIO.SearchOption.SearchAllSubDirectories, "*.*")
+            File.Delete(foundFile)
+        Next
+
+        Dim dirInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\..\TestData\UPS")
+
+        If (dirInfo.GetFiles().Length > 0) Then
+            For Each foundFile As String In My.Computer.FileSystem.GetFiles(m_datasetPath + "\..\TestData\UPS", _
+                Microsoft.VisualBasic.FileIO.SearchOption.SearchTopLevelOnly, "*.*")
+                Dim fileInfo As FileInfo = New FileInfo(foundFile)
+                My.Computer.FileSystem.CopyFile(foundFile, m_datasetPath + "\..\Cache\SERVER\" + fileInfo.Name)
+            Next
+        Else
+            For Each foundFile As String In My.Computer.FileSystem.GetFiles(m_datasetPath + "\..\Originals\UPS", _
+                Microsoft.VisualBasic.FileIO.SearchOption.SearchAllSubDirectories, "*.*")
+                Dim fileInfo As FileInfo = New FileInfo(foundFile)
+                My.Computer.FileSystem.CopyFile(foundFile, m_datasetPath + "\..\Cache\SERVER\" + fileInfo.Name)
+            Next
+        End If
+
+
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\..\Cache\SERVER")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.FullName.EndsWith(".dcm")) Then
+
+                Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+
+                Dim matchReqWithUPS As Boolean = True
+                Dim strBeginAndEndDate As String() = dicomMessageCFindReq(Tags.ScheduledProcedureStepStartDateandTime).Values(0).Split("-")
+                Dim cFindReqBeginDateTime As New Date(Convert.ToInt32(Left(strBeginAndEndDate(0), 4)), Convert.ToInt32(strBeginAndEndDate(0).Substring(4, 2)), Convert.ToInt32(strBeginAndEndDate(0).Substring(6, 2)), Convert.ToInt32(strBeginAndEndDate(0).Substring(8, 2)), Convert.ToInt32(strBeginAndEndDate(0).Substring(10, 2)), Convert.ToInt32(strBeginAndEndDate(0).Substring(12, 2)))
+                Dim cFindReqEndDateTime As New Date(Convert.ToInt32(Left(strBeginAndEndDate(1), 4)), Convert.ToInt32(strBeginAndEndDate(1).Substring(4, 2)), Convert.ToInt32(strBeginAndEndDate(1).Substring(6, 2)), Convert.ToInt32(strBeginAndEndDate(1).Substring(8, 2)), Convert.ToInt32(strBeginAndEndDate(1).Substring(10, 2)), Convert.ToInt32(strBeginAndEndDate(1).Substring(12, 2)))
+
+
+                If Not dicomMessageCFindReq(Tags.ProcedureStepState).Values(0) = dicomFile.DataSet(Tags.ProcedureStepState).Values(0) Then
+                    matchReqWithUPS = False
+                End If
+
+
+                If Not dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0) = "" And dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0).Length > 13 Then
+                    Dim UPSDateTime As New Date(Convert.ToInt32(Left(dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0), 4)), Convert.ToInt32(dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0).Substring(4, 2)), Convert.ToInt32(dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0).Substring(6, 2)), Convert.ToInt32(dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0).Substring(8, 2)), Convert.ToInt32(dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0).Substring(10, 2)), Convert.ToInt32(dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0).Substring(12, 2)))
+                    UPSDateTime = UPSDateTime.AddSeconds(1.0)
+
+                    If Not (UPSDateTime <= cFindReqEndDateTime And UPSDateTime >= cFindReqBeginDateTime) Then
+                        matchReqWithUPS = False
+                        'responseMessage.Set(Tags.ScheduledProcedureStepStartDateandTime, DvtkData.Dimse.VR.DT, dicomFile.DataSet(Tags.ScheduledProcedureStepStartDateandTime).Values(0))
+                    End If
+
+                End If
+
+
+                If Not dicomMessageCFindReq(Tags.PatientName).Values(0) = "" Then
+
+                    Dim searchName As String = dicomMessageCFindReq(Tags.PatientName).Values(0).Replace(" ", "\^")
+
+                    Dim pattern As String = "^" + searchName + "$"
+                    pattern = pattern.Replace("*", "[\x20-\x7e]*")
+                    pattern = pattern.Replace("?", "[\x20-\x7e]?")
+
+                    Dim patientNameRegEx As System.Text.RegularExpressions.Regex = New System.Text.RegularExpressions.Regex(pattern)
+
+                    If Not (patientNameRegEx.IsMatch(dicomFile.DataSet(Tags.PatientName).Values(0))) Then
+                        matchReqWithUPS = False
+                    End If
+                End If
+
+                If (dicomMessageCFindReq.DataSet.Exists(Tags.ScheduledStationNameCodeSequence)) Then
+                    If dicomMessageCFindReq.DataSet.GetitemCount(Tags.ScheduledStationNameCodeSequence) > 0 Then
+                        If (dicomMessageCFindReq.DataSet.Exists(Tags.ScheduledStationCodeValue)) Then
+                            If dicomMessageCFindReq(Tags.ScheduledStationCodeValue).Values(0) = "" Or dicomMessageCFindReq(Tags.ScheduledStationCodeValue).Values(0) = dicomFile.DataSet(Tags.ScheduledStationCodeValue).Values(0) Then
+                            Else
+                                matchReqWithUPS = False
+                            End If
+                        End If
+
+                        If (dicomMessageCFindReq.DataSet.Exists(Tags.ScheduledStationCodingSchemeDesignator)) Then
+                            If dicomMessageCFindReq(Tags.ScheduledStationCodingSchemeDesignator).Values(0) = "" Or dicomMessageCFindReq(Tags.ScheduledStationCodingSchemeDesignator).Values(0) = dicomFile.DataSet(Tags.ScheduledStationCodingSchemeDesignator).Values(0) Then
+                            Else
+                                matchReqWithUPS = False
+                            End If
+                        End If
+                    End If
+                End If
+                'If dicomMessageCFindReq(Tags.ScheduledStationCodeMeaning).Values(0) = "" Or dicomMessageCFindReq(Tags.ScheduledStationCodeMeaning).Values(0) = dicomFile.DataSet(Tags.ScheduledStationCodeMeaning).Values(0) Then
+                'Else
+                '    matchReqWithUPS = False
+                'End If
+                If dicomMessageCFindReq(Tags.PatientID).Values(0) = "" Or dicomMessageCFindReq(Tags.PatientID).Values(0) = dicomFile.DataSet(Tags.PatientID).Values(0) Then
+                Else
+                    matchReqWithUPS = False
+                End If
+
+                If matchReqWithUPS Then
+
+                    ' Ups komt overeen met waardes uit request, maak respons bericht en voeg toe aan responsmessages
+                    Dim responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CFINDRSP)
+
+                    CFindRspCount = CFindRspCount + 1
+
+                    Logger.GetInstance().LogMessage("Make reference dataset file (C-Find-RSP) for each UPS that matches.")
+
+                    responseMessage.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, &HFF00) ' Status.
+                    responseMessage.Set(Tags.SOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.UnifiedProcedureStepPullSOPClassUID)
+                    responseMessage.Set(Tags.SOPInstanceUID, DvtkData.Dimse.VR.UI, dicomFile.DataSet(Tags.SOPInstanceUID).Values(0))
+
+                    Dim i As Integer
+                    For i = 0 To dicomMessageCFindReq.DataSet.Count - 1
+
+                        If (dicomMessageCFindReq.DataSet.Item(i).VR = DvtkData.Dimse.VR.SQ) Then
+
+                            If (dicomMessageCFindReq.DataSet.Item(i).ItemCount = 0) Then
+                                If (CFindRspCount = 1) Then
+                                    'Logger.GetInstance().LogWarningMessage("C-Find-Req contains an empty sequence " + Tags.GetTagName(dicomMessageCFindReq.DataSet.Item(i).TagSequenceString) + " with tagsequence: " + dicomMessageCFindReq.DataSet.Item(i).TagSequenceString)
+                                End If
+                                checkUPSSequenceAttribute(dicomFile.DataSet.Item(dicomMessageCFindReq.DataSet.Item(i).TagSequenceString), responseMessage, dicomFile)
+                            Else
+                                checkUPSSequenceAttribute(dicomMessageCFindReq.DataSet.Item(i), responseMessage, dicomFile)
+                            End If
+
+                        Else
+                            If (dicomFile.DataSet.Exists(dicomMessageCFindReq.DataSet.Item(i).TagSequenceString)) Then
+                                responseMessage.Set(dicomMessageCFindReq.DataSet.Item(i).TagSequenceString, dicomMessageCFindReq.DataSet.Item(i).VR, dicomFile.DataSet(dicomMessageCFindReq.DataSet.Item(i).TagSequenceString).Values(0))
+                            End If
+                        End If
+
+                    Next
+
+                    'responseMessage.DataSet.Set(Tags.IisTypeOfInstances, CS, "Test")
+                    responseMessage.DataSet.Delete(Tags.IisTypeOfInstances)
+
+                    'responseMessage.DataSet.Set(Tags.IisTypeOfInstances, CS, "")
+                    responseMessage.DataSet.Delete("0x00404021[1]/0x00080000")
+                    responseMessage.DataSet.Delete("0x00404021[1]/0x00200000")
+                    responseMessage.DataSet.Delete("0x00404021[1]/0x00400000")
+
+                    responseMessages.Add(responseMessage)
+                    'responseMessage.DataSet.Write(m_datasetPath + "\..\Cache\PDS\C-FIND-RSP" + CFindRspCount.ToString() + ".dcm")
+
+                End If
+
+
+
+            End If
+
+        Next
+
+        'Add Success response
+        Dim responseMessage2 As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CFINDRSP)
+        responseMessage2.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status = Success
+        responseMessages.Add(responseMessage2)
+
+        Return responseMessages
+    End Function
+
+    Public Function GetUPSPull_NGET_Response(dicomMessageNGetReq As DicomMessage) As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+        Dim responseMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection = New DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection()
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+
+        Dim SOPInstanceUID As String = dicomMessageNGetReq(Tags.RequestedSOPInstanceUID).Values.Item(0)
+        Dim UPSdicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = ReferenceDataSet.GetInstance().GetAvailebleUPS(SOPInstanceUID)
+
+        If Not UPSdicomFile Is Nothing Then
+
+            ' Ups komt overeen met waardes uit request, maak respons bericht en voeg toe aan responsmessages
+            Dim responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NGETRSP)
+
+            responseMessage.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, &HFF00) ' Status.
+            responseMessage.Set(Tags.AffectedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.UnifiedProcedureStepPullSOPClassUID)
+            responseMessage.Set(Tags.AffectedSOPInstanceUID, DvtkData.Dimse.VR.UI, UPSdicomFile.DataSet(Tags.SOPInstanceUID).Values(0))
+
+            Dim AttributeIdentifierList As String = dicomMessageNGetReq(Tags.AttributeIdentifierList).Values.ToString()
+
+
+            If dicomMessageNGetReq(Tags.AttributeIdentifierList).Exists() Then
+                Dim value As String = dicomMessageNGetReq(Tags.AttributeIdentifierList).Values.ToString()
+
+                Dim split As String() = value.Split(",")
+
+                For Each Attribute As String In split
+                    Attribute = Attribute.Trim()
+                    If (UPSdicomFile.DataSet.Exists(Attribute.Trim(""""))) Then
+
+                        If (UPSdicomFile.DataSet(Attribute.Trim("""")).VR = SQ) Then
+                            DataSetHandler.copySeqAttributeFromInputToOutput(UPSdicomFile.DataSet(Attribute.Trim("""")), responseMessage.DicomMessage, UPSdicomFile.DataSet, True)
+                        Else
+                            responseMessage.DataSet.Set(Attribute.Trim(""""), UPSdicomFile.DataSet(Attribute.Trim("""")).VR, UPSdicomFile.DataSet(Attribute.Trim("""")).Values(0))
+                        End If
+
+
+                    End If
+                Next
+            End If
+
+            responseMessages.Add(responseMessage)
+
+            'Add Success response
+            Dim responseMessage2 As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.NGETRSP)
+            responseMessage2.Set(Tags.StatusCommandElement, DvtkData.Dimse.VR.US, 0) ' Status = Success
+            responseMessages.Add(responseMessage2)
+        End If
+
+        Return responseMessages
+    End Function
+
+    Public Function createCMoveRqUPS(ByVal XMLFileName As String, ByVal sutActorId As String, ByVal storeActorId As String, ByVal SOPInstanceUIDUPS As String) As DicomMessageCollection
+        'WV: in order to request the appropiate data from the system under test, we need several UIDs
+        'the study UID, the series UID and the SOP instance UID(s)
+        'these can be found in the selected UPS in the input information sequence
+        'also in there is the specific location (AEtitle) where the object can be found
+
+        'we use a message collection
+        Dim retVal As DicomMessageCollection = New DicomMessageCollection()
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\..\Cache\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.StartsWith("C-FIND-RSP")) Then
+
+                Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                dicomFile.Read(File.FullName)
+
+                Dim dataSet As Dicom.Other.DataSet = dicomFile.DataSet
+                If dataSet.Exists(Tags.InputInformationSequence) And dataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUIDUPS Then
+                    'loop trough items in the input information sequence
+
+                    Dim nrOfIisItems As Integer = dataSet.Item(Tags.InputInformationSequence).ItemCount
+                    If nrOfIisItems > 0 Then
+
+                        For iisItem As Integer = 1 To nrOfIisItems
+                            Dim sqIisItem As Dicom.Other.SequenceItem = dataSet.Item(Tags.InputInformationSequence).GetItem(iisItem)
+
+
+                            'loop through items
+
+                            If sqIisItem.Exists(Tags.StudyInstanceUID) Then
+                                Dim studyInstanceUID As String = sqIisItem.GetValues(Tags.StudyInstanceUID).Item(0)
+                                Dim serieInstanceUID As String = sqIisItem.GetValues(Tags.SeriesInstanceUID).Item(0)
+
+                                Dim sqDICOMRetrievalItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.DICOMRetrievalSequence, 1)
+
+                                Dim sutSetting As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(sutActorId, CMOVERQ)
+                                Dim sutAeTitle As String = sutSetting.AETitle
+                                Dim retrieveAeTitle As String = sutAeTitle
+                                If sqDICOMRetrievalItem.Exists(Tags.retrieveAETitleMOVE) Then
+                                    retrieveAeTitle = sqDICOMRetrievalItem.GetValues(Tags.retrieveAETitleMOVE).Item(0)
+                                End If
+
+                                'compare AE titles
+                                If retrieveAeTitle = sutAeTitle Then
+                                    Dim nrOfSopItems As Integer = sqIisItem.GetitemCount(Tags.ReferencedSOPSequenceMOVE)
+                                    For sopItem As Integer = 1 To nrOfSopItems
+                                        Dim sqSopItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.ReferencedSOPSequenceMOVE, sopItem)
+
+                                        Dim sopInstanceUID As String = sqSopItem.GetValues(Tags.ReferencedSOPInstanceUIDMOVE).Item(0)
+
+                                        'everything is known now, add to message collection
+                                        AddMoveMessageToRQ(retVal, studyInstanceUID, serieInstanceUID, sopInstanceUID, storeActorId)
+
+                                    Next 'number of sop instance items
+                                End If
+                                'Next 'number of serie items
+                            End If
+                        Next 'number of information sequence items
+
+                    End If
+                End If
+            End If
+        Next
+        Return retVal
+    End Function
+
+
+    Public Function createCStoreRqFromChosenFiles(ByVal sutActorId As String, ByVal storeActorId As String, ByVal files As String()) As DicomMessageCollection
+        'we use a message collection
+        Dim retVal As DicomMessageCollection = New DicomMessageCollection()
+
+        For Each File As String In files
+
+            If (File.EndsWith(".dcm")) Then
+
+                Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                dicomFile.Read(File)
+                Dim dataSet As Dicom.Other.DataSet = dicomFile.DataSet
+
+                Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+                Dim sutSettingOST As SUTAESettingWrapper = config.GetSUTAEConfiguration(New OSTActor().Id, CSTORERQ)
+
+                Try
+                    Dim newMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+                    newMessage.DataSet.Read(File)
+                    'newMessage.Set(Tags.MoveOriginatorApplicationEntity, AE, sutSettingOST.AETitle)
+                    'newMessage.Set(Tags.MoveOriginatorMessageID, US, count.ToString())
+                    newMessage.Set(Tags.AffectedSOPClassUID, UI, dataSet(Tags.SOPClassUID).Values(0))
+                    newMessage.Set(Tags.AffectedSOPInstanceUID, UI, dataSet(Tags.SOPInstanceUID).Values(0))
+                    'count = count + 1
+                    retVal.Add(newMessage)
+                Catch ex As Exception
+                    Logger.GetInstance().LogErrorMessage(String.Format("DICOM file '{0}' is not valid.", File))
+                End Try
+            End If
+
+        Next
+        Return retVal
+    End Function
+
+    Public Sub UpdateCacheCFind_ResponseWithOutputSequence(ByVal SOPInstanceUID As String, ByVal m_sutActorId As String, ByVal m_storeActorId As String, ByVal messages As DicomMessageCollection)
+
+        LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.EndsWith(".dcm")) Then
+
+                Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                'Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet()
+                dicomFile.Read(File.FullName)
+
+                If (dicomFile.DataSet(Tags.SOPInstanceUID).Values(0).ToString() = SOPInstanceUID) Then
+                    dicomFile.DataSet.Delete(Tags.UPSPerformedProcedureOutputInformationSequence)
+                    Dim count As Integer = 1
+                    For Each dicommessage As DicomMessage In messages
+                        dicomFile.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPClassUID.Replace("0x00404033[1]", "0x00404033[" + count.ToString() + "]"), UI, dicommessage.DataSet(Tags.SOPClassUID).Values(0))
+                        dicomFile.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceReferencedSOPSequenceRefSOPInstanceUID.Replace("0x00404033[1]", "0x00404033[" + count.ToString() + "]"), UI, dicommessage.DataSet(Tags.SOPInstanceUID).Values(0))
+                        dicomFile.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceSerieInstanceUID.Replace("0x00404033[1]", "0x00404033[" + count.ToString() + "]"), UI, dicommessage.DataSet(Tags.SeriesInstanceUID).Values(0))
+                        dicomFile.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceStudyInstanceUID.Replace("0x00404033[1]", "0x00404033[" + count.ToString() + "]"), UI, dicommessage.DataSet(Tags.StudyInstanceUID).Values(0))
+                        dicomFile.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceTypeOfInstances.Replace("0x00404033[1]", "0x00404033[" + count.ToString() + "]"), UI, "DICOM")
+                        count = count + 1
+                    Next
+                    Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+                    Dim sutSetting As SUTAESettingWrapper = config.GetSUTAEConfiguration(m_sutActorId, CSTORERQ)
+                    dicomFile.DataSet.Set(Tags.UPSPerformedProcedureOutputInformationSequenceDICOMRetrievalSequenceAETitle, AE, sutSetting.AETitle)
+                    dicomFile.Write(File.FullName)
+
+                End If
+            End If
+        Next
+
+    End Sub
+
+    Public Function createCStoreRqFromOutputSeq(ByVal sutActorId As String, ByVal storeActorId As String, ByVal UPSDICOMdataset As Dicom.Other.DataSet) As DicomMessageCollection
+        'WV: in order to request the appropiate data from the system under test, we need several UIDs
+        'the study UID, the series UID and the SOP instance UID(s)
+        'these can be found in the selected UPS in the output information sequence
+        'also in there is the specific location (AEtitle) where the object can be found
+
+        'we use a message collection
+        Dim retVal As DicomMessageCollection = New DicomMessageCollection()
+
+
+        Dim dataDirectoryPath As String = DataSetHandler.getDataPath(DataSetHandler.UPSDataXMLFileName)
+
+        dataDirectoryPath = dataDirectoryPath + "OST"
+
+        Dim dirInfo As DirectoryInfo = New DirectoryInfo(dataDirectoryPath)
+
+        If (dirInfo.GetFiles().Length = 0) Then
+            dataDirectoryPath = dataDirectoryPath + "\..\..\Originals\OST"
+        End If
+
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(dataDirectoryPath)
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = New DvtkHighLevelInterface.Dicom.Files.DicomFile
+            dicomFile.Read(File.FullName)
+
+            Dim dataSet As Dicom.Other.DataSet = dicomFile.DataSet
+            If UPSDICOMdataset.Exists(Tags.UPSPerformedProcedureOutputInformationSequence) Then
+                'loop trough items in the input information sequence
+
+                Dim nrOfIisItems As Integer = UPSDICOMdataset.Item(Tags.UPSPerformedProcedureOutputInformationSequence).ItemCount
+                If nrOfIisItems > 0 Then
+
+                    For iisItem As Integer = 1 To nrOfIisItems
+                        Dim sqIisItem As Dicom.Other.SequenceItem = UPSDICOMdataset.Item(Tags.UPSPerformedProcedureOutputInformationSequence).GetItem(iisItem)
+
+
+                        'loop through items
+
+                        If sqIisItem.Exists(Tags.StudyInstanceUID) Then
+                            Dim studyInstanceUID As String = sqIisItem.GetValues(Tags.StudyInstanceUID).Item(0)
+                            Dim serieInstanceUID As String = sqIisItem.GetValues(Tags.SeriesInstanceUID).Item(0)
+
+                            Dim sqDICOMRetrievalItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.DICOMRetrievalSequence, 1)
+
+                            Dim sutSetting As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(sutActorId, CSTORERQ)
+                            Dim sutAeTitle As String = sutSetting.AETitle
+                            Dim retrieveAeTitle As String = sutAeTitle
+                            If sqDICOMRetrievalItem.Exists(Tags.retrieveAETitleMOVE) Then
+                                retrieveAeTitle = sqDICOMRetrievalItem.GetValues(Tags.retrieveAETitleMOVE).Item(0)
+                            End If
+
+                            'compare AE titles
+                            If retrieveAeTitle = sutAeTitle Then
+                                Dim nrOfSopItems As Integer = sqIisItem.GetitemCount(Tags.ReferencedSOPSequenceMOVE)
+                                For sopItem As Integer = 1 To nrOfSopItems
+                                    Dim sqSopItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.ReferencedSOPSequenceMOVE, sopItem)
+
+                                    Dim sopInstanceUID As String = sqSopItem.GetValues(Tags.ReferencedSOPInstanceUIDMOVE).Item(0)
+
+                                    'everything is known now, check output information seq attributes with RO-object attributes 
+
+                                    If (dataSet(Tags.StudyInstanceUID).Values(0) = studyInstanceUID And dataSet(Tags.SeriesInstanceUID).Values(0) = serieInstanceUID And dataSet(Tags.SOPInstanceUID).Values(0) = sopInstanceUID) Then
+                                        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+                                        Dim sutSettingOST As SUTAESettingWrapper = config.GetSUTAEConfiguration(New OSTActor().Id, CSTORERQ)
+
+                                        Dim newMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+                                        newMessage.DataSet.Read(File.FullName)
+                                        newMessage.Set(Tags.MoveOriginatorApplicationEntity, AE, sutSettingOST.AETitle)
+                                        newMessage.Set(Tags.MoveOriginatorMessageID, US, 1)
+                                        newMessage.Set(Tags.AffectedSOPClassUID, UI, dataSet(Tags.SOPClassUID).Values(0))
+                                        newMessage.Set(Tags.AffectedSOPInstanceUID, UI, dataSet(Tags.SOPInstanceUID).Values(0))
+
+                                        retVal.Add(newMessage)
+                                        'AddMoveMessageToRQ(retVal, studyInstanceUID, serieInstanceUID, sopInstanceUID, storeActorId)
+                                    End If
+                                Next 'number of sop instance items
+                            End If
+                            'Next 'number of serie items
+                        End If
+                    Next 'number of information sequence items
+
+                End If
+            End If
+        Next
+        Return retVal
+    End Function
+
+    Public Function createNSetRqUPSProgressUpdate(ByVal XMLFileName As String, ByVal SOPInstanceUIDUPS As String, NsetRq As DicomMessage) As DicomMessage
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\..\Cache\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.StartsWith("C-FIND-RSP")) Then
+
+                Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                dicomFile.Read(File.FullName)
+
+                Dim dataSet As Dicom.Other.DataSet = dicomFile.DataSet
+                If dataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUIDUPS Then
+
+                    ' Fill  (0x00001001)  Requested SOP Instance UID
+                    NsetRq.Set(Tags.RequestedSOPInstanceUID, UI, dataSet(Tags.SOPInstanceUID).Values(0))
+
+                    ' Fill  (0x00081195)  Transaction UID
+                    NsetRq.DataSet.Set(Tags.TransactionUID, DvtkData.Dimse.VR.UI, dataSet(Tags.TransactionUID).Values(0))
+
+                    '' Fill > (0x00404019)  Performed Workitem Code Sequence
+                    'If dataSet.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                    '    ' Fill >> (0x00080100)  Code Value
+                    '    NsetRq.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, dataSet(Tags.ScheduledWorkitemCodeValue).Values(0))
+                    '    ' Fill >> (0x00080102)  Coding Scheme Designator
+                    '    NsetRq.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, dataSet(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                    '    ' Fill >> (0x00080104)  Code Meaning
+                    '    NsetRq.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, dataSet(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                    'End If
+
+
+                    For i As Integer = 0 To NsetRq.DataSet.Count - 1
+
+                        If (NsetRq.DataSet.Item(i).VR = DvtkData.Dimse.VR.SQ) Then
+
+                            If (NsetRq.DataSet.Item(i).ItemCount = 0) Then
+                                NsetRq.DataSet.Delete(NsetRq.DataSet.Item(i).TagSequenceString)
+                            Else
+                                NsetRq = DataSetHandler.copySeqAttributeFromInputToOutput(NsetRq.DataSet(NsetRq.DataSet.Item(i).TagSequenceString), NsetRq, dicomFile.DataSet, False)
+                            End If
+
+                        Else
+
+                            If (NsetRq.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Values(0) = "") Then
+                                If (dicomFile.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Exists) Then
+                                    If Not (dicomFile.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Values(0) = "") Then
+                                        NsetRq.DataSet.Set(NsetRq.DataSet.Item(i).TagSequenceString, NsetRq.DataSet.Item(i).VR, dicomFile.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Values(0))
+                                    End If
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
+            End If
+        Next
+        Return NsetRq
+    End Function
+
+    Public Function createNSetRqUPSFinalUpdate(ByVal XMLFileName As String, ByVal SOPInstanceUIDUPS As String, NsetRq As DicomMessage) As DicomMessage
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\..\Cache\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.StartsWith("C-FIND-RSP")) Then
+
+                Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                dicomFile.Read(File.FullName)
+
+                Dim dataSet As Dicom.Other.DataSet = dicomFile.DataSet
+                If dataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUIDUPS Then
+
+                    ' Fill  (0x00001001)  Requested SOP Instance UID
+                    NsetRq.Set(Tags.RequestedSOPInstanceUID, UI, dataSet(Tags.SOPInstanceUID).Values(0))
+
+                    ' Fill  (0x00081195)  Transaction UID
+                    NsetRq.DataSet.Set(Tags.TransactionUID, UI, dataSet(Tags.TransactionUID).Values(0))
+
+                    '' Fill > (0x00404019)  Performed Workitem Code Sequence
+                    'If dataSet.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                    '    ' Fill >> (0x00080100)  Code Value
+                    '    NsetRq.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, dataSet(Tags.ScheduledWorkitemCodeValue).Values(0))
+                    '    ' Fill >> (0x00080102)  Coding Scheme Designator
+                    '    NsetRq.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, dataSet(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                    '    ' Fill >> (0x00080104)  Code Meaning
+                    '    NsetRq.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, dataSet(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                    'End If
+
+
+
+                    '' Fill > (0x00404028)  Performed Station Name Code Sequence
+                    'If dataSet.Exists(Tags.ScheduledStationNameCodeSequence) Then
+                    '    ' Fill >> (0x00080100)  Code Value
+                    '    NsetRq.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeValue, SH, dataSet(Tags.ScheduledStationCodeValue).Values(0))
+                    '    ' Fill >> (0x00080102)  Coding Scheme Designator
+                    '    NsetRq.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodingSchemeDesignator, SH, dataSet(Tags.ScheduledStationCodingSchemeDesignator).Values(0))
+                    '    ' Fill >> (0x00080104)  Code Meaning
+                    '    NsetRq.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeMeaning, LO, dataSet(Tags.ScheduledStationCodeMeaning).Values(0))
+                    'End If
+
+                    For i As Integer = 0 To NsetRq.DataSet.Count - 1
+
+                        If (NsetRq.DataSet.Item(i).VR = DvtkData.Dimse.VR.SQ) Then
+
+                            If (NsetRq.DataSet.Item(i).ItemCount = 0) Then
+                                NsetRq.DataSet.Delete(NsetRq.DataSet.Item(i).TagSequenceString)
+                            Else
+                                NsetRq = DataSetHandler.copySeqAttributeFromInputToOutput(NsetRq.DataSet(NsetRq.DataSet.Item(i).TagSequenceString), NsetRq, dicomFile.DataSet, False)
+                            End If
+
+                        Else
+
+                            If (NsetRq.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Values(0) = "") Then
+                                If (dicomFile.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Exists) Then
+                                    If Not (dicomFile.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Values(0) = "") Then
+                                        NsetRq.DataSet.Set(NsetRq.DataSet.Item(i).TagSequenceString, NsetRq.DataSet.Item(i).VR, dicomFile.DataSet(NsetRq.DataSet.Item(i).TagSequenceString).Values(0))
+                                    End If
+                                End If
+                            End If
+                        End If
+                    Next
+
+                End If
+            End If
+        Next
+        Return NsetRq
+    End Function
+
+    Public Function getTrainsactionUIDUPS(ByVal SOPInstanceUIDUPS As String) As String
+
+        Dim directoryInfo As DirectoryInfo = New DirectoryInfo(m_datasetPath + "\..\Cache\CLIENT")
+        For Each File As FileInfo In directoryInfo.GetFiles
+
+            If (File.Name.StartsWith("C-FIND-RSP")) Then
+
+                Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile = New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                dicomFile.Read(File.FullName)
+
+                Dim dataSet As Dicom.Other.DataSet = dicomFile.DataSet
+                If dataSet(Tags.SOPInstanceUID).Values(0) = SOPInstanceUIDUPS Then
+
+                    ' Fill  (0x00081195)  Transaction UID
+                    Return dataSet(Tags.TransactionUID).Values(0)
+
+                End If
+            End If
+        Next
+        Return ""
+    End Function
+
+    Public Function checkUPSSequenceAttribute(sequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute, respons As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim x As Integer
+        Dim SeqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+        For x = 1 To sequenceAttribute.ItemCount()
+            SeqItem = sequenceAttribute.GetItem(x)
+
+            Dim i As Integer
+            For i = 0 To SeqItem.Count - 1
+
+                If SeqItem.Item(i).VR = DvtkData.Dimse.VR.SQ Then
+                    checkUPSSequenceAttribute(SeqItem.Item(i), respons, dicomFile)
+                Else
+                    If (dicomFile.DataSet.Exists(SeqItem.Item(i).TagSequenceString)) Then
+                        respons.Set(SeqItem.Item(i).TagSequenceString, SeqItem.Item(i).VR, dicomFile.DataSet(SeqItem.Item(i).TagSequenceString).Values(0))
+                    End If
+                End If
+            Next
+        Next
+
+
+        Return respons
+
+    End Function
+
+    'Returns the DataSet of the Unified Procedure Step Pull Object in the ReferenceDataSet
+    Public Function GetUnifiedProcedureStepPush_NACTION_REQ() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/N-ACTION-RQ").InnerText
+        Dim UnifiedProcedureStepPush_NACTION_REQ As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DicomMessage(NACTIONRQ)
+        Try
+            'Read the Response
+            UnifiedProcedureStepPush_NACTION_REQ.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (UnifiedProcedureStepPush NACTION RQ): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+
+        Return UnifiedProcedureStepPush_NACTION_REQ
+
+    End Function
+
+    'Returns the DataSet of the Unified Procedure Step Pull Object in the ReferenceDataSet
+    Public Function GetUnifiedProcedureStepPush_NSET_REQ_RO21(fileName As String) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        'Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/N-SET-RQ-RO21").InnerText
+        Dim UnifiedProcedureStepPush_NSET_REQ As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DicomMessage(NSETRQ)
+        Try
+            'Read the Response
+            UnifiedProcedureStepPush_NSET_REQ.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (UnifiedProcedureStepPush NSET REQ RO21): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+
+        Return UnifiedProcedureStepPush_NSET_REQ
+
+    End Function
+
+    'Returns the DataSet of the Unified Procedure Step Pull Object in the ReferenceDataSet
+    Public Function GetUnifiedProcedureStepPush_NSET_REQ_RO26(fileName As String) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        'Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/N-SET-RQ-RO26").InnerText
+        Dim UnifiedProcedureStepPush_NSET_REQ As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DicomMessage(NSETRQ)
+
+        Try
+            'Read the Response
+            UnifiedProcedureStepPush_NSET_REQ.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (UnifiedProcedureStepPush NSET REQ RO26): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+
+        Return UnifiedProcedureStepPush_NSET_REQ
+
+    End Function
+
+    Public Function GetUnifiedProcedureStepPush_NGET_REQ(fileName As String) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        'Dim fileName As String = m_datasetPath + "\" + m_DataSetXML.SelectSingleNode("/DataSet/N-SET-RQ-RO26").InnerText
+        Dim UnifiedProcedureStepPush_NGET_REQ As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DicomMessage(NGETRQ)
+
+        Try
+            'Read the Response
+            UnifiedProcedureStepPush_NGET_REQ.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (UnifiedProcedureStepPush NGET REQ): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+
+        Return UnifiedProcedureStepPush_NGET_REQ
+
+    End Function
+
+    'Returns the DataSet of the Unified Procedure Step Pull Object in the ReferenceDataSet
+    Public Function GetUnifiedProcedureStepPush_NCREATE_REQ(fileName As String) As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+
+        Dim UnifiedProcedureStepPush_NCREATE_REQ As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(NCREATERQ)
+
+
+        UnifiedProcedureStepPush_NCREATE_REQ.CommandSet.Set(Tags.AffectedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+        UnifiedProcedureStepPush_NCREATE_REQ.CommandSet.Set(Tags.AffectedSOPInstanceUID, UI, DvtkHighLevelInterface.Dicom.Other.UID.Create())
+
+        Try
+            'Read the Request
+            UnifiedProcedureStepPush_NCREATE_REQ.DataSet.Read(fileName)
+            Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (UnifiedProcedureStepPush NCREATE RQ): '{0}'.", fileName))
+        Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+            Throw New System.Exception("Error Reading the file from the Dataset: " + fileName, ex)
+        End Try
+
+        'load and store datasets
+
+        UnifiedProcedureStepPush_NCREATE_REQ.Set(Tags.ScheduledProcedureStepStartDateandTime, DvtkData.Dimse.VR.DT, System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".0000")
+        UnifiedProcedureStepPush_NCREATE_REQ.Set(Tags.ScheduledProcedureStepModificationDateandTime, DvtkData.Dimse.VR.DT, System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".0000")
+
+        ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSCacheXMLFileName)
+
+        Dim UPSDirectoryInfo As DirectoryInfo = New DirectoryInfo(ReferenceDataSet.GetInstance.m_datasetPath + "\CLIENT")
+        Dim count As Integer = UPSDirectoryInfo.GetFiles.Length
+
+        Dim fileName2 As String = ReferenceDataSet.GetInstance.m_datasetPath + "\CLIENT\NewUPs" + count.ToString() + ".dcm"
+
+        Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+        If Not fileName = "" Then
+            Try
+                'Write the dataset to file
+                dicomFile.DataSet = UnifiedProcedureStepPush_NCREATE_REQ.DataSet
+
+                dicomFile.DataSet.Set(Tags.SOPClassUID, UI, UnifiedProcedureStepPush_NCREATE_REQ(Tags.AffectedSOPClassUID).Values(0))
+                dicomFile.DataSet.Set(Tags.SOPInstanceUID, UI, UnifiedProcedureStepPush_NCREATE_REQ(Tags.AffectedSOPInstanceUID).Values(0))
+
+                dicomFile.Write(fileName2)
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception("Error writing the Dataset to file: " + fileName, ex)
+            End Try
+        End If
+
+
+        Return UnifiedProcedureStepPush_NCREATE_REQ
+    End Function
+
+    'Returns the DataSets of the RetrieveWorkitemInputObjectsfromArchive C-MOVE-request
+    Public Function GetRetrieveWorkitemInputObjectsfromArchive() As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+        Dim m_ResponseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+
+        m_ResponseMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CMOVERQ)
+        m_ResponseMessage.CommandSet.Set(DvtkData.Dimse.Tag.MOVE_DESTINATION, DvtkData.Dimse.VR.AE, "DVT")
+
+        m_ResponseMessage.Set(Tags.AffectedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.StudyRootQueryRetrieveMOVESOPClassUID)
+        m_ResponseMessage.Set(Tags.QueryRetrieveLevel, DvtkData.Dimse.VR.CS, "IMAGE")
+
+        m_ResponseMessage.Set(Tags.SOPInstanceUID, DvtkData.Dimse.VR.UI, "1.2.246.352.71.5.373347851.477.20090608145026")
+        m_ResponseMessage.Set(Tags.StudyInstanceUID, DvtkData.Dimse.VR.UI, "1.2.3.2")
+        m_ResponseMessage.Set(Tags.SeriesInstanceUID, DvtkData.Dimse.VR.UI, "1.2.3.3")
+
+        Return m_ResponseMessage
+    End Function
+
+    'Returns the DataSets of the RetrieveWorkitemInputObjectsfromTMS C-MOVE-request
+    Public Function GetRetrieveWorkitemInputObjectsfromTMS(ByVal aeTMS As String, ByVal aePDS As String) As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+        Dim m_sendMessages As DvtkHighLevelInterface.Dicom.Messages.DicomMessageCollection
+
+
+        ReferenceDataSet.createCMoveRq(DataSetHandler.UPSCacheXMLFileName, aeTMS, aePDS)
+        'm_ResponseMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CMOVERQ)
+        'm_ResponseMessage.CommandSet.Set(DvtkData.Dimse.Tag.MOVE_DESTINATION, DvtkData.Dimse.VR.AE, "DVT")
+
+        'm_ResponseMessage.Set(Tags.QueryRetrieveLevel, DvtkData.Dimse.VR.CS, "IMAGE")
+        'm_ResponseMessage.Set(Tags.AffectedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.StudyRootQueryRetrieveMOVESOPClassUID)
+        'm_ResponseMessage.Set(Tags.SOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.StudyRootQueryRetrieveMOVESOPClassUID)
+
+        'm_ResponseMessage.Set(Tags.StudyInstanceUID, DvtkData.Dimse.VR.UI, "1.2.3.2")
+        'm_ResponseMessage.Set(Tags.SeriesInstanceUID, DvtkData.Dimse.VR.UI, "1.2.3.3")
+        'm_ResponseMessage.Set(Tags.SOPInstanceUID, DvtkData.Dimse.VR.UI, "1.2.246.352.71.5.373347851.477.20090608145026")
+        'm_ResponseMessage.DataSet.Item(Tags.SOPInstanceUID).Values.Add("1.2.246.352.71.4.373347851.102.20090608123915")
+
+        Return m_sendMessages
+    End Function
+
+    Public Function GetCStoreMessages(ByVal cmoveRequestMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal receiveActorId As String) As DicomMessageCollection
+
+        Dim result As DicomMessageCollection = New DicomMessageCollection()
+
+        Dim dataDirectoryPath As String = DataSetHandler.getDataPath(DataSetHandler.UPSDataXMLFileName)
+
+        If Not String.IsNullOrEmpty(receiveActorId) Then
+
+            If (receiveActorId = (New OSTActor).Id) Then
+
+                dataDirectoryPath = dataDirectoryPath + "OST"
+
+                Dim dirInfo As DirectoryInfo = New DirectoryInfo(dataDirectoryPath)
+
+                If (dirInfo.GetFiles().Length = 0) Then
+                    dataDirectoryPath = dataDirectoryPath + "\..\..\Originals\OST"
+                End If
+
+
+            ElseIf (receiveActorId = (New TMSActor).Id) Then
+                dataDirectoryPath = dataDirectoryPath + "TMS"
+
+                Dim dirInfo As DirectoryInfo = New DirectoryInfo(dataDirectoryPath)
+
+                If (dirInfo.GetFiles().Length = 0) Then
+                    dataDirectoryPath = dataDirectoryPath + "\..\..\Originals\TMS"
+                End If
+
+            End If
+
+        End If
+
+        Dim message As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = _
+            New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+
+
+        Dim NrOfSopIds As Integer = cmoveRequestMessage.DataSet.GetValues(Tags.SOPInstanceUID).Count
+        Dim foundImages(NrOfSopIds) As Boolean '
+        For index As Integer = 0 To NrOfSopIds - 1
+            foundImages(index) = False
+        Next
+
+        'Need AE Title for C-STORE-RQ
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+        Dim sutSettingPDS As SUTAESettingWrapper = config.GetSUTAEConfiguration(New PDSActor().Id, CSTORERQ)
+
+
+        For Each filePath As String In Directory.GetFiles(dataDirectoryPath)
+
+            Try
+                message.DataSet.Read(filePath)
+                Logger.GetInstance().LogMessage(String.Format("Read reference dataset file (CSTORE RQ): '{0}'.", filePath))
+            Catch ex As DvtkHighLevelInterface.Common.Other.HliException
+                Throw New System.Exception(String.Format("Error Reading the file from the Dataset: '{0}'", filePath), ex)
+            End Try
+            'LOOP trough sop instance UIDs
+
+            For index As Integer = 0 To NrOfSopIds - 1
+                If (foundImages(index) = False) Then
+                    If cmoveRequestMessage(Tags.StudyInstanceUID).Values(0) = message(Tags.StudyInstanceUID).Values(0) Then
+                        If cmoveRequestMessage(Tags.SeriesInstanceUID).Values(0) = message(Tags.SeriesInstanceUID).Values(0) Then
+                            If cmoveRequestMessage(Tags.SOPInstanceUID).Values(index) = message(Tags.SOPInstanceUID).Values(0) Then
+                                Dim newMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ)
+
+                                newMessage.DataSet.Read(filePath)
+                                Logger.GetInstance().LogMessage(String.Format("Read asked RT object in CSTORE RQ: '{0}'.", filePath))
+
+                                newMessage.Set(Tags.MoveOriginatorApplicationEntity, AE, sutSettingPDS.AETitle)
+                                newMessage.Set(Tags.MoveOriginatorMessageID, US, cmoveRequestMessage(Tags.MessageID).Values(0))
+                                newMessage.Set(Tags.AffectedSOPClassUID, UI, message(Tags.SOPClassUID).Values(0))
+                                newMessage.Set(Tags.AffectedSOPInstanceUID, UI, message(Tags.SOPInstanceUID).Values(0))
+                                result.Add(newMessage)
+                                foundImages(index) = True
+
+                            End If
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        For index As Integer = 0 To NrOfSopIds - 1
+            If (foundImages(index) = False) Then
+                'WARING, FILE NOT FOUND IN REFERENCE DATASET
+                Logger.GetInstance().LogWarningMessage(String.Format( _
+                    "Dicom object with study instance UID: '{0}' serie instance UID: '{1}' and SOP instance UID: '{2}' not found in the reference data.", _
+                    cmoveRequestMessage.Item(Tags.StudyInstanceUID).Values(0), cmoveRequestMessage(Tags.SeriesInstanceUID).Values(0), cmoveRequestMessage(Tags.SOPInstanceUID).Values(index)))
+                'Throw New Exception()
+            End If
+        Next
+        Return result
+
+    End Function
+
+    Public Shared Function createCMoveRq(ByVal XMLFileName As String, ByVal sutActorId As String, ByVal storeActorId As String) As DicomMessageCollection
+        'RVDH: in order to request the appropiate data from the system under test, we need several UIDs
+        'the study UID, the series UID and the SOP instance UID(s)
+        'also in there is the specific location (AEtitle) where the image can be found
+
+        'we use a message collection, but for the IPDW workflow we only allow one C-MOVE-RQ, multiple C-MOVE's are not supported (yet)
+        Dim retVal As DicomMessageCollection = New DicomMessageCollection()
+
+        'open workitem in dataset
+        Dim datasetName As String = "C-FIND-RSP"
+        Dim dataSet As Dicom.Other.DataSet = DataSetHandler.LoadDatasetFromFile(XMLFileName, datasetName)
+        If dataSet.Exists(Tags.InputInformationSequence) Then
+            'loop trough items in the input information sequence
+
+            Dim nrOfIisItems As Integer = dataSet.Item(Tags.InputInformationSequence).ItemCount
+            If nrOfIisItems > 0 Then
+
+                For iisItem As Integer = 1 To nrOfIisItems
+                    Dim sqIisItem As Dicom.Other.SequenceItem = dataSet.Item(Tags.InputInformationSequence).GetItem(iisItem)
+
+                    'loop through items
+
+                    If sqIisItem.Exists(Tags.StudyInstanceUID) Then
+                        Dim studyInstanceUID As String = sqIisItem.GetValues(Tags.StudyInstanceUID).Item(0)
+
+                        Dim nrOfSeriesItems As Integer = sqIisItem.GetitemCount(Tags.ReferencedSeriesSequenceMOVE)
+                        For serieItem As Integer = 1 To nrOfSeriesItems
+                            Dim sqSerieItem As Dicom.Other.SequenceItem = sqIisItem.Getitem(Tags.ReferencedSeriesSequenceMOVE, serieItem)
+
+                            Dim sutSetting As SUTAESettingWrapper = TestToolConfiguration.GetInstance().GetSUTAEConfiguration(sutActorId, CMOVERQ)
+                            Dim sutAeTitle As String = sutSetting.AETitle
+                            Dim retrieveAeTitle As String = sutAeTitle
+                            If sqSerieItem.Exists(Tags.retrieveAETitleMOVE) Then
+                                retrieveAeTitle = sqSerieItem.GetValues(Tags.retrieveAETitleMOVE).Item(0)
+                            End If
+
+                            'compare AE titles
+                            If retrieveAeTitle = sutAeTitle Then
+                                Dim serieInstanceUID As String = sqSerieItem.GetValues(Tags.SeriesInstanceUID).Item(0)
+
+                                Dim nrOfSopItems As Integer = sqSerieItem.GetitemCount(Tags.ReferencedSOPSequenceMOVE)
+                                For sopItem As Integer = 1 To nrOfSopItems
+                                    Dim sqSopItem As Dicom.Other.SequenceItem = sqSerieItem.Getitem(Tags.ReferencedSOPSequenceMOVE, sopItem)
+
+                                    Dim sopInstanceUID As String = sqSopItem.GetValues(Tags.ReferencedSOPInstanceUIDMOVE).Item(0)
+
+                                    'everything is known now, add to message collection
+                                    AddMoveMessageToRQ(retVal, studyInstanceUID, serieInstanceUID, sopInstanceUID, storeActorId)
+
+                                Next 'number of sop instance items
+                            End If
+                        Next 'number of serie items
+                    End If
+                Next 'number of information sequence items
+
+            End If
+        End If
+        Return retVal
+    End Function
+
+    Private Shared Sub AddMoveMessageToRQ(ByVal messageCollection As DicomMessageCollection, ByVal studyInstanceUID As String, ByVal serieInstanceUID As String, ByVal sopInstanceUID As String, ByVal storeActorId As String)
+
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+        Dim dvtkSetting As DVTKAEConfiguration = config.GetDVTKAEConfiguration(storeActorId, CommandConfig.CSTORE)
+
+        'If messageCollection.Count = 0 Then
+
+        messageCollection.Add(CreateMoveMessage(dvtkSetting.AETitle, studyInstanceUID, serieInstanceUID, sopInstanceUID))
+
+        'Else
+        '    'loop trough messages and look where our data can be added
+        '    Dim newSeries As Boolean = True
+
+        '    For Each msg As DicomMessage In messageCollection
+        '        If msg.DataSet.Exists(Tags.StudyInstanceUID) Then
+        '            If Not msg.DataSet.GetValues(Tags.StudyInstanceUID).Item(0) = studyInstanceUID Then
+        '                'logging, it is not possible in our testtool to use images of different studies
+        '                'in this case multiple C-MOVE's would be needed, which we do not support
+        '            Else
+        '                If msg.DataSet.Exists(Tags.SeriesInstanceUID) Then
+        '                    If msg.DataSet.GetValues(Tags.SeriesInstanceUID).Item(0) = serieInstanceUID Then
+        '                        'Add an extra sop instance UID to the C-MOVE-RQ
+        '                        msg.DataSet.AddValues(Tags.SOPInstanceUID, sopInstanceUID)
+        '                        newSeries = False
+        '                    End If
+        '                End If
+        '            End If
+        '        End If
+        '    Next
+        '    If newSeries = True Then
+        '        'LOGGING
+        '        Logger.GetInstance().LogMessage("WARNING, images in the C-FIND-RSP's with different study instance UID and/or serie instance UID, this is not supported by the test tooling.")
+        '        'WARNING, MULTIPLE C-MOVEs ARE NEEDED TO RECEIVE ALL THE NEEDED DATA
+        '        'messageCollection.Add(createMoveMessage(dvtkSetting.AETitle, studyInstanceUID, serieInstanceUID, sopInstanceUID))
+        '    End If
+        'End If
+
+    End Sub
+
+    Private Shared Function CreateMoveMessage(ByVal aeTitle As String, ByVal studyInstanceUID As String, ByVal serieInstanceUId As String, ByVal sopInstanceUID As String) As DicomMessage
+        'the message itself, a query-retrieve mesage op study niveau
+        Dim newMoveRq As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = New DicomMessage(CMOVERQ)
+        newMoveRq.Set(Tags.AffectedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.StudyRootQueryRetrieveMOVESOPClassUID)
+        newMoveRq.Set(Tags.QueryRetrieveLevel, DvtkData.Dimse.VR.CS, "IMAGE")
+        newMoveRq.Set(Tags.MoveDestination, AE, aeTitle)
+        newMoveRq.Set(Tags.StudyInstanceUID, UI, studyInstanceUID)
+        newMoveRq.Set(Tags.SeriesInstanceUID, UI, serieInstanceUId)
+        newMoveRq.Set(Tags.SOPInstanceUID, UI, sopInstanceUID)
+        Return newMoveRq
+    End Function
+
+End Class
+
+
+

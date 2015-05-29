@@ -1,0 +1,18 @@
+﻿Public Class GiveAETitleDialog
+
+    Private m_AETitle As String
+
+    Public ReadOnly Property AETitle() As String
+        Get
+            Return m_AETitle
+        End Get
+    End Property
+
+    Private Sub OK_Button_Click(sender As System.Object, e As System.EventArgs) Handles OK_Button.Click
+
+        m_AETitle = tbAETitle.Text
+
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.Close()
+    End Sub
+End Class

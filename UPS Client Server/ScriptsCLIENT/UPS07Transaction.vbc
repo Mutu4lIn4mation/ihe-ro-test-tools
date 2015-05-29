@@ -1,0 +1,107 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPS07Transaction
+    Inherits Transaction
+
+    Private m_procedureStep As ProcedureStep
+    Private ups07IODType As IODType = Nothing
+    Private _isCompleted As Boolean
+
+    'Constructor
+    Public Sub New(ByVal isCompleted As Boolean, ByVal clearMessageDataAfterSend As Boolean)
+
+        MyBase.New("UPS-07", "UPS Completed/Canceleled", IODType.UnifiedProcedureStepPull, clearMessageDataAfterSend)
+        ups07IODType = IODType.UnifiedProcedureStepPull
+        _isCompleted = isCompleted
+    End Sub
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Send N-Action-RQ with COMPLETED/CANCELED status to selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+        selectUPSForm.ShowDialog()
+
+        If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+
+
+            For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+
+                If (DataRow.Selected) Then
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                    If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+
+
+                        ' Make the N-ACTION-RQ message
+                        Dim message As DicomMessage = New DicomMessage(NACTIONRQ)
+
+                        ' Set the Requested SOPClassUID 
+                        message.Set(Tags.RequestedSOPClassUID, UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                        ' Set the Requested SOP Instance UID
+                        message.Set(Tags.RequestedSOPInstanceUID, UI, SOPInstanceUID)
+
+                        ' ActionType ID
+                        message.Set(Tags.ActionTypeID, US, "1")
+
+                        'Set Unified Procedure Step State 
+
+                        If _isCompleted Then
+
+                            message.Set(Tags.ProcedureStepState, CS, "COMPLETED")
+                        Else
+                            message.Set(Tags.ProcedureStepState, CS, "CANCELED")
+                        End If
+
+
+                        If Not (String.IsNullOrEmpty(ReferenceDataSet.GetInstance.getTrainsactionUIDUPS(SOPInstanceUID))) Then
+                            ' Transactuion ID
+                            message.DataSet.Set(Tags.TransactionUID, UI, ReferenceDataSet.GetInstance.getTrainsactionUIDUPS(SOPInstanceUID))
+
+                            datasetMessages.Add(message)
+                        Else
+                            Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an Transaction UID"))
+                        End If
+
+                        'ReferenceDataSet.GetInstance.UpdateCacheCFind_Response(SOPInstanceUID, message)
+
+                    Else
+                        Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                    End If
+                End If
+            Next
+
+        Else
+            ' cancel scenario
+        End If
+
+
+        Return datasetMessages
+
+
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        ' Some rules need the dicomMessage send in the request
+        Dim msg As ArrayList = DirectCast(TransactionDataMessages, ArrayList)
+
+        '(0x00000900)  Status
+        m_rules.Add(New UpdateClientUPSRule(Tags.StatusCommandElement, "0", msg, ups07IODType, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+
+End Class

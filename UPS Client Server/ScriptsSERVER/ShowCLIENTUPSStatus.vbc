@@ -1,0 +1,32 @@
+Class ShowCLIENTUPSStatus
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+        Dim pdsActor As PDSActor = New PDSActor()
+        Dim tmsActor As TMSActor = New TMSActor()
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+
+        selectUPSForm.SetUPSInProgress.Visible = False
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+        'Configure the receive step: set the cstore thread as part of the C-Move command
+        Dim receive As ReceiveScenarioStep = New ReceiveScenarioStep(pdsActor, tmsActor, True, DvtkData.Dimse.DimseCommand.NEVENTREPORTRQ)
+
+        Dim ups01Transaction As UPS01Transaction = New UPS01Transaction()
+        receive.AddTransaction(ups01Transaction)
+
+        'Add the steps to the list
+        m_scenarioSteps.Add(receive)
+
+        ' Response validation step
+        Dim validateResponseStep As ValidateScenarioStep = New ValidateScenarioStep(receive)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+        validateResponseStep.AddRules(m_rules)
+
+        m_scenarioSteps.Add(validateResponseStep)
+
+        selectUPSForm.ShowDialog()
+    End Sub
+End Class

@@ -1,0 +1,35 @@
+Class MessageHandlerNGet
+    Inherits DvtkHighLevelInterface.Dicom.Threads.MessageHandler
+
+    Private Sub CopyInterRelationAttributes(ByVal requestMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage, ByVal responseMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage)
+        Dim value As String = ""
+
+        '(0x00000110)  Message ID Being responded to
+        value = requestMessage(Tags.MessageID).Values.Item(0)
+        responseMessage.Set(Tags.MessageIDBeingRespondedTo, US, value)
+
+    End Sub
+
+    'DimseCommand.CFINDRSP
+    Public Overrides Function HandleNGetRequest(ByVal theDicomMessage As DicomMessage) As Boolean
+
+        Dim requestedSOPClassUID As String = theDicomMessage.CommandSet.Item(Tags.RequestedSOPClassUID).Values(0)
+        If requestedSOPClassUID = SOPclass.UnifiedProcedureStepPushSOPClassUID.ToString() Then
+            ReferenceDataSet.GetInstance.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+            Dim index As Integer = 0
+            For Each message As DicomMessage In ReferenceDataSet.GetInstance().GetUPSPull_NGET_Response(theDicomMessage)
+                CopyInterRelationAttributes(theDicomMessage, message)
+
+                Send(message, theDicomMessage.EncodedPresentationContextID)
+            Next
+
+            Return (True)
+
+        Else
+            Throw New Exception(String.Format("Handling N-Get RQ of requested SOP Class UID '{0}' not supported", requestedSOPClassUID))
+        End If
+
+    End Function
+
+End Class

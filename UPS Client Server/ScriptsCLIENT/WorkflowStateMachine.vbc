@@ -1,0 +1,352 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+Imports System.Xml.Serialization
+#End If
+
+'Class WorkflowStateMachine_Test
+
+'    Public Shared Sub RunTests()
+
+'        Dim success As Boolean = True
+
+'        Try
+'            WorkflowStateMachine.Instance.PDS.CheckState(IPDW_Scenario.RetrievalOfWorkitemInputObjects)
+'        Catch e As Exception
+'            success = False
+'        End Try
+
+
+'        Try
+'            WorkflowStateMachine.Instance.PDS.CheckState(IPDW_Scenario.PositionRegistrationProcedureStepFinished)
+'            success = False
+'        Catch e As Exception
+'        End Try
+
+'        Try
+'            WorkflowStateMachine.Instance.PDS.SetScenarioFinished(IPDW_Scenario.AcquisitionProcedureStepFinished)
+'            WorkflowStateMachine.Instance.PDS.CheckState(IPDW_Scenario.PositionRegistrationProcedureStepStart)
+'        Catch e As Exception
+'            success = False
+'        End Try
+
+'        Try
+'            WorkflowStateMachine.Instance.TMS.CheckState(IPDW_Scenario.RetrievalOfWorkitemInputObjects)
+'            success = False
+'        Catch e As Exception
+'        End Try
+
+'        WorkflowStateMachine.Instance.ResetStates()
+
+'        Try
+'            WorkflowStateMachine.Instance.TMS.CheckState(IPDW_Scenario.RetrievalOfWorkitemInputObjects)
+'            success = False
+'        Catch e As Exception
+
+'        End Try
+
+'        Console.WriteLine(success)
+'        Console.Read()
+
+'    End Sub
+
+'End Class
+
+''' <summary>
+''' Keeps track of already executed scenarios and allows to check 
+''' whether a scenario's prerequisites have been met.
+''' </summary>
+''' <remarks></remarks>
+Class WorkflowStateMachine
+
+#Region "Private Readonly and Constant Fields"
+
+    Private ReadOnly XMLFileName As String = "WorkflowState.xml"
+
+#End Region
+
+#Region "Private Fields"
+
+    Private m_WorkflowState As WorkflowState
+    Private m_PDS As WorkflowStateWrapper
+    Private m_TMS As WorkflowStateWrapper
+    Private Shared m_FileAccessMutex As Threading.Mutex = New Threading.Mutex(False, "WorkflowStateXMLFileAccessMutex")
+
+#End Region
+
+#Region "Ctor and singleton pattern"
+
+    Public Shared Instance As WorkflowStateMachine = New WorkflowStateMachine()
+
+    Private Sub New()
+
+        m_WorkflowState = LoadState(TestToolConfiguration.GetInstance.GetScriptPath + XMLFileName)
+        
+        m_PDS = New WorkflowStateWrapper("PDS", m_WorkflowState.PDS)
+        m_TMS = New WorkflowStateWrapper("TMS", m_WorkflowState.TMS)
+
+        AddHandler m_PDS.WorkflowStateChanged, AddressOf Me.SaveState
+        AddHandler m_TMS.WorkflowStateChanged, AddressOf Me.SaveState
+
+    End Sub
+
+#End Region
+
+#Region "Private Methods"
+
+    ''' <summary>
+    ''' Loads the scenario states from disk.
+    ''' </summary>
+    ''' <param name="filePath"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Shared Function LoadState(ByVal filePath As String) As WorkflowState
+
+        Try
+
+            m_FileAccessMutex.WaitOne()
+
+            Dim data As WorkflowState
+            Dim serializer As New XmlSerializer(GetType(WorkflowState))
+            Using fs As FileStream = New FileStream(filePath, FileMode.Open)
+                data = DirectCast(serializer.Deserialize(fs), WorkflowState)
+            End Using
+
+            Return data
+
+        Catch ex As Exception
+
+            Throw New System.Exception(String.Format("An error occured while loading the WorkflowState file '{0}'", filePath), ex)
+
+        Finally
+
+            m_FileAccessMutex.ReleaseMutex()
+
+        End Try
+
+    End Function
+
+    ''' <summary>
+    ''' Saves the scenario states to disk.
+    ''' </summary>
+    ''' <param name="filePath"></param>
+    ''' <param name="data"></param>
+    ''' <remarks></remarks>
+    Private Shared Sub SaveState(ByVal filePath As String, ByVal data As WorkflowState)
+
+        Try
+
+            m_FileAccessMutex.WaitOne()
+
+            Dim serializer As New XmlSerializer(GetType(WorkflowState))
+            Using fs As FileStream = New FileStream(filePath, FileMode.Create)
+                serializer.Serialize(fs, data)
+
+            End Using
+
+        Catch ex As Exception
+
+            Throw New System.Exception(String.Format("An error occured while saving the WorkflowState file '{0}'", filePath), ex)
+
+        Finally
+
+            m_FileAccessMutex.ReleaseMutex()
+
+        End Try
+
+    End Sub
+
+    ''' <summary>
+    ''' Saves all state information to disk.
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub SaveState()
+
+        m_WorkflowState.PDS = m_PDS.ToArray()
+        m_WorkflowState.TMS = m_TMS.ToArray()
+
+        SaveState(TestToolConfiguration.GetInstance.GetScriptPath + XMLFileName, m_WorkflowState)
+
+    End Sub
+
+
+#End Region
+
+#Region "Public Properties"
+
+    ''' <summary>
+    ''' The state information belonging to all IPDW scenarios for actor PDS.
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public ReadOnly Property PDS() As WorkflowStateWrapper
+        Get
+            Return m_PDS
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' The state information belonging to all IPDW scenarios for actor TMS.
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public ReadOnly Property TMS() As WorkflowStateWrapper
+        Get
+            Return m_TMS
+        End Get
+    End Property
+
+#End Region
+
+#Region "Public Methods"
+
+    ''' <summary>
+    ''' Resets are "executed" flags for all scenarios, for PDS and TMS actors.
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub ResetStates()
+
+        m_PDS.ResetStates()
+        m_TMS.ResetStates()
+
+    End Sub
+
+#End Region
+
+End Class
+
+''' <summary>
+''' Delegate called when a WorkflowStateWrapper's contents change.
+''' </summary>
+''' <remarks></remarks>
+Public Delegate Sub WorkflowStateChanged()
+
+''' <summary>
+''' Contains methods to check and alter state information for a particular combination of a scenario and actor.
+''' </summary>
+''' <remarks></remarks>
+Class WorkflowStateWrapper
+
+    Public Event WorkflowStateChanged As WorkflowStateChanged
+
+#Region "Private Fields"
+
+    Private m_Indices As List(Of UPS_Scenario) = New List(Of UPS_Scenario) 'Keeps track of the order of scenarios
+    Private m_States As Dictionary(Of UPS_Scenario, Boolean) = New Dictionary(Of UPS_Scenario, Boolean) ' Keeps track of the "executed" states
+
+    Private m_ActorId As String = String.Empty
+
+#End Region
+
+#Region "Ctor"
+
+    Public Sub New(ByVal actorId As String, ByVal collection As IEnumerable(Of WorkflowScenarioState))
+
+        m_ActorId = actorId
+
+        For Each item As WorkflowScenarioState In collection
+
+            m_Indices.Add(item.UPS_Scenario)
+            m_States.Add(item.UPS_Scenario, item.Executed)
+
+        Next
+
+    End Sub
+
+#End Region
+
+#Region "Public Methods"
+
+    ''' <summary>
+    ''' Check whether a scenario's prerequisite scenarios have been executed. Throws an exception when not all
+    ''' prerequisite scenarios have been executed, or no state information is present for the scenario.
+    ''' </summary>
+    ''' <param name="scenario"></param>
+    ''' <remarks></remarks>
+    Public Sub CheckState(ByVal scenario As UPS_Scenario)
+
+        Dim index As Integer = m_Indices.IndexOf(scenario)
+
+        If (index < 0 Or Not m_States.ContainsKey(scenario)) Then
+            Throw New ArgumentException(String.Format("No state information present for scenario '{1}' under actor '{1}'.", scenario, m_ActorId))
+        End If
+
+        For i As Integer = 0 To index - 1
+
+            Dim scen As UPS_Scenario = m_Indices(i)
+
+            If Not m_States(scen) Then
+
+                'Logger.GetInstance().LogWarningMessage(String.Format("A precondition of scenario '{0}' is the succesful execution of scenario '{1}'." & _
+                '                    " When this prerequisite is not executed, the testtool cannot guarantee 100% correct validation.", scenario, scen))
+
+                Exit For
+
+            End If
+
+        Next
+
+    End Sub
+
+    ''' <summary>
+    ''' Sets the "executed" state flag of a particular scenario to "True".
+    ''' </summary>
+    ''' <param name="scenario"></param>
+    ''' <remarks></remarks>
+    Public Sub SetScenarioFinished(ByVal scenario As UPS_Scenario)
+
+        If Not m_States.ContainsKey(scenario) Or m_Indices.IndexOf(scenario) < 0 Then
+            Throw New ArgumentException(String.Format("No state information present for scenario '{1}' under actor '{1}'.", scenario, m_ActorId))
+        End If
+
+        m_States(scenario) = True
+
+        RaiseEvent WorkflowStateChanged()
+
+    End Sub
+
+    ''' <summary>
+    ''' Sets all "executed" flags to "False" for all scenarios.
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Sub ResetStates()
+
+        Dim resetStates As Dictionary(Of UPS_Scenario, Boolean) = New Dictionary(Of UPS_Scenario, Boolean)
+        For Each kvp As KeyValuePair(Of UPS_Scenario, Boolean) In m_States
+            resetStates.Add(kvp.Key, False)
+        Next
+
+        m_States = resetStates
+
+        RaiseEvent WorkflowStateChanged()
+
+    End Sub
+
+    ''' <summary>
+    ''' Re-creates an array of WorkflowScenarioStates (to use in a WorkflowState object which is saved to disk).
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function ToArray() As WorkflowScenarioState()
+
+        Dim stateData As List(Of WorkflowScenarioState) = New List(Of WorkflowScenarioState)()
+
+        For Each kvp As KeyValuePair(Of UPS_Scenario, Boolean) In m_States
+
+            Dim state As WorkflowScenarioState = New WorkflowScenarioState()
+            state.UPS_Scenario = kvp.Key
+            state.Executed = kvp.Value
+
+            stateData.Add(state)
+
+        Next
+
+        Return stateData.ToArray()
+
+    End Function
+
+#End Region
+
+End Class
+

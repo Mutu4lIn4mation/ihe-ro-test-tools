@@ -1,0 +1,201 @@
+#If Not DVT_INTERPRETS_SCRIPT Then
+Imports System.Collections.Generic
+#End If
+
+Class UPS06Transaction
+    Inherits Transaction
+
+    Private ups06IODType As IODType = Nothing
+
+    'Constructor
+    Public Sub New()
+
+        MyClass.New(True)
+
+    End Sub
+
+    'Constructor
+    Public Sub New(ByVal clearMessageDataAfterSend As Boolean)
+
+        MyBase.New("UPS-06", "UPS Final Update", IODType.UnifiedProcedureStepPull, clearMessageDataAfterSend)
+        ups06IODType = IODType.UnifiedProcedureStepPull
+
+    End Sub
+
+    Private Sub CopyInterOperabilityAttributes(ByVal message As DicomMessage)
+        
+    End Sub
+
+    Protected Overrides Function GetTransactionReferenceDataMessages() As System.Collections.ArrayList
+
+        ' Some rules need the dataset used in the request.
+        Dim referenceData As ReferenceDataSet = ReferenceDataSet.GetInstance
+        referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+        Dim datasetMessages As ArrayList = New ArrayList()
+
+        Dim message As DicomMessage
+        'CopyInterOperabilityAttributes(message)
+
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        Dim FinalProgressUpdateForm As FinalProgressUpdateContent = New FinalProgressUpdateContent()
+        selectUPSForm.DataGridUPS.MultiSelect = False
+        selectUPSForm.SetUPSInProgress.Text = "Send N-Set-RQ with final update to selected UPS"
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetCacheCFind_Responses()
+
+
+            selectUPSForm.ShowDialog()
+
+            If selectUPSForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                For Each DataRow As DataGridViewRow In selectUPSForm.UPSDataGridView.Rows
+                    If (DataRow.Selected) Then
+
+                    referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+
+                    If (String.IsNullOrEmpty(FinalProgressUpdateForm.selectedFile)) Then
+                        referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+                        FinalProgressUpdateForm.selectedFile = referenceData.m_datasetPath + "\N-SET-RQ[RO21].dcm"
+                    End If
+
+                    Dim SOPInstanceUID As String = DataRow.Cells("SopInstanceUIDColumn").Value.ToString()
+
+                    If Not (String.IsNullOrEmpty(SOPInstanceUID)) Then
+
+                        Dim datasetWithOutputSeq As DvtkHighLevelInterface.Dicom.Other.DataSet = referenceData.GetSelectedCFindRsp(SOPInstanceUID)
+
+                        If Not (String.IsNullOrEmpty(datasetWithOutputSeq(Tags.TransactionUID).Values(0))) Then
+
+                            If (datasetWithOutputSeq.Exists(Tags.UPSProgressInformationUnifiedProcedureStepProgress)) Then
+                                FinalProgressUpdateForm.numProcudureStepProgress.Value = datasetWithOutputSeq(Tags.UPSProgressInformationUnifiedProcedureStepProgress).Values(0)
+                            End If
+
+                            FinalProgressUpdateForm.OpenFileDialog1.InitialDirectory = FinalProgressUpdateForm.selectedFile
+                            FinalProgressUpdateForm.ShowDialog()
+
+                            If FinalProgressUpdateForm.DialogResult = Windows.Forms.DialogResult.OK Then
+
+                                referenceData.LoadNewDataSet(DataSetHandler.UPSMessagesXMLFileName)
+                                message = ReferenceDataSet.GetInstance().GetUnifiedProcedureStepPush_NSET_REQ_RO21(FinalProgressUpdateForm.selectedFile)
+
+                                Dim NSetRQ As DicomMessage = referenceData.createNSetRqUPSFinalUpdate(DataSetHandler.UPSCacheXMLFileName, SOPInstanceUID, message)
+                                ' Set the Requested SOPClassUID 
+                                NSetRQ.Set(Tags.RequestedSOPClassUID, DvtkData.Dimse.VR.UI, SOPclass.UnifiedProcedureStepPushSOPClassUID)
+
+                                If (datasetWithOutputSeq(Tags.UPSPerformedProcedureOutputInformationSequence).ItemCount > 0) Then
+
+                                    NSetRQ = DataSetHandler.copySeqAttributeFromInputToOutput(datasetWithOutputSeq(Tags.UPSPerformedProcedureOutputInformationSequence), NSetRQ, datasetWithOutputSeq, True)
+
+                                End If
+
+
+                                If Not (FinalProgressUpdateForm.dtPPSSDT.CustomFormat = "-") Then
+
+                                    ' Performed Procedure Step Start DateTime
+                                    NSetRQ.Set(Tags.UPSPerformedProcedureSequencePerformedProcedureStepStartDateTime, DT, FinalProgressUpdateForm.dtPPSSDT.Value.ToString("yyyyMMddHHmmss" + ".0000"))
+
+                                End If
+
+
+                                If Not (FinalProgressUpdateForm.dtPPSEDT.CustomFormat = "-") Then
+                                    ' Performed Procedure Step End DateTime
+                                    NSetRQ.Set(Tags.UPSPerformedProcedureSequenceScheduledProcedureStepEndDateTime, DT, FinalProgressUpdateForm.dtPPSEDT.Value.ToString("yyyyMMddHHmmss" + ".0000"))
+                                End If
+
+                                If (FinalProgressUpdateForm.dtPSCDT.Enabled) Then
+
+                                    NSetRQ.Set(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeValue, SH, FinalProgressUpdateForm.tbDiscontinuationReasonCodeValue.Text)
+                                    NSetRQ.Set(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodingSchemeDesignator, SH, FinalProgressUpdateForm.tbDiscontinuationReasonCodingSchemeDesignator.Text)
+                                    NSetRQ.Set(Tags.UPSProgressInformationProcedureStepDiscontinuationReasonCodeSequenceCodeMeaning, LO, FinalProgressUpdateForm.tbDiscontinuationReasonCodeMeaning.Text)
+
+                                    NSetRQ.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, FinalProgressUpdateForm.numProcudureStepProgress.Value)
+                                Else
+                                    ' Set Unified Procedure Step Progress
+                                    NSetRQ.Set(Tags.UPSProgressInformationUnifiedProcedureStepProgress, DS, "100")
+                                End If
+
+                                'ReferenceDataSet.GetInstance.UpdateCacheCFind_Response(SOPInstanceUID, NSetRQ)
+
+                                If NSetRQ.Exists(Tags.UPSPerformedProcedurePerformedWorkitemCodeSequence) Then
+                                    If NSetRQ(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue).Values(0).ToString() = "" Then
+                                        ' Fill > (0x00404019)  Performed Workitem Code Sequence
+                                        If datasetWithOutputSeq.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                                            ' Fill >> (0x00080100)  Code Value
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, datasetWithOutputSeq(Tags.ScheduledWorkitemCodeValue).Values(0))
+                                            ' Fill >> (0x00080102)  Coding Scheme Designator
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, datasetWithOutputSeq(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                                            ' Fill >> (0x00080104)  Code Meaning
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, datasetWithOutputSeq(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                                        End If
+                                    End If
+                                Else
+                                    ' Fill > (0x00404019)  Performed Workitem Code Sequence
+                                    If datasetWithOutputSeq.Exists(Tags.ScheduledWorkitemCodeSequence) Then
+                                        ' Fill >> (0x00080100)  Code Value
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeValue, SH, datasetWithOutputSeq(Tags.ScheduledWorkitemCodeValue).Values(0))
+                                        ' Fill >> (0x00080102)  Coding Scheme Designator
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodingSchemeDesignator, SH, datasetWithOutputSeq(Tags.ScheduledWorkitemCodingSchemeDesignator).Values(0))
+                                        ' Fill >> (0x00080104)  Code Meaning
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedWorkitemCodeCodeMeaning, LO, datasetWithOutputSeq(Tags.ScheduledWorkitemCodeMeaning).Values(0))
+                                    End If
+                                End If
+
+                                If NSetRQ.Exists(Tags.UPSPerformedProcedurePerformedStationNameCodeSequence) Then
+                                    If NSetRQ(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeValue).Values(0).ToString() = "" Then
+                                        ' Fill > (0x00404028)  Performed Station Name Code Sequence
+                                        If datasetWithOutputSeq.Exists(Tags.ScheduledStationNameCodeSequence) Then
+                                            ' Fill >> (0x00080100)  Code Value
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeValue, SH, datasetWithOutputSeq(Tags.ScheduledStationCodeValue).Values(0))
+                                            ' Fill >> (0x00080102)  Coding Scheme Designator
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodingSchemeDesignator, SH, datasetWithOutputSeq(Tags.ScheduledStationCodingSchemeDesignator).Values(0))
+                                            ' Fill >> (0x00080104)  Code Meaning
+                                            NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeMeaning, LO, datasetWithOutputSeq(Tags.ScheduledStationCodeMeaning).Values(0))
+                                        End If
+                                    End If
+                                Else
+                                    ' Fill > (0x00404028)  Performed Station Name Code Sequence
+                                    If datasetWithOutputSeq.Exists(Tags.ScheduledStationNameCodeSequence) Then
+                                        ' Fill >> (0x00080100)  Code Value
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeValue, SH, datasetWithOutputSeq(Tags.ScheduledStationCodeValue).Values(0))
+                                        ' Fill >> (0x00080102)  Coding Scheme Designator
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodingSchemeDesignator, SH, datasetWithOutputSeq(Tags.ScheduledStationCodingSchemeDesignator).Values(0))
+                                        ' Fill >> (0x00080104)  Code Meaning
+                                        NSetRQ.DataSet.Set(Tags.UPSPerformedProcedurePerformedStationNameCodeCodeMeaning, LO, datasetWithOutputSeq(Tags.ScheduledStationCodeMeaning).Values(0))
+                                    End If
+                                End If
+
+
+                                datasetMessages.Add(NSetRQ)
+                            End If
+                        Else
+                            Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an Transacion UID"))
+                        End If
+                    Else
+                        Logger.GetInstance().LogErrorMessage(String.Format("Selected UPS has not an SOP Instance UID"))
+                    End If
+
+
+                End If
+            Next
+            End If
+
+            Return datasetMessages
+
+    End Function
+
+    ' This function returns all common rules that apply on a response of this transaction
+    Public Function GetCommonTransactionRulesForResponse() As System.Collections.Generic.IEnumerable(Of Rule)
+        Dim m_rules As List(Of Rule) = New List(Of Rule)
+
+        ' Some rules need the dicomMessage send in the request
+        Dim msg As ArrayList = DirectCast(TransactionDataMessages, ArrayList)
+
+        '(0x00000900)  Status
+        m_rules.Add(New UpdateClientUPSRule(Tags.StatusCommandElement, "0", msg, ups06IODType, ErrorSeverity.RuleError))
+
+        Return m_rules
+
+    End Function
+
+End Class

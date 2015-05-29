@@ -1,0 +1,48 @@
+﻿Public Class ChooseStorageObjects
+    Public selectedFiles As String()
+
+    Private Sub chooseStorageFiles_Click(sender As System.Object, e As System.EventArgs) Handles chooseStorageFiles.Click
+
+        'If (OpenStorageFileDialog.ShowDialog() = DialogResult.OK) Then
+
+        Dim newThread As New System.Threading.Thread(AddressOf ThreadMethod)
+        newThread.SetApartmentState(Threading.ApartmentState.STA)
+        newThread.Start()
+
+        'End If
+
+    End Sub
+
+
+    Sub ThreadMethod()
+
+        If (OpenStorageFileDialog.ShowDialog() = DialogResult.OK) Then
+            Me.SetText(OpenStorageFileDialog.FileNames)
+
+        End If
+
+    End Sub
+
+    Delegate Sub SetTextCallback(ByVal text As String())
+
+    Private Sub SetText(ByVal [text] As String())
+
+        ' InvokeRequired required compares the thread ID of the
+        ' calling thread to the thread ID of the creating thread.
+        ' If these threads are different, it returns true.
+        'If Me.selectedFiles.InvokeRequired Then
+        '  Dim d As New SetTextCallback(AddressOf SetText)
+        '   Me.Invoke(d, New Object() {[text]})
+        'Else
+        Me.selectedFiles = [text]
+
+
+        'End If
+    End Sub
+
+    Private Sub btnConfirm_Click(sender As System.Object, e As System.EventArgs) Handles btnConfirm.Click
+        Me.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.Close()
+    End Sub
+
+End Class

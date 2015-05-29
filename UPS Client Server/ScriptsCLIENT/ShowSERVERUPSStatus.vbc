@@ -1,0 +1,16 @@
+Class ShowSERVERUPSStatus
+    Inherits Scenario
+
+    'Constructor
+    Public Sub New()
+
+        Dim selectUPSForm As SelectUPS = New SelectUPS()
+        selectUPSForm.SetUPSInProgress.Visible = False
+
+        selectUPSForm.responseDataSets = ReferenceDataSet.GetInstance.GetAllUPSes()
+
+
+        selectUPSForm.ShowDialog()
+
+    End Sub
+End Class
