@@ -19,10 +19,6 @@
         <Value>1.2.840.10008.1.2</Value>
         <Used>true</Used>
       </TransferSyntax>
-      <TransferSyntax>
-        <Value>1.2.840.10008.1.2.2</Value>
-        <Used>true</Used>
-      </TransferSyntax>
     </Sender>
     <Receiver>
       <TransferSyntax>
@@ -31,10 +27,6 @@
       </TransferSyntax>
       <TransferSyntax>
         <Value>1.2.840.10008.1.2</Value>
-        <Used>true</Used>
-      </TransferSyntax>
-      <TransferSyntax>
-        <Value>1.2.840.10008.1.2.2</Value>
         <Used>true</Used>
       </TransferSyntax>
     </Receiver>
