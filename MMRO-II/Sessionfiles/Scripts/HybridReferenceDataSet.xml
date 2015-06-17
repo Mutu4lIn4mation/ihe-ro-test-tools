@@ -2,6 +2,20 @@
 <DataSet>
     <DataSetPath>..\..\Datasets\Hybrid</DataSetPath>
     <CTImageSet description="SingleSeries">
+		<CTImage>CT\CT1.dcm</CTImage>
+        <CTImage>CT\CT2.dcm</CTImage>
+        <CTImage>CT\CT3.dcm</CTImage>
+        <CTImage>CT\CT4.dcm</CTImage>
+        <CTImage>CT\CT5.dcm</CTImage>
+        <CTImage>CT\CT6.dcm</CTImage>
+        <CTImage>CT\CT7.dcm</CTImage>
+        <CTImage>CT\CT8.dcm</CTImage>
+        <CTImage>CT\CT9.dcm</CTImage>
+        <CTImage>CT\CT10.dcm</CTImage>
+        <CTImage>CT\CT11.dcm</CTImage>
+        <CTImage>CT\CT12.dcm</CTImage>
+        <CTImage>CT\CT13.dcm</CTImage>
+        <CTImage>CT\CT14.dcm</CTImage>
         <CTImage>CT\CT15.dcm</CTImage>
         <CTImage>CT\CT16.dcm</CTImage>
         <CTImage>CT\CT17.dcm</CTImage>
@@ -223,7 +237,22 @@
         <CTImage>CT\CT233.dcm</CTImage>
         <CTImage>CT\CT234.dcm</CTImage>
         <CTImage>CT\CT235.dcm</CTImage>
-           </CTImageSet>
+		<CTImage>CT\CT236.dcm</CTImage>
+        <CTImage>CT\CT237.dcm</CTImage>
+        <CTImage>CT\CT238.dcm</CTImage>
+        <CTImage>CT\CT239.dcm</CTImage>
+        <CTImage>CT\CT240.dcm</CTImage>
+        <CTImage>CT\CT241.dcm</CTImage>
+        <CTImage>CT\CT242.dcm</CTImage>
+        <CTImage>CT\CT243.dcm</CTImage>
+        <CTImage>CT\CT244.dcm</CTImage>
+        <CTImage>CT\CT245.dcm</CTImage>
+        <CTImage>CT\CT246.dcm</CTImage>
+        <CTImage>CT\CT247.dcm</CTImage>
+        <CTImage>CT\CT248.dcm</CTImage>
+        <CTImage>CT\CT249.dcm</CTImage>
+        <CTImage>CT\CT250.dcm</CTImage>
+    </CTImageSet>
     <PETImageSet description="SingleSeries">
         <PETImage>PET\PT1.dcm</PETImage>
         <PETImage>PET\PT2.dcm</PETImage>

@@ -4,12 +4,10 @@
 <SupportedTransferSyntaxesSender>
 <TransferSyntax>1.2.840.10008.1.2.1</TransferSyntax>
 <TransferSyntax>1.2.840.10008.1.2</TransferSyntax>
-<TransferSyntax>1.2.840.10008.1.2.2</TransferSyntax>
 </SupportedTransferSyntaxesSender>
 <SupportedTransferSyntaxesReceiver>
 <TransferSyntax>1.2.840.10008.1.2.1</TransferSyntax>
 <TransferSyntax>1.2.840.10008.1.2</TransferSyntax>
-<TransferSyntax>1.2.840.10008.1.2.2</TransferSyntax>
 </SupportedTransferSyntaxesReceiver>
 <ReportDebugMessages>Yes</ReportDebugMessages>
 <DoCleanUp>Yes</DoCleanUp>
