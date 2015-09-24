@@ -1,0 +1,1013 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:x="urn:schemas-microsoft-com:office:excel"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Excel.Sheet>
+<meta name=Generator content="Microsoft Excel 15">
+<link id=Main-File rel=Main-File
+href="../CheckBRTODosimetricPlannerDataSet_vbs.html">
+<link rel=File-List href=filelist.xml>
+<link rel=Stylesheet href=stylesheet.css>
+<style>
+<!--table
+	{mso-displayed-decimal-separator:"\,";
+	mso-displayed-thousand-separator:"\.";}
+@page
+	{margin:.75in .7in .75in .7in;
+	mso-header-margin:.3in;
+	mso-footer-margin:.3in;}
+-->
+</style>
+<![if !supportTabStrip]><script language="JavaScript">
+<!--
+function fnUpdateTabs()
+ {
+  if (parent.window.g_iIEVer>=4) {
+   if (parent.document.readyState=="complete"
+    && parent.frames['frTabs'].document.readyState=="complete")
+   parent.fnSetActiveSheet(2);
+  else
+   window.setTimeout("fnUpdateTabs();",150);
+ }
+}
+
+if (window.name!="frSheet")
+ window.location.replace("../CheckBRTODosimetricPlannerDataSet_vbs.html");
+else
+ fnUpdateTabs();
+//-->
+</script>
+<![endif]>
+</head>
+
+<body link=blue vlink=purple>
+
+<table border=0 cellpadding=0 cellspacing=0 width=929 style='border-collapse:
+ collapse;table-layout:fixed;width:698pt'>
+ <col width=254 style='mso-width-source:userset;mso-width-alt:9289;width:191pt'>
+ <col width=93 style='mso-width-source:userset;mso-width-alt:3401;width:70pt'>
+ <col width=62 style='width:47pt'>
+ <col width=289 style='mso-width-source:userset;mso-width-alt:10569;width:217pt'>
+ <col width=231 style='mso-width-source:userset;mso-width-alt:8448;width:173pt'>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 width=254 style='height:15.0pt;width:191pt'><a
+  name="RANGE!A1"></a></td>
+  <td class=xl73 width=93 style='width:70pt'></td>
+  <td class=xl73 width=62 style='width:47pt'></td>
+  <td width=289 style='width:217pt'></td>
+  <td width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl73></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl95 style='height:15.0pt'>C.7.1.1 Patient Module</td>
+  <td class=xl96 style='border-left:none'>&nbsp;</td>
+  <td class=xl96 style='border-left:none'>&nbsp;</td>
+  <td class=xl97 style='border-left:none'>&nbsp;</td>
+  <td class=xl97 style='border-left:none'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl98 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl99 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl99 style='border-top:none;border-left:none'>Type</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl98 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Patient's
+  Name</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0010,0010</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Patient ID</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0010,0020</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr class=xl103 height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Patient's
+  Birthdate</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0010,0030</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>O+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Patient's Sex</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0010,0040</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>O+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl92 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl104 width=93 style='width:70pt'></td>
+  <td class=xl78></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl79 style='height:15.0pt'><a name="RANGE!A10"></a></td>
+  <td class=xl78></td>
+  <td class=xl78></td>
+  <td class=xl79></td>
+  <td class=xl106></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl95 style='height:15.0pt'>C.7.2.1 General Study Module</td>
+  <td class=xl96 style='border-left:none'>&nbsp;</td>
+  <td class=xl107 style='border-left:none'>&nbsp;</td>
+  <td class=xl97 style='border-left:none'>&nbsp;</td>
+  <td class=xl108 style='border-left:none'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl98 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl99 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl109 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl110 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Study
+  Instance UID</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0020,000D</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Study Date</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0008,0020</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Study Time</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0008,0030</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>'Referring(Physician)</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0008,0090</td>
+  <td class=xl111 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Study ID</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0020,0010</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Accession
+  Number</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0008,0050</td>
+  <td class=xl111 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl100 style='height:15.0pt;border-top:none'>Study
+  Description</td>
+  <td class=xl101 style='border-top:none;border-left:none'>0008,1030</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>O+</td>
+  <td class=xl100 style='border-top:none;border-left:none'>Same as in reference
+  data</td>
+  <td class=xl102 style='border-top:none;border-left:none'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl112 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl73></td>
+  <td></td>
+  <td class=xl106></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl92 width=254 style='height:15.0pt;width:191pt'><a
+  name="RANGE!A21"></a></td>
+  <td class=xl80 width=93 style='width:70pt'></td>
+  <td class=xl80 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl106></td>
+ </tr>
+ <tr height=18 style='mso-height-source:userset;height:13.9pt'>
+  <td height=18 class=xl113 width=254 style='height:13.9pt;width:191pt'>C.7.4.1
+  Frame Of Reference Module</td>
+  <td colspan=3 class=xl117 width=444 style='border-left:none;width:334pt'>&nbsp;</td>
+  <td class=xl114 width=231 style='border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl98 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl99 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl99 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl110 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Frame of Reference UID</td>
+  <td class=xl88 width=93 style='border-top:none;border-left:none;width:70pt'>0020,0052</td>
+  <td class=xl88 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Same
+  as in reference data</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Position Reference Indicator</td>
+  <td class=xl88 width=93 style='border-top:none;border-left:none;width:70pt'>0020,1040</td>
+  <td class=xl88 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Same
+  as in reference data</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>CriticalAttributeMappingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl92 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl104 width=93 style='width:70pt'></td>
+  <td class=xl104 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td class=xl73></td>
+  <td class=xl73></td>
+  <td></td>
+  <td class=xl106></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl113 width=254 style='height:15.0pt;width:191pt'>C.7.6.2
+  RT Image Plane<span style='mso-spacerun:yes'>  </span>Module</td>
+  <td class=xl116 width=93 style='border-left:none;width:70pt'>&nbsp;</td>
+  <td class=xl116 width=62 style='border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl117 width=289 style='border-left:none;width:217pt'>&nbsp;</td>
+  <td class=xl114 width=231 style='border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl98 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl99 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl99 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl110 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=120 style='height:90.0pt'>
+  <td height=120 class=xl115 width=254 style='height:90.0pt;border-top:none;
+  width:191pt'>Image Orientation (Patient)</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0020,0037</td>
+  <td class=xl118 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>1.
+  Shall be present in every RT Dose IOD.<br>
+    2. For an axial image (Image Type, (0008,0008) should be AXIAL), direction
+  cosines shall be (+/-1, 0, 0, 0, +/1, 0) with an angle tolerance of 0.001
+  radians (0.057 degrees)</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ImageOrientationPatientRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Slice Thickness</td>
+  <td class=xl111 style='border-top:none;border-left:none'>0018,0050</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  not be relied on.</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>OptionalRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Slice Location</td>
+  <td class=xl111 style='border-top:none;border-left:none'>0020,1041</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  not be relied on.</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>OptionalRule</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl115 width=254 style='height:60.0pt;border-top:none;
+  width:191pt'>Pixel Spacing</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0030</td>
+  <td class=xl118 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'><span
+  style='mso-spacerun:yes'> </span>1. For CTImage IOD, non-isotropic pixels are
+  outside the scope of the profile.<br>
+    2. For RT Dose IOD, pixel spacing may be nonisotropic</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>PixelSpacingRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl105 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl120 width=93 style='width:70pt'></td>
+  <td class=xl120 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl106 style='height:15.0pt'></td>
+  <td class=xl121></td>
+  <td class=xl121></td>
+  <td></td>
+  <td class=xl106></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl122 width=254 style='height:15.0pt;width:191pt'>C.7.6.6
+  Multi-Frame<span style='mso-spacerun:yes'>  </span>Module</td>
+  <td class=xl123 width=93 style='border-left:none;width:70pt'>&nbsp;</td>
+  <td class=xl123 width=62 style='border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl117 width=289 style='border-left:none;width:217pt'>&nbsp;</td>
+  <td class=xl114 width=231 style='border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl110 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl124 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl124 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl110 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl115 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Frame Increment Pointer</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0009</td>
+  <td class=xl118 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Frame
+  increment pointer should point to the Grid Offset Vecter (3004,000C)</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>FrameIncrementPointerRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl105 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl120 width=93 style='width:70pt'></td>
+  <td class=xl120 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl105 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl120 width=93 style='width:70pt'></td>
+  <td class=xl120 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl122 width=254 style='height:15.0pt;width:191pt'>C.8.8.3
+  RT Dose<span style='mso-spacerun:yes'>  </span>Module</td>
+  <td class=xl123 width=93 style='border-left:none;width:70pt'>&nbsp;</td>
+  <td class=xl123 width=62 style='border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl117 width=289 style='border-left:none;width:217pt'>&nbsp;</td>
+  <td class=xl114 width=231 style='border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl110 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl124 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl124 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl110 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Samples per Pixel</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0002</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  shall be 1</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Photometric Interpretation</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0004</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  shall be MONOCHROME2</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Bits Allocated</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0100</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  should be 16 or 32</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueListRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Bits Stored</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0101</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  equal to Bits Allocated (0028,0100)</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>EqualToRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>High Bit<span style='mso-spacerun:yes'> </span></td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0102</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  = Bits Stored(0028,0101) - 1</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>HighBitRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl115 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Pixel Representation</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0028,0103</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  have the value 0 = unsigned integer. Negative dose values shall not be
+  present.&quot;</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Dose Units</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>3004,0002</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  be equal to the enumerated value GY</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Dose Type</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>3004,0004</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  be equal to the defined term PHYSICAL</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl115 width=254 style='height:60.0pt;border-top:none;
+  width:191pt'>Dose Comment</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>3004,0006</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>&quot;Shall
+  be present if Referenced RT Plan Sequence is NOT PRESENT If present it should
+  have the same value as RT Plan Description and it should not be empty&quot;</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>DoseCommentRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl125 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Normalization Point</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>3004,0008</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  not be relied on.</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Dose Summation Type</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>3004,000A</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  have the value PLAN</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl115 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Referenced RT Plan Sequence</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>300C,0002</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  be present if Dose Summation Type (3004,000A) has the value PLAN</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>IsRequiredRule</td>
+ </tr>
+ <tr height=120 style='height:90.0pt'>
+  <td height=120 class=xl115 width=254 style='height:90.0pt;border-top:none;
+  width:191pt'>&quot;&gt;&gt;Referenced Fraction Group Sequence</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>300C,0020</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  be present if the parent sequence is present, and<br>
+    shall reference a single fraction group within the<br>
+    referenced RT Plan.<br>
+    Referenced Frame of Reference</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ReferencedFractionGroup-SequenceRule</td>
+ </tr>
+ <tr height=180 style='height:135.0pt'>
+  <td height=180 class=xl115 width=254 style='height:135.0pt;border-top:none;
+  width:191pt'>Grid Frame Offset Vector</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>3004,000C</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>1.
+  First z coordinate shall be equal to zero. <br>
+    2. The remaining z coordinates shall be relative to the<br>
+    starting z position in Image Position (Patient) (0020,0032). <br>
+    <br>
+    Note: Can not be checked, the only thing that can be checked is that the
+  offset is increasing every step.</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>GridFrameOffsetVectorRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl125 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Tissue Heterogeneity Correction</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>3004,0014</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  be present but may be null.<span style='mso-spacerun:yes'>  </span>The value
+  shall be given if known.</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>OptionalRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl126 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl120 width=93 style='width:70pt'></td>
+  <td class=xl127 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl106 style='height:15.0pt'><a name="RANGE!A59"></a></td>
+  <td class=xl121></td>
+  <td class=xl121></td>
+  <td></td>
+  <td class=xl106></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td colspan=2 height=20 class=xl137 width=347 style='border-right:.5pt solid black;
+  height:15.0pt;width:261pt'>C.8.8.13 RT Fraction Scheme<span
+  style='mso-spacerun:yes'>  </span>Module</td>
+  <td class=xl128 width=62 style='border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl117 width=289 style='border-left:none;width:217pt'>&nbsp;</td>
+  <td class=xl114 width=231 style='border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl110 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl124 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl124 style='border-top:none;border-left:none'>Type</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl110 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Fraction Group Sequence</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>300A,0070</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Only
+  1 item shall be present</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>NrIntOfSequenceItemRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl115 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Number of Brachy Application Setups</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00A0</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  shall be 0</td>
+  <td class=xl115 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl105 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl120 width=93 style='width:70pt'></td>
+  <td class=xl127 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl105 width=254 style='height:15.0pt;width:191pt'><a
+  name="RANGE!A65"></a></td>
+  <td class=xl120 width=93 style='width:70pt'></td>
+  <td class=xl127 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl105 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td colspan=2 height=20 class=xl113 width=347 style='height:15.0pt;
+  width:261pt'><a name="RANGE!A66">C.8.8.14 RT Beams Module</a></td>
+  <td class=xl136 width=62 style='border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl117 width=289 style='border-left:none;width:217pt'>&nbsp;</td>
+  <td class=xl117 width=231 style='border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl98 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl135 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl99 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl98 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>Beam Sequence</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00B0</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Up
+  to 100 beams should be supported</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>this
+  rule is not tested</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl83 width=254 style='height:60.0pt;border-top:none;
+  width:191pt'>&gt;Beam Name</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00C2</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>1.
+  The Beam Name is unique within the Beam Sequence<br>
+    2. Once a Beam Name is created, it will never change.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>BeamNameIsUniqueRule<br>
+    BeamNameNotChangedRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Beam Type<span style='mso-spacerun:yes'> </span></td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00C4</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  = STATIC or DYNAMIC</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>ValueListRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Radiation Type</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00C6</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Only<span
+  style='mso-spacerun:yes'>  </span>value possible: PHOTON</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl86 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>&gt;High-Dose Technique Type</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00C7</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Geometric
+  Plans shall not specify this attribute.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>NotPresentRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl86 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>&gt;Treatment Machine Name</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00B2</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>An
+  Actor must not rely on the presence of this attribute.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Source-Axis Distance</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00B4</td>
+  <td class=xl88 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  be present</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>IsRequiredRule</td>
+ </tr>
+ <tr height=180 style='height:135.0pt'>
+  <td height=180 class=xl83 width=254 style='height:135.0pt;border-top:none;
+  width:191pt'>Beam Limiting Device Sequence</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00B6</td>
+  <td class=xl88 width=62 style='border-top:none;border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>If
+  &gt;&gt;RT Beam Limiting Device Type(300A,00B8) = X, Y, ASYMX or ASYMY then
+  the sequence should contain descriptions of two sets of jaws, so 2 items
+  should be present else if<span style='mso-spacerun:yes'>  </span>&gt;&gt;RT
+  Beam Limiting Device Type(300A,00B8) = MLCX<span style='mso-spacerun:yes'> 
+  </span>or MLCY then the sequence shall report at least one set of MLC
+  descriptions, so at least 1 item should be present</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>BeamLimitingDeviceSequenceRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl86 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Referenced Patient Setup Number</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300C,006A</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>&nbsp;</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>IsRequiredRule</td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl86 width=254 style='height:45.0pt;border-top:none;
+  width:191pt'>&gt;Number of Wedges</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00D0</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Geometric
+  Plans are constrained to a value of 0 (i.e. a Geometric Plan must not include
+  a Wedge).</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl86 width=254 style='height:45.0pt;border-top:none;
+  width:191pt'>&gt;Number of Compensators</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00E0</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Geometric
+  Plans are constrained to a value of 0 (i.e. a Geometric Plan must not include
+  a Compensator).</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl86 width=254 style='height:45.0pt;border-top:none;
+  width:191pt'>&gt;Number of Boli</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00ED</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Geometric
+  Plans are constrained to a value of 0 (i.e. a Geometric Plan must not include
+  any Boli).</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=100 style='height:75.0pt'>
+  <td height=100 class=xl83 width=254 style='height:75.0pt;border-top:none;
+  width:191pt'>&gt;Number of Blocks</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00F0</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>1.
+  Up to 8 block items shall be suported (test this with script and
+  dataset)<br>
+    2. Only one block with &gt;&gt;Block Type(300A,00F8) = APERTURE may be
+  present in the total of maximum 8 blocks</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>BlockRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Block Sequence</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00F4</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>&nbsp;</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>BlockNumberofPointsRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;&gt;Block Divergence</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,00FA</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  should be PRESENT</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>IsRequiredRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;&gt;Block Number of Points</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,0104</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  &gt;= 3</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>BlockNumberofPointsRule</td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl83 width=254 style='height:45.0pt;border-top:none;
+  width:191pt'>&gt;&gt;Block Data</td>
+  <td class=xl84 width=93 style='border-top:none;border-left:none;width:70pt'>300A,0106</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>1.
+  Shall not be 0 points. One or more points should be present.<br>
+    2.No boundary check done.<span style='mso-spacerun:yes'> </span></td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>BlockDataRule</td>
+ </tr>
+ <tr height=140 style='height:105.0pt'>
+  <td height=140 class=xl83 width=254 style='height:105.0pt;border-top:none;
+  width:191pt'>&gt;Applicator Sequence</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,0107</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>&nbsp;</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Not
+  expected in Geometric Plans.<span style='mso-spacerun:yes'>  </span>However,
+  if present, shall be handled in a safe manner by the receiving system (and
+  document this behavior in their IHE-RO Profile adherence statement).<span
+  style='mso-spacerun:yes'>  </span>Applications exporting this sequence are
+  outside the scope of the BRTO Profile.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Final Cumulative Meterset Weight</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,010E</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  not be present in a Geometric Plan.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>NotPresentRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;border-top:none;
+  width:191pt'>&gt;Number of Control Points</td>
+  <td class=xl87 width=93 style='border-top:none;border-left:none;width:70pt'>300A,0110</td>
+  <td class=xl85 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  have a value of 2 for Geometric Plans.<span
+  style='mso-spacerun:yes'>  </span></td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>ValueRule</td>
+ </tr>
+ <tr height=140 style='height:105.0pt'>
+  <td height=140 class=xl89 width=254 style='height:105.0pt;border-top:none;
+  width:191pt'>&gt;Control Point Sequence</td>
+  <td class=xl90 width=93 style='border-top:none;border-left:none;width:70pt'>300A,0111</td>
+  <td class=xl91 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>In
+  the BRTO Profile, for Geometric Plans the second control point (sequence
+  item) shall contain only:<br>
+    ·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Control Point Index (300A,0112) with a
+  value of 1<br>
+    ·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cumulative Meterset Weight (300A,0134) set
+  to NULL.<span style='mso-spacerun:yes'> </span></td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>ControlPointSequenceRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl83 width=254 style='height:30.0pt;width:191pt'>&gt;&gt;Cumulative
+  Meterset Weight</td>
+  <td class=xl87 width=93 style='border-left:none;width:70pt'>300A,0134</td>
+  <td class=xl85 width=62 style='border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  be NULL for Geometric Plans (in both the first and second control point).</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>CumulativeMetersetWeightRule</td>
+ </tr>
+ <tr height=60 style='height:45.0pt'>
+  <td height=60 class=xl89 width=254 style='height:45.0pt;border-top:none;
+  width:191pt'>&gt;&gt;Referenced Dose Reference Sequence</td>
+  <td class=xl90 width=93 style='border-top:none;border-left:none;width:70pt'>300C,0050</td>
+  <td class=xl91 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Shall
+  not be present for Geometric Plans.<br>
+    Must not be relied upon by actors operating on the object as a Geometric
+  Plan.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>NotPresentRule</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl89 width=254 style='height:60.0pt;width:191pt'>&gt;&gt;Nominal
+  Beam Energy</td>
+  <td class=xl90 width=93 style='border-left:none;width:70pt'>300A,0114</td>
+  <td class=xl91 width=62 style='border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Actors
+  must not rely on the presence of this attribute to operate correctly.
+  However, if this attribute is present, actors may not ignore the value.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl89 width=254 style='height:60.0pt;width:191pt'>&gt;&gt;Dose
+  Rate Set</td>
+  <td class=xl90 width=93 style='border-left:none;width:70pt'>300A,0115</td>
+  <td class=xl91 width=62 style='border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Actors
+  must not rely on the presence of this attribute to operate correctly.
+  However, if this attribute is present, actors may not ignore the value.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl83 width=254 style='height:15.0pt;width:191pt'>&gt;&gt;Wedge
+  Position Sequence</td>
+  <td class=xl87 width=93 style='border-left:none;width:70pt'>300A,0116</td>
+  <td class=xl85 width=62 style='border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Must
+  not be present in a Geometric Plan</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>WedgePositionSequenceRule</td>
+ </tr>
+ <tr height=100 style='height:75.0pt'>
+  <td height=100 class=xl89 width=254 style='height:75.0pt;border-top:none;
+  width:191pt'>&gt;&gt;Beam Limiting Device Position Sequence</td>
+  <td class=xl90 width=93 style='border-top:none;border-left:none;width:70pt'>300A,011A</td>
+  <td class=xl91 width=62 style='border-top:none;border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Must
+  be present and correspond to those devices defined in the Beam Limiting
+  Device Sequence. It shall be present for a Geometric Plan for Control Point
+  Index 0 only.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>BeamLimitingDevicePositionSequenceRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl83 width=254 style='height:30.0pt;width:191pt'>&gt;&gt;Gantry
+  Rotation Direction</td>
+  <td class=xl87 width=93 style='border-left:none;width:70pt'>300A,011F</td>
+  <td class=xl85 width=62 style='border-left:none;width:47pt'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>For
+  a Geometric Plan for Control Point Index 0 only, must have a value of NONE.</td>
+  <td class=xl83 width=231 style='border-top:none;border-left:none;width:173pt'>GantryRotationDirectionRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl92 width=254 style='height:15.0pt;width:191pt'></td>
+  <td class=xl132 width=93 style='width:70pt'></td>
+  <td class=xl80 width=62 style='width:47pt'></td>
+  <td class=xl92 width=289 style='width:217pt'></td>
+  <td class=xl92 width=231 style='width:173pt'></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl106 style='height:15.0pt'></td>
+  <td class=xl121></td>
+  <td class=xl121></td>
+  <td></td>
+  <td class=xl106></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl129 style='height:15.0pt'>C.12.1 SOP Common</td>
+  <td class=xl130 style='border-left:none'>&nbsp;</td>
+  <td class=xl130 style='border-left:none'>&nbsp;</td>
+  <td class=xl97 style='border-left:none'>&nbsp;</td>
+  <td class=xl108 style='border-left:none'>&nbsp;</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl110 style='height:15.0pt;border-top:none'>Attribute</td>
+  <td class=xl124 style='border-top:none;border-left:none'>Tag</td>
+  <td class=xl124 style='border-top:none;border-left:none'>&nbsp;</td>
+  <td class=xl98 style='border-top:none;border-left:none'>Description<span
+  style='mso-spacerun:yes'> </span></td>
+  <td class=xl110 style='border-top:none;border-left:none'>rule name</td>
+ </tr>
+ <tr height=80 style='height:60.0pt'>
+  <td height=80 class=xl102 style='height:60.0pt;border-top:none'>SOP Instance
+  UID</td>
+  <td class=xl111 style='border-top:none;border-left:none'>0008,0018</td>
+  <td class=xl111 style='border-top:none;border-left:none'>R+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>If
+  an application alters an Information Object instance, then the new
+  Information Object<br>
+    <span style='mso-spacerun:yes'>  </span>instance shall be assigned a new
+  UID.</td>
+  <td class=xl102 style='border-top:none;border-left:none'>SOPInstanceUIDRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl102 style='height:30.0pt;border-top:none'>Specific
+  Character Set</td>
+  <td class=xl111 style='border-top:none;border-left:none'>0008,0005</td>
+  <td class=xl111 style='border-top:none;border-left:none'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Value
+  is ISO_IR 100, or blank (empty),<br>
+    <span style='mso-spacerun:yes'> </span>no other values may be used</td>
+  <td class=xl102 style='border-top:none;border-left:none'>ValueListRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl115 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Instance Creation Date</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0008,0012</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Actors
+  must not rely on the presence of this attribute to operate correctly.</td>
+  <td class=xl102 style='border-top:none;border-left:none'>OptionalRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl115 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Instance Creation Time</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0008,0013</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Actors
+  must not rely on the presence of this attribute to operate correctly.</td>
+  <td class=xl102 style='border-top:none;border-left:none'>OptionalRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl115 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Instance Creator UID</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0008,0014</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Actors
+  must not rely on the presence of this attribute to operate correctly.</td>
+  <td class=xl102 style='border-top:none;border-left:none'>OptionalRule</td>
+ </tr>
+ <tr height=40 style='height:30.0pt'>
+  <td height=40 class=xl115 width=254 style='height:30.0pt;border-top:none;
+  width:191pt'>Instance Number</td>
+  <td class=xl118 width=93 style='border-top:none;border-left:none;width:70pt'>0020,0013</td>
+  <td class=xl119 width=62 style='border-top:none;border-left:none;width:47pt'>O+*</td>
+  <td class=xl83 width=289 style='border-top:none;border-left:none;width:217pt'>Actors
+  must not rely on the presence of this attribute to operate correctly.</td>
+  <td class=xl102 style='border-top:none;border-left:none'>OptionalRule</td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 style='height:15.0pt'></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr height=20 style='height:15.0pt'>
+  <td height=20 class=xl69 style='height:15.0pt'></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <![if supportMisalignedColumns]>
+ <tr height=0 style='display:none'>
+  <td width=254 style='width:191pt'></td>
+  <td width=93 style='width:70pt'></td>
+  <td width=62 style='width:47pt'></td>
+  <td width=289 style='width:217pt'></td>
+  <td width=231 style='width:173pt'></td>
+ </tr>
+ <![endif]>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,78 @@
+
+'Test tool base class, this class runs IHE-RO scenario's and generates results files
+MustInherit Class TestToolBase
+    Inherits DvtkHighLevelInterface.Dicom.Threads.DicomThread
+
+    Protected m_scenarioRunner As ScenarioRunner = New ScenarioRunner()
+
+    'Constructor
+    Public Sub New()
+        'We want to report all messages on the same thread, therefor the Reporter needs TestTool object
+        'Reporter can than call the methods: WriteErrorNow(), WriteWarningNow() and WriteInformationNow()
+        Reporter.GetInstance.SetTestTool(Me)
+    End Sub
+
+    Public Sub WriteErrorNow(ByVal errorText As String)
+        WriteError(errorText)
+    End Sub
+
+    Public Sub WriteWarningNow(ByVal warningText As String)
+        WriteWarning(warningText)
+    End Sub
+
+    Public Sub WriteInformationNow(ByVal informationText As String)
+        WriteInformation(informationText)
+    End Sub
+
+    'has scenario dataset (xml filename)
+    Protected m_scenarioDatasetXmlFileName As String
+    'has scenario steps
+    Protected m_scenarioSteps As ArrayList = New ArrayList
+
+    'The scenario steps
+    Public ReadOnly Property ScenarioSteps() As ArrayList
+        Get
+            Return m_scenarioSteps
+        End Get
+    End Property
+
+    'The xml file containing the file names and locations of the scenario test data
+    Public ReadOnly Property ScenarioDatasetFile() As String
+        Get
+            Return m_scenarioDatasetXmlFileName
+        End Get
+    End Property
+
+    Public ReadOnly Property Name() As String
+        Get
+            Return Me.GetType().Name
+        End Get
+    End Property
+
+    Public Sub ValidateMessages()
+
+
+        Dim CustomDatasetDialog As New CustomDatasetDialog()
+
+        CustomDatasetDialog.lbCustomDatasets.DataSource = ReferenceDataSet.GetInstance().GetCustomDatasetNames()
+
+        CustomDatasetDialog.ShowDialog()
+
+        Dim dicomFileNames() As String = ReferenceDataSet.GetInstance.GetAllCustomDataSetDicomFileNames(CustomDatasetDialog.lbCustomDatasets.SelectedItem.ToString())
+
+        Dim i As Integer
+
+        For i = 0 To dicomFileNames.Length - 1
+            Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+
+            Dim dicomMessage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage
+            dicomFile.Read(dicomFileNames(i))
+            dicomMessage = New DvtkHighLevelInterface.Dicom.Messages.DicomMessage(DvtkData.Dimse.DimseCommand.CSTORERQ, dicomFile.DataSet)
+            dicomMessage.Set(Tags.MediaStorageSOPClassUID, DvtkData.Dimse.VR.UI, dicomFile.DataSet(Tags.SOPClassUID).Values(0))
+            dicomMessage.Set(Tags.MediaStorageSOPInstanceUID, DvtkData.Dimse.VR.UI, dicomFile.DataSet(Tags.SOPInstanceUID).Values(0))
+            Validate(dicomMessage)
+
+        Next
+
+    End Sub
+End Class

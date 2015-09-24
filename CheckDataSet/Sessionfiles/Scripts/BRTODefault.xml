@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<DataSet>
+  <DataSetPath>..\..\Datasets\Custom\BRTODefault</DataSetPath>
+  <CTImageSet description="SingleSeries">
+    <CTImage>CT\CT1_01.dcm</CTImage>
+    <CTImage>CT\CT1_02.dcm</CTImage>
+    <CTImage>CT\CT1_03.dcm</CTImage>
+    <CTImage>CT\CT1_04.dcm</CTImage>
+    <CTImage>CT\CT1_05.dcm</CTImage>
+    <CTImage>CT\CT1_06.dcm</CTImage>
+    <CTImage>CT\CT1_07.dcm</CTImage>
+    <CTImage>CT\CT1_08.dcm</CTImage>
+    <CTImage>CT\CT1_09.dcm</CTImage>
+    <CTImage>CT\CT1_10.dcm</CTImage>
+    <CTImage>CT\CT1_11.dcm</CTImage>
+    <CTImage>CT\CT1_12.dcm</CTImage>
+    <CTImage>CT\CT1_13.dcm</CTImage>
+    <CTImage>CT\CT1_14.dcm</CTImage>
+    <CTImage>CT\CT1_15.dcm</CTImage>
+    <CTImage>CT\CT1_16.dcm</CTImage>
+    <CTImage>CT\CT1_17.dcm</CTImage>
+    <CTImage>CT\CT1_18.dcm</CTImage>
+    <CTImage>CT\CT1_19.dcm</CTImage>
+    <CTImage>CT\CT1_20.dcm</CTImage>
+    <CTImage>CT\CT1_21.dcm</CTImage>
+    <CTImage>CT\CT1_22.dcm</CTImage>
+    <CTImage>CT\CT1_23.dcm</CTImage>
+    <CTImage>CT\CT1_24.dcm</CTImage>
+    <CTImage>CT\CT1_25.dcm</CTImage>
+    <CTImage>CT\CT1_26.dcm</CTImage>
+    <CTImage>CT\CT1_27.dcm</CTImage>
+    <CTImage>CT\CT1_28.dcm</CTImage>
+    <CTImage>CT\CT1_29.dcm</CTImage>
+    <CTImage>CT\CT1_30.dcm</CTImage>
+    <CTImage>CT\CT1_31.dcm</CTImage>
+    <CTImage>CT\CT1_32.dcm</CTImage>
+    <CTImage>CT\CT1_33.dcm</CTImage>
+    <CTImage>CT\CT1_34.dcm</CTImage>
+    <CTImage>CT\CT1_35.dcm</CTImage>
+    <CTImage>CT\CT1_36.dcm</CTImage>
+    <CTImage>CT\CT1_37.dcm</CTImage>
+    <CTImage>CT\CT1_38.dcm</CTImage>
+    <CTImage>CT\CT1_39.dcm</CTImage>
+  </CTImageSet>
+  <PETImageSet description="SingleSeries">
+  </PETImageSet>
+  <MRImageSet descriMRion="SingleSeries">
+  </MRImageSet>
+  <SpatialRegistration>
+  </SpatialRegistration>
+  <RTStructureSet>RTSTRUCT\RTStructureSet.dcm</RTStructureSet>
+  <RTDose>RTDOSE\RT-Dose.dcm</RTDose>
+  <RTPlanGeometric>GEOMETRICPLAN\RTPlanGeometric.dcm</RTPlanGeometric>
+  <RTPlanDosimetric>DOSIMETRICPLAN\RTPlanDosimetric.dcm</RTPlanDosimetric>
+</DataSet>

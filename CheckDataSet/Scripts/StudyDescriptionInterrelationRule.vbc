@@ -1,0 +1,153 @@
+Class StudyDescriptionInterrelationRule
+    Inherits MessageCollectionRule
+
+    Private m_checkInRTDose As Boolean
+    Private m_checkInRTStructureSet As Boolean
+    Private m_tagSequence As String
+    Private m_message As String
+    Private m_StudydescriptionPresent As Integer
+    Private m_ObjectName As String
+    Dim m_value As DvtkHighLevelInterface.Dicom.Other.Attribute
+    Private m_dataSetCollection() As DvtkHighLevelInterface.Dicom.Files.DicomFile = Nothing
+    Private m_messageCollectionHelper As messageCollectionHelper
+
+    Public Sub New(ByVal checkInRTDose As Boolean, ByVal checkInRTStructureSet As Boolean, ByVal iodTypeRule As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Study Description Interrelation Rule", iodTypeRule, severity)
+        m_tagSequence = Tags.StudyDescription
+        m_checkInRTDose = checkInRTDose
+        m_checkInRTStructureSet = checkInRTStructureSet
+        m_StudydescriptionPresent = False
+        m_value = Nothing
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection() As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        Dim valid As Boolean = True
+
+        'Store the data set collection global
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+        m_message = "All the objects contain the same value for The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") ."
+
+        valid = Me.CheckImages()
+
+        If valid Then
+            valid = Me.CheckOtherObjects()
+        End If
+
+        If valid And Not m_StudydescriptionPresent = 1 Then
+            Me.SetValid(m_message)
+        Else
+            If m_StudydescriptionPresent = 1 Then
+                m_message = "The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") is not present."
+            End If
+            Me.SetError(m_message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+
+    Private Function CheckImages() As Boolean
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+
+        'Check if there are CT images, if so get the tag value so you can compare it with the other data
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage) > 0 Then
+            dataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, 1)
+            m_ObjectName = "CT image object"
+            If Not Me.CheckValue(dataSet, m_ObjectName) Then
+                Return False
+            End If
+        End If
+
+        'Check if there are MR images and compare the tag with the variable value (tag value of other data object)
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.MRImage) > 0 Then
+            dataSet = m_messageCollectionHelper.GetSliceImage(IODType.MRImage, 1)
+            m_ObjectName = "MR image object"
+            If Not Me.CheckValue(dataSet, m_ObjectName) Then
+                Return False
+            End If
+        End If
+
+        'Check if there are PET images and compare the tag with the variable value (tag value of other data object)
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.PETImage) > 0 Then
+            dataSet = m_messageCollectionHelper.GetSliceImage(IODType.PETImage, 1)
+            m_ObjectName = "PET image object"
+            If Not Me.CheckValue(dataSet, m_ObjectName) Then
+                Return False
+            End If
+        End If
+
+        Return True
+    End Function
+
+    Private Function CheckOtherObjects() As Boolean
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim idx As Integer
+
+        'Check if the user wants to check in a RT Dose object
+        If m_checkInRTDose Then
+            dataSet = m_messageCollectionHelper.GetRTDose
+            If Not dataSet Is Nothing Then
+                m_ObjectName = "RT Dose object"
+                If Not Me.CheckValue(dataSet, m_ObjectName) Then
+                    Return False
+                End If
+            End If
+        End If
+
+        'Check if the user wants to check in a RT Structure object
+        If m_checkInRTStructureSet Then
+            dataSet = m_messageCollectionHelper.GetStructureSet
+            If Not dataSet Is Nothing Then
+                m_ObjectName = "RT Structure Set object"
+                If Not Me.CheckValue(dataSet, m_ObjectName) Then
+                    Return False
+                End If
+            End If
+        End If
+
+        Dim numberOfSpatialRegistrations As Integer = m_messageCollectionHelper.GetNumberOfSpatialRegistrations
+        If numberOfSpatialRegistrations > 0 Then
+            For idx = 1 To numberOfSpatialRegistrations
+                dataSet = m_messageCollectionHelper.GetSpatialRegistration(idx)
+                m_ObjectName = "Spatial Registration object"
+                If Not Me.CheckValue(dataSet, m_ObjectName) Then
+                    Return False
+                End If
+            Next idx
+        End If
+
+        Return True
+    End Function
+
+    Private Function CheckValue(ByVal dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal objectName As String) As Boolean
+        'If value isn't filled in, fill it, else compare it with the tag of this object
+        If m_value Is Nothing Then
+            If dataSet.Exists(m_tagSequence) Then
+                m_value = dataSet(m_tagSequence)
+                m_StudydescriptionPresent = m_StudydescriptionPresent + 1
+            Else
+                If m_StudydescriptionPresent = 0 Then
+                    m_message = "The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") is not present in all recieved objects."
+                    Return True
+                Else
+                    m_message = "In the" + objectName + " the attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") is not present." + Environment.NewLine + "If The tag Study description is present in one of the objects, it should be present in all the other objects as well."
+                    Return False
+                End If
+            End If
+        Else
+            If Not Me.ValuesAreEqual(m_value, dataSet(m_tagSequence)) Then
+                m_message = "In the" + objectName + " the attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has a different value then the other data objects."
+                Return False
+            End If
+        End If
+
+        Return True
+    End Function
+    'This method compares two attribute values and returns true if equal, false if not.
+    Private Function ValuesAreEqual(ByRef attribute1 As DvtkHighLevelInterface.Dicom.Other.Attribute, ByRef attribute2 As DvtkHighLevelInterface.Dicom.Other.Attribute) As Boolean
+
+        Return attribute1.Values.Equals(attribute2.Values)
+    End Function
+End Class

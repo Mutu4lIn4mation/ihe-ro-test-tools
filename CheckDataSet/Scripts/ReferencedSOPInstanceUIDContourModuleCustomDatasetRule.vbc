@@ -1,0 +1,170 @@
+Class ReferencedSOPInstanceUIDContourModuleCustomDatasetRule
+    Inherits MappingRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal expedtedReferencedIODType As IODType, ByVal folderName As String)
+
+        MyBase.New("Referenced SOP Instance UID Contour Module Rule", iodType, severity)
+        m_expedtedReferencedIODType = expedtedReferencedIODType
+        m_folderName = folderName
+    End Sub
+
+    Private m_expedtedReferencedIODType As IODType
+    Private m_message As String
+    Private m_valid As Boolean = False
+    Private m_messageCollectionHelper As messageCollectionHelper
+    Private m_folderName As String
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        Dim structureSetDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim ctImage As DvtkHighLevelInterface.Dicom.Messages.DicomMessage = Nothing
+        Dim done As Boolean = False
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+        'Dim roiContourSequenceTag As String = "0x30060039"
+        Dim roiContourSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim contourSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim contourImageSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim referencedSOPInstanceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim referencedImageDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim SOPInstanceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        If dicomFile.DataSet Is Nothing Then
+            m_valid = False
+            m_message = "No RT Structure Set received"
+        Else
+            structureSetDataSet = dicomFile.DataSet
+            'Check if Roi Contour Sequence exists
+            If structureSetDataSet.Exists(Tags.ROIContourSequence) = False Then
+                m_valid = False
+                done = True
+                m_message = "The attribute: '" + Tags.GetTagName(Tags.ROIContourSequence) + "' (" + Tags.ROIContourSequence + ") is not present."
+            Else
+                roiContourSequenceAttribute = structureSetDataSet(Tags.ROIContourSequence)
+                Dim i As Integer
+
+                If done = False Then
+                    For i = 1 To roiContourSequenceAttribute.ItemCount()
+                        If done = False Then
+                            seqItem = roiContourSequenceAttribute.GetItem(i)
+                            'Contour Sequence (3006,0040) check if exists
+                            If seqItem.Exists(Tags.ContourSequenceTag) = False Then
+                                m_valid = False
+                                done = True
+                                m_message = "The attribute: '" + Tags.GetTagName(Tags.ContourSequenceTag) + "' (" + Tags.ContourSequenceTag + ") is not present."
+                            Else
+                                'Contour Sequence (3006,0040)
+                                contourSequenceAttribute = seqItem(Tags.ContourSequenceTag)
+
+                                Dim j As Integer
+                                If done = False Then
+                                    For j = 1 To contourSequenceAttribute.ItemCount()
+                                        If done = False Then
+                                            seqItem = contourSequenceAttribute.GetItem(j)
+                                            'Contour Image Sequence 3006,0016 check if exists                                    
+                                            If seqItem.Exists(Tags.ContourImageSequenceTag) = False Then
+                                                m_valid = False
+                                                done = True
+                                                m_message = "The attribute: '" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") is not present."
+                                            Else
+                                                'Contour Image Sequence 3006,0016
+                                                contourImageSequenceAttribute = seqItem(Tags.ContourImageSequenceTag)
+                                                'Get the number of contour image sequence items, should be 1 according to IHE-RO
+                                                If contourImageSequenceAttribute.ItemCount() = 1 Then
+                                                    seqItem = contourImageSequenceAttribute.GetItem(1)
+                                                    referencedSOPInstanceUIDAttribute = seqItem(Tags.ReferencedSOPInstanceUIDMOVE)
+
+                                                    Dim numberOfImages As Integer
+                                                    Dim refData As ReferenceDataSet = ReferenceDataSet.GetInstance
+
+                                                    If m_expedtedReferencedIODType = iodType.MRImage Then
+                                                        numberOfImages = ReferenceDataSet.GetInstance.GetCustomDatasetCStoreMessages(m_folderName, iodType.MRImage).Count
+                                                    ElseIf m_expedtedReferencedIODType = iodType.PETImage Then
+                                                        numberOfImages = ReferenceDataSet.GetInstance.GetCustomDatasetCStoreMessages(m_folderName, iodType.PETImage).Count
+                                                    ElseIf m_expedtedReferencedIODType = iodType.CTImage Then
+                                                        numberOfImages = ReferenceDataSet.GetInstance.GetCustomDatasetCStoreMessages(m_folderName, iodType.CTImage).Count
+                                                    End If
+
+                                                    If numberOfImages = 0 Then
+                                                        m_valid = False
+                                                        done = True
+
+                                                        If m_expedtedReferencedIODType = iodType.MRImage Then
+                                                            m_message = "No MR-Images received"
+                                                        ElseIf m_expedtedReferencedIODType = iodType.PETImage Then
+                                                            m_message = "No PET-Images received"
+                                                        ElseIf m_expedtedReferencedIODType = iodType.CTImage Then
+                                                            m_message = "No CT-Images received"
+                                                        End If
+
+                                                    End If
+
+                                                    'Itterate throug the ct-images to find the matching Sop Instance UID of the CT image
+                                                    'Stop if found
+                                                    Dim k As Integer
+
+                                                    For k = 0 To numberOfImages - 1
+                                                        If done = False Then
+                                                            If m_expedtedReferencedIODType = iodType.MRImage Then
+                                                                referencedImageDataSet = ReferenceDataSet.GetInstance.GetCustomDatasetCStoreMessages(m_folderName, iodType.MRImage)(k).DataSet
+                                                            ElseIf m_expedtedReferencedIODType = iodType.PETImage Then
+                                                                referencedImageDataSet = ReferenceDataSet.GetInstance.GetCustomDatasetCStoreMessages(m_folderName, iodType.PETImage)(k).DataSet
+                                                            ElseIf m_expedtedReferencedIODType = iodType.CTImage Then
+                                                                referencedImageDataSet = ReferenceDataSet.GetInstance.GetCustomDatasetCStoreMessages(m_folderName, iodType.CTImage)(k).DataSet
+                                                            End If
+
+
+                                                            If referencedImageDataSet Is Nothing Then
+                                                                m_valid = False
+                                                                done = True
+                                                                If m_expedtedReferencedIODType = iodType.MRImage Then
+                                                                    m_message = "No MR-Images received"
+                                                                ElseIf m_expedtedReferencedIODType = iodType.PETImage Then
+                                                                    m_message = "No PET-Images received"
+                                                                ElseIf m_expedtedReferencedIODType = iodType.CTImage Then
+                                                                    m_message = "No CT-Images received"
+                                                                End If
+
+                                                            Else
+                                                                'Check if the Sop InstanceUID exsists
+                                                                If referencedImageDataSet.Exists(Tags.SOPInstanceUID) Then
+                                                                    SOPInstanceUIDAttribute = referencedImageDataSet(Tags.SOPInstanceUID)
+                                                                    If referencedSOPInstanceUIDAttribute.Values.Equals(SOPInstanceUIDAttribute.Values) = True Then
+                                                                        m_valid = True
+                                                                        done = True
+                                                                        m_message = "'ReferencedSOPInstanceUID' (" + Tags.ReferencedSOPInstanceUIDMOVE + ") has a reference to'" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") of the " + m_expedtedReferencedIODType.ToString() + "'s"
+                                                                    Else
+                                                                        m_valid = False
+                                                                        m_message = "'ReferencedSOPInstanceUID' (" + Tags.ReferencedSOPInstanceUIDMOVE + ") has no reference to '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") of the " + m_expedtedReferencedIODType.ToString() + "'s"
+                                                                    End If
+                                                                End If
+                                                            End If
+                                                        End If
+                                                    Next
+                                                Else
+                                                    m_valid = False
+                                                    done = True
+                                                    m_message = "Number of '" + Tags.GetTagName(Tags.ContourImageSequenceTag) + "' (" + Tags.ContourImageSequenceTag + ") items is not equal to one"
+                                                End If
+                                            End If
+                                        End If
+                                    Next
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
+            End If
+        End If
+
+
+        If m_valid = True Then
+            Me.SetValid(m_message)
+        Else
+            Me.SetError(m_message)
+        End If
+
+        Me.Report()
+    End Sub
+End Class

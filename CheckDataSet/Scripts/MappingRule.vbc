@@ -1,0 +1,10 @@
+MustInherit Class MappingRule
+    Inherits Rule
+
+    Public Sub New(ByVal RuleName As String, ByVal iodTypeRule As IODType, ByVal errorSeverity As ErrorSeverity)
+        MyBase.New(RuleName, iodTypeRule, errorSeverity)
+    End Sub
+
+    Public MustOverride Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+End Class

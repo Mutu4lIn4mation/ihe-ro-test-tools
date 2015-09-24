@@ -1,0 +1,50 @@
+SESSION
+
+SESSION-TYPE media
+SESSION-FILE-VERSION 2
+
+# Product Test Session Properties
+SESSION-TITLE "Media Session"
+SESSION-ID 001
+MANUFACTURER "C:\Projecten\ASTRO\ihe_ro2013\trunk\ihe_ro2013\03-Code\DVtkProject\BRTO\Datasets\Referencedatasets\FullRefSet\"
+MODEL-NAME "Product Name"
+SOFTWARE-VERSIONS "Version 2.4"
+APPLICATION-ENTITY-NAME "DICOM"
+APPLICATION-ENTITY-VERSION "3.0"
+TESTED-BY "DVT"
+DATE "20150922"
+
+# Test Session Properties
+LOG-ERROR true
+LOG-WARNING true
+LOG-INFO true
+LOG-RELATION false
+LOG-DEBUG false
+PDU-DUMP false
+STORAGE-MODE as-media
+DETAILED-VALIDATION-RESULTS true
+SUMMARY-VALIDATION-RESULTS true
+INCLUDE-TYPE-3-NOTPRESENT-INRESULTS false
+DUMP-ATTRIBUTES-REF-FILES false
+ENSURE-EVEN-ATTRIBUTE-VALUE-LENGTH true
+
+# Definitions
+DEFINITION-DIRECTORY "C:\ASTRO\CheckDataSet\Definition files\DICOM definition files\"
+DEFINITION "CT Image Storage.def"
+DEFINITION "MR Image Storage.def"
+DEFINITION "PET Image Storage.def"
+DEFINITION "RT Dose Storage.def"
+DEFINITION "RT Plan Storage.def"
+DEFINITION "RT Structure Set Storage.def"
+DEFINITION "Spatial Registration Storage.def"
+DEFINITION "All Dimse Commands.def"
+DEFINITION "C:\Program Files (x86)\DVTk\DVT\Bin\AllDimseCommands.def"
+
+# Results
+RESULTS-ROOT "C:\ASTRO\CheckDataSet\ResultDicomValidation\"
+APPEND-TO-RESULTS-FILE true
+
+# Data Directory
+DATA-DIRECTORY "C:\ASTRO\CheckDataSet\ResultDicomValidation\"
+
+ENDSESSION

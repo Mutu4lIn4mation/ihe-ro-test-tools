@@ -1,0 +1,106 @@
+Class BlockRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Block Rule", "", iodType, severity)
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        'Dim beamSequenceTagSequence As String = "0x300A00B0"
+        Dim beamSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        'Dim numberOfBlocksTagSequence As String = "0x300A00F0"
+        Dim numberOfBlocksAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        'Dim blockSequenceTagSequence As String = "0x300A00F4"
+        Dim blockSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        'Dim blockTypeTag As String = "0x300a00f8"
+        Dim blockTypeAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+        If (iodType = IODTypeRule And (iodType = iodType.RTPlanDosimetric Or iodType = iodType.RTPlanGeometric)) Then
+            Dim message As String = ""
+            Dim done As Boolean = False
+            Dim valid As Boolean = False
+
+            If dicomFile.DataSet.Exists(Tags.BeamSequence) = False Then
+                message = "The attribute: '" + Tags.GetTagName(Tags.BeamSequence) + "' (" + Tags.BeamSequence + ") is not present."
+                valid = False
+                done = True
+            End If
+
+            If done = False Then
+                beamSequenceAttribute = dicomFile.DataSet(Tags.BeamSequence)
+                Dim i As Integer
+                For i = 1 To beamSequenceAttribute.ItemCount()
+                    seqItem = beamSequenceAttribute.GetItem(i)
+                    If done = False Then
+                        If seqItem.Exists(Tags.BlockSequenceTagSequence) = True Then
+                            blockSequenceAttribute = seqItem(Tags.BlockSequenceTagSequence)
+
+                            'Check that a maximum of only one Apperture block is present
+                            Dim apertureValue As DvtkHighLevelInterface.Dicom.Other.Values
+
+                            If Me.IsValueUniqueInSequence(Tags.BlockTypeTag, "APERTURE", blockSequenceAttribute) = ValueUniquePresent.isNotUnique Then
+                                message = "Apperture Block is not unique"
+                                valid = False
+                                done = True
+                            Else
+                                valid = True
+                            End If
+                        End If
+                    End If
+                    If done = False Then
+                        'Check if Number Of Blocks exsists
+                        If seqItem.Exists(Tags.NumberOfBlocksTagSequence) = False Then
+                            message = "The attribute: '" + Tags.GetTagName(Tags.NumberOfBlocksTagSequence) + "' (" + Tags.NumberOfBlocksTagSequence + ") is not present."
+                            valid = False
+                            done = True
+                            'Check if Block Sequence exists
+                        Else
+                            numberOfBlocksAttribute = seqItem(Tags.NumberOfBlocksTagSequence)
+                            Dim numberOfBlocks As Integer
+                            Try
+                                numberOfBlocks = Integer.Parse(numberOfBlocksAttribute.Values(0).ToString())
+                            Catch ex As System.Exception
+                                numberOfBlocks = 0
+                            End Try
+
+                            Dim numberOfExpectedBlocks As Integer
+                            Dim tagString As String
+                            tagString = Tags.BeamSequence + "[" + i.ToString() + "]/" + Tags.NumberOfBlocksTagSequence
+
+                            Try
+                                numberOfExpectedBlocks = Integer.Parse(ReferenceDataSet.GetInstance.GetRTPlanGeometric.DataSet(tagString).Values(0))
+                            Catch ex As System.Exception
+                                'If the number of blocks throws an exception then we make the number of expected blocks so high that the 
+                                'check will fail.
+                                numberOfExpectedBlocks = 1000000
+                            End Try
+
+                            If numberOfBlocks < numberOfExpectedBlocks Then
+                                'Me.ErrSeverity = ErrorSeverity.RuleInfo
+                                message = "'" + Tags.GetTagName(Tags.NumberOfBlocksTagSequence) + "' (" + Tags.NumberOfBlocksTagSequence + ") is " + numberOfBlocks.ToString()
+                                valid = False
+                                done = True
+                            End If
+                        End If
+                    End If
+                Next
+            End If
+
+            If valid Then
+                message = "'" + Tags.GetTagName(Tags.NumberOfBlocksTagSequence) + "' (" + Tags.NumberOfBlocksTagSequence + ") is Valid, and aperture block is unique"
+                Me.SetValid(message)
+            Else
+                Me.SetError(message)
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

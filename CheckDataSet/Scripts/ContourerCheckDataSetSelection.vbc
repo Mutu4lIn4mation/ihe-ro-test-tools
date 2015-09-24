@@ -1,0 +1,74 @@
+﻿Public Class ContourerCheckDataSetSelection
+
+    Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
+        If buttonsChecked() Then
+            Me.DialogResult = System.Windows.Forms.DialogResult.OK
+            Me.Close()
+        End If
+        
+    End Sub
+
+    Private Function buttonsChecked() As Boolean
+        If Not tbSelectedStructureSet.Text = "" Then
+            Return True
+        Else
+            MessageBox.Show("Please select one item for the received dataset", "Invalid selection", MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly)
+            Return False
+        End If
+
+    End Function
+
+    Private Sub btnSelectReceivedItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectReceivedItem.Click
+
+#If DVT_INTERPRETS_SCRIPT Then
+        Dim newThread As New System.Threading.Thread(AddressOf ThreadMethod)
+        newThread.SetApartmentState(Threading.ApartmentState.STA)
+        newThread.Start()
+#Else
+        tbSelectedStructureSet.ReadOnly = False
+#End If
+
+
+    End Sub
+
+
+    Sub ThreadMethod()
+
+        If ofdReceivedDataSet.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+            Me.SetText(ofdReceivedDataSet.FileName)
+
+        End If
+
+    End Sub
+
+    Delegate Sub SetTextCallback(ByVal text As String)
+
+    Private Sub SetText(ByVal [text] As String)
+
+        Me.tbSelectedStructureSet.Text = [text]
+
+    End Sub
+
+    Private Sub btnSelectImageSet_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectImageSet.Click
+        Dim newThread As New System.Threading.Thread(AddressOf ThreadMethod2)
+        newThread.SetApartmentState(Threading.ApartmentState.STA)
+        newThread.Start()
+    End Sub
+
+    Sub ThreadMethod2()
+
+        If ImageSetFolderBrowserDialog.ShowDialog() = System.Windows.Forms.DialogResult.OK Then
+            Me.SetText2(ImageSetFolderBrowserDialog.SelectedPath)
+
+        End If
+
+    End Sub
+
+    Delegate Sub SetTextCallback2(ByVal text As String)
+
+    Private Sub SetText2(ByVal [text] As String)
+
+        Me.tbSelectedImageSet.Text = [text]
+
+    End Sub
+End Class

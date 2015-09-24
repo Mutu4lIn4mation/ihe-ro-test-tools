@@ -1,0 +1,108 @@
+Class BeamLimitingDevicePositionSequenceRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Beam Limiting Device Position Sequence Rule", "", iodType, severity)
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        Dim beamSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        Dim beamLimitingDeviceSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim rtBeamLimitingDeviceTypeAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim controlPointSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim beamLimitingDevicePositionSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim rtBeamLimitingDeviceTypeAttributeInner As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+        Dim seqItemInnerLoop As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+        If iodType = IODTypeRule Then
+            Dim message As String = ""
+            Dim done As Boolean = False
+            Dim valid As Boolean = False
+
+            If dicomFile.DataSet.Exists(Tags.BeamSequence) = False Then
+                message = "The attribute: '" + Tags.GetTagName(Tags.BeamSequence) + "' (" + Tags.BeamSequence + ") is not present."
+                valid = False
+                done = True
+            End If
+
+            If done = False Then
+                beamSequenceAttribute = dicomFile.DataSet(Tags.BeamSequence)
+                Dim i As Integer
+                For i = 1 To beamSequenceAttribute.ItemCount()
+                    If done = False Then
+                        seqItem = beamSequenceAttribute.GetItem(i)
+
+                        If seqItem.Exists(Tags.BeamLimitingDeviceSequenceTagSequence) = False Then
+                            message = "The attribute: '" + Tags.GetTagName(Tags.RtBeamLimitingDeviceTypeTagSequence) + "' (" + Tags.RtBeamLimitingDeviceTypeTagSequence + ") is not present."
+                            valid = False
+                            done = True
+                        Else
+                            beamLimitingDeviceSequenceAttribute = seqItem(Tags.BeamLimitingDeviceSequenceTagSequence)
+                            Dim j As Integer
+                            For j = 1 To beamLimitingDeviceSequenceAttribute.ItemCount()
+                                seqItem = beamLimitingDeviceSequenceAttribute.GetItem(j)
+                                If done = False Then
+                                    If seqItem.Exists(Tags.RtBeamLimitingDeviceTypeTagSequence) = False Then
+                                        message = "The attribute: '" + Tags.GetTagName(Tags.RtBeamLimitingDeviceTypeTagSequence) + "' (" + Tags.RtBeamLimitingDeviceTypeTagSequence + ") is not present."
+                                        valid = False
+                                        done = True
+                                    Else
+                                        'Get the RT BeamLimitingDeviceType that will be compared
+                                        rtBeamLimitingDeviceTypeAttribute = seqItem(Tags.RtBeamLimitingDeviceTypeTagSequence)
+
+                                        seqItemInnerLoop = beamSequenceAttribute.GetItem(i)
+                                        If seqItemInnerLoop.Exists(Tags.ControlPointSequenceTagSequence) = False Then
+                                            message = "The attribute: '" + Tags.GetTagName(Tags.ControlPointSequenceTagSequence) + "' (" + Tags.ControlPointSequenceTagSequence + ") is not present."
+                                            valid = False
+                                            done = True
+                                        Else
+                                            controlPointSequenceAttribute = seqItemInnerLoop(Tags.ControlPointSequenceTagSequence)
+                                            If done = False Then
+                                                'Beam Limiting Device Position Sequence, check only for first control point
+                                                seqItemInnerLoop = controlPointSequenceAttribute.GetItem(1)
+                                                If seqItemInnerLoop.Exists(Tags.BeamLimitingDevicePositionSequenceTagSequence) = False Then
+                                                    message = "The attribute: '" + Tags.GetTagName(Tags.ControlPointSequenceTagSequence) + "' (" + Tags.ControlPointSequenceTagSequence + ") is not present."
+                                                    valid = False
+                                                    done = True
+                                                Else
+                                                    beamLimitingDevicePositionSequenceAttribute = seqItemInnerLoop(Tags.BeamLimitingDevicePositionSequenceTagSequence)
+                                                    Dim k As Integer
+                                                    If done = False Then
+                                                        For k = 1 To beamLimitingDevicePositionSequenceAttribute.ItemCount()
+                                                            seqItemInnerLoop = beamLimitingDevicePositionSequenceAttribute.GetItem(k)
+                                                            If seqItemInnerLoop.Exists(Tags.RtBeamLimitingDeviceTypeTagSequence) = True Then
+                                                                rtBeamLimitingDeviceTypeAttributeInner = seqItemInnerLoop(Tags.RtBeamLimitingDeviceTypeTagSequence)
+                                                                If rtBeamLimitingDeviceTypeAttribute.Values.Equals(rtBeamLimitingDeviceTypeAttributeInner.Values) Then
+                                                                    valid = True
+                                                                End If
+                                                            End If
+                                                        Next
+                                                    End If
+                                                End If
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            Next
+                        End If
+                    End If
+                Next
+            End If
+
+            If valid Then
+                message = "Beam Limiting Device Position are referenced correctly"
+                Me.SetValid(message)
+            Else
+                Me.SetError(message)
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

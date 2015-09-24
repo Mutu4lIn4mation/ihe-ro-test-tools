@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<TesttoolConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SoftwareVersion>
+    <Major>3</Major>
+    <Minor>0</Minor>
+  </SoftwareVersion>
+  <Debugging>
+    <ReportDebugMessages>true</ReportDebugMessages>
+    <DoCleanUp>true</DoCleanUp>
+    <ReportTBDRule>true</ReportTBDRule>
+  </Debugging>
+  <SupportedTransferSyntaxes>
+    <Sender>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.1</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+    </Sender>
+    <Receiver>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2.1</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+      <TransferSyntax>
+        <Value>1.2.840.10008.1.2</Value>
+        <Used>true</Used>
+      </TransferSyntax>
+    </Receiver>
+  </SupportedTransferSyntaxes>
+</TesttoolConfig>

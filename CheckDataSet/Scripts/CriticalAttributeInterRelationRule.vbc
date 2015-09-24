@@ -1,0 +1,228 @@
+Class CriticalAttributeInterRelationRule
+    Inherits MessageCollectionRule
+
+    Private m_checkInRTDose As Boolean
+    Private m_checkInRTStructureSet As Boolean
+    Private m_message As String
+    Private m_TagSequence As String
+    Dim m_value As DvtkHighLevelInterface.Dicom.Other.Attribute
+    Private m_dataSetCollection As messageCollectionHelper
+
+    Public Sub New(ByVal TagSequence As String, ByVal checkInRTDose As Boolean, ByVal checkInRTStructureSet As Boolean, ByVal severity As ErrorSeverity, iodType As IODType)
+
+        MyBase.New("Critical Attribute Inter Relation Rule", iodType, severity)
+        m_TagSequence = TagSequence
+        m_checkInRTDose = checkInRTDose
+        m_checkInRTStructureSet = checkInRTStructureSet
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection() As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        Dim valid As Boolean = True
+
+        'Store the data set collection global
+        m_dataSetCollection = New messageCollectionHelper(dataSetCollection)
+
+        m_message = "All the objects contain the same value for tag " + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ")"
+
+        valid = Me.CheckImages()
+
+        If valid Then
+            valid = Me.CheckOtherObjects()
+        End If
+
+        If valid Then
+            Me.SetValid(m_message)
+        Else
+            Me.SetError(m_message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+
+    Private Function CheckImages() As Boolean
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+
+        'Check if there are CT images, if so get the tag value so you can compare it with the other data
+        If m_dataSetCollection.GetNumberOfSliceImages(IODType.CTImage) > 0 Then
+            dataSet = m_dataSetCollection.GetSliceImage(IODType.CTImage, 1)
+            If Not Me.CheckValue(dataSet, "CT image") Then
+                Return False
+            End If
+        End If
+
+        'Check if there are MR images and compare the tag with the variable value (tag value of other data object)
+        If m_dataSetCollection.GetNumberOfSliceImages(IODType.MRImage) > 0 Then
+            dataSet = m_dataSetCollection.GetSliceImage(IODType.MRImage, 1)
+            If Not Me.CheckValue(dataSet, "MR image") Then
+                Return False
+            End If
+        End If
+
+        'Check if there are PET images and compare the tag with the variable value (tag value of other data object)
+        If m_dataSetCollection.GetNumberOfSliceImages(IODType.PETImage) > 0 Then
+            dataSet = m_dataSetCollection.GetSliceImage(IODType.PETImage, 1)
+            If Not Me.CheckValue(dataSet, "PET image") Then
+                Return False
+            End If
+        End If
+
+        Return True
+    End Function
+
+    Private Function CheckOtherObjects() As Boolean
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim idx As Integer
+
+        'Check if the user wants to check in a RT Dose object
+        If m_checkInRTDose Then
+            If Not m_dataSetCollection.GetRTDose Is Nothing Then
+                dataSet = m_dataSetCollection.GetRTDose
+                If Not Me.CheckValue(dataSet, "RT Dose object") Then
+                    Return False
+                End If
+            End If
+        End If
+
+        'Check if the user wants to check in a RT Structure object
+        If m_checkInRTStructureSet Then
+            If Not m_dataSetCollection.GetStructureSet Is Nothing Then
+                dataSet = m_dataSetCollection.GetStructureSet
+                If Not Me.CheckValue(dataSet, "RT Structure Set object") Then
+                    Return False
+                End If
+            End If
+        End If
+
+        If m_dataSetCollection.GetNumberOfSpatialRegistrations > 0 Then
+            For idx = 1 To m_dataSetCollection.GetNumberOfSpatialRegistrations
+                dataSet = m_dataSetCollection.GetSpatialRegistration(idx)
+                If Not Me.CheckValue(dataSet, "Spatial Registration object") Then
+                    Return False
+                End If
+            Next idx
+        End If
+
+        Return True
+    End Function
+
+    Private Function CheckValue(ByVal dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal objectName As String) As Boolean
+        'If value isn't filled in, fill it, else compare it with the tag of this object
+        If m_value Is Nothing Then
+            If dataSet.Exists(m_tagSequence) Then
+                m_value = dataSet(m_tagSequence)
+            Else
+                m_message = "In the " + objectName + " the attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present."
+                Return False
+            End If
+        Else
+            If Not Me.ValuesAreEqual(m_value, dataSet(m_tagSequence)) Then
+                m_message = "In the " + objectName + " the attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not equal as the other data objects."
+                Return False
+            End If
+        End If
+
+        Return True
+    End Function
+
+    'This method compares two attribute values and returns true if equal, false if not.
+    Protected Function ValuesAreEqual(ByRef attribute1 As DvtkHighLevelInterface.Dicom.Other.Attribute, ByRef attribute2 As DvtkHighLevelInterface.Dicom.Other.Attribute) As Boolean
+        Select Case attribute1.VR
+            Case DvtkData.Dimse.VR.PN
+                Return PersonNameEqual(attribute1.Values, attribute2.Values)
+            Case DvtkData.Dimse.VR.TM
+                Return TimeEqual(attribute1.Values, attribute2.Values)
+            Case DvtkData.Dimse.VR.DA
+                Return DateEqual(attribute1.Values, attribute2.Values)
+            Case Else
+                Return attribute1.Values.Equals(attribute2.Values)
+        End Select
+
+    End Function
+
+    'This method compares the segments of a person name
+    Protected Function PersonNameEqual(ByRef value1 As DvtkHighLevelInterface.Dicom.Other.Values, ByRef value2 As DvtkHighLevelInterface.Dicom.Other.Values) As Boolean
+        Dim name1 As String = value1.ToString()
+        Dim name2 As String = value2.ToString()
+
+        'remove 2nd and 3rd component groups if present
+        If name1.IndexOf("="c) > -1 Then
+            name1 = name1.Substring(0, name1.IndexOf("="c))
+        End If
+        If name2.IndexOf("="c) > -1 Then
+            name2 = name2.Substring(0, name2.IndexOf("="c))
+        End If
+
+        name1 = name1.Trim(""""c)
+        name2 = name2.Trim(""""c)
+
+        Dim delimStr As String = "^"
+        Dim delimiter As Char() = delimStr.ToCharArray()
+
+        'Split the person names based on the ^ delimiters
+        Dim name1Elements As ArrayList = SplitPNIntoElements(name1)
+        Dim name2Elements As ArrayList = SplitPNIntoElements(name2)
+
+        'compare the 5 PN elements of the first group
+        For i As Integer = 0 To 4
+            If Not name1Elements(i) = name2Elements(i) Then
+                Return False
+            End If
+        Next
+        Return True
+    End Function
+
+    'splits a person name component group into its 5 components
+    Private Function SplitPNIntoElements(ByVal value As String) As ArrayList
+        Dim elements As ArrayList = New ArrayList
+        Dim delimiterPosition As Integer
+
+        For i As Integer = 1 To 5
+            delimiterPosition = value.IndexOf("^")
+            If delimiterPosition > -1 Then
+                elements.Add(value.Substring(0, delimiterPosition).TrimEnd(" "c))
+                value = value.Remove(0, delimiterPosition + 1)
+            Else
+                If value.Length > 0 Then
+                    elements.Add(value)
+                    value = ""
+                Else
+                    elements.Add("")
+                End If
+            End If
+        Next
+        Return elements
+    End Function
+
+    Protected Function TimeEqual(ByRef value1 As DvtkHighLevelInterface.Dicom.Other.Values, ByRef value2 As DvtkHighLevelInterface.Dicom.Other.Values) As Boolean
+        Dim time1Str As String = value1.ToString()
+        Dim time2Str As String = value2.ToString()
+
+        Dim time1 As TimeTM = New TimeTM(time1Str)
+        Dim time2 As TimeTM = New TimeTM(time2Str)
+
+        If Not time1.Equals(time2) Then
+            Return False
+        Else
+            Return True
+        End If
+    End Function
+
+    Protected Function DateEqual(ByRef value1 As DvtkHighLevelInterface.Dicom.Other.Values, ByRef value2 As DvtkHighLevelInterface.Dicom.Other.Values) As Boolean
+        Dim date1Str As String = value1.ToString()
+        Dim date2Str As String = value2.ToString()
+
+        'the format should now be yyyymmdd
+        Dim date1 As DateDA = New DateDA(date1Str)
+        Dim date2 As DateDA = New DateDA(date2Str)
+
+        If Not date1.Equals(date2) Then
+            Return False
+        Else
+            Return True
+        End If
+    End Function
+
+
+End Class

@@ -1,0 +1,215 @@
+Class ValidatorDataSet
+
+    'Constructor
+    Public Sub New()
+
+    End Sub
+
+    Protected m_logger As Logger = Logger.GetInstance()
+    'the scenariorules it will apply
+    Public rules As ArrayList
+
+    Private m_validationFiles() As DvtkHighLevelInterface.Dicom.Files.DicomFile
+
+    'This method validates all received messages. It applies DICOM validation and checks for the specified IHE-RO scenario rules
+    Public Sub ValidateMessages(ByRef sendFiles() As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByRef receivedFiles() As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByRef scenarioRules As ArrayList)
+        'set the rules that need to be verified
+        rules = scenarioRules
+
+        'Nod Needed for IHE RO 2008
+        ' Determine which RTPlan is used, geometric or dosimetric
+        'DetermineRTPlanIOD()
+
+        'Load Appropriate defintion files
+        LoadAppropriateDefinitionFiles()
+
+
+        applyRules(sendFiles, receivedFiles)
+
+    End Sub
+
+
+    'apply all the rules for the selected messages
+    Private Sub applyRules(ByRef validationSendFiles() As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByRef validationReceivedFiles() As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        'Validate and apply message level rules
+        For Each file As DvtkHighLevelInterface.Dicom.Files.DicomFile In validationReceivedFiles
+            If KnownMessageType(file) Then
+
+                If (file.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.RTStructureSetSOPClassUID) Then
+                    Reporter.GetInstance.ReportDebugMessage("RT Structure Set validation")
+                ElseIf (file.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.RTPlanDosimetricSOPClassUID) Then
+                    Reporter.GetInstance.ReportDebugMessage("RT Plan dosimetric validation")
+                ElseIf (file.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.RTIonPlanSOPClassUID) Then
+                    Reporter.GetInstance.ReportDebugMessage("RT Plan geometric validation")
+                ElseIf (file.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.RTDoseSOPClassUID) Then
+                    Reporter.GetInstance.ReportDebugMessage("RT Dose validation")
+                ElseIf (file.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.SpatialRegistrationSOPClassUID) Then
+                    Reporter.GetInstance.ReportDebugMessage("Spatial Registration validation")
+                End If
+
+                'Apply Attribute level rules
+                ApplyAttributeRules(file)
+                'Apply Module level rules
+                ApplyModuleRules(file)
+                'Apply Mapping rules
+                ApplyMappingRules(file)
+            Else
+                Reporter.GetInstance.ReportWarningMessage("Unexpected SOP Class skipped.")
+            End If
+        Next
+
+        For Each file As DvtkHighLevelInterface.Dicom.Files.DicomFile In validationSendFiles
+            If KnownMessageType(file) Then
+
+                'Apply Attribute level rules
+                ApplyAttributeRules(file)
+            Else
+                Reporter.GetInstance.ReportWarningMessage("Unexpected SOP Class skipped.")
+            End If
+        Next
+
+        'Apply Message Collection rules on send messages
+        ApplyMessageCollectionRuleRules(validationSendFiles)
+    End Sub
+
+    'This method loads the Appropriate defintion files for dicom validation of received messages
+    Protected Sub LoadAppropriateDefinitionFiles()
+        'Dim RtPlanDefinitionFiletoLoad As String
+        'Dim RtPlanDefinitionFiletoUnload As String
+        'RtPlanDefinitionFiletoLoad = config.GetDefinitionFileName(m_usedRtPlanType)
+        Dim config As TestToolConfiguration = TestToolConfiguration.GetInstance()
+
+        config.LoadDefinitionFiles(config.GetMainThread)
+
+        LogLoadedDefinitionFiles(config.GetMainThread.Options.LoadedDefinitionFileNames)
+    End Sub
+
+    'Logs the loaded definition files
+    Protected Sub LogLoadedDefinitionFiles(ByVal defFiles As String())
+        Logger.GetInstance.LogMessage("Loaded Definition files : ")
+        For Each deffilename As String In defFiles
+            Logger.GetInstance.LogMessage("	Definition file: " + deffilename)
+        Next
+    End Sub
+
+
+    'This method applies the attribute rules
+    Protected Sub ApplyAttributeRules(ByRef file As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        'Determine message iodType
+        Dim attRule As AttributeRule
+        Dim msgIodType As IODType = DetermineIodType(file)
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In rules
+            If ((TypeOf scenariorule Is AttributeRule) And (msgIodType = scenariorule.IODTypeRule)) Then
+                attRule = DirectCast(scenariorule, AttributeRule)
+                attRule.ApplyRule(file, msgIodType)
+            End If
+        Next
+    End Sub
+
+    'This method applies the module rules
+    Protected Sub ApplyModuleRules(ByRef file As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        'Determine message iodType
+        Dim modRule As ModuleRule
+        Dim msgIodType As IODType = DetermineIodType(file)
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In rules
+            If ((TypeOf scenariorule Is ModuleRule) And (msgIodType = scenariorule.IODTypeRule)) Then
+                modRule = DirectCast(scenariorule, ModuleRule)
+                modRule.ApplyRule(File, scenariorule.IODTypeRule)
+            End If
+        Next
+    End Sub
+
+    'This method applies the mapping rules
+    Protected Sub ApplyMappingRules(ByRef file As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        'Determine message iodType
+        Dim mapRule As MappingRule
+        Dim msgIodType As IODType = DetermineIodType(file)
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In rules
+            If ((TypeOf scenariorule Is MappingRule) And (msgIodType = scenariorule.IODTypeRule)) Then
+                mapRule = DirectCast(scenariorule, MappingRule)
+                mapRule.ApplyRule(file, scenariorule.IODTypeRule)
+            End If
+        Next
+
+    End Sub
+
+
+    'This method applies the MessageCollection rules
+    Protected Sub ApplyMessageCollectionRuleRules(ByRef files() As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        Dim messageCollectionRule As MessageCollectionRule
+
+        'iterate through the scenariorules
+        For Each scenariorule As Rule In rules
+            If TypeOf scenariorule Is MessageCollectionRule Then
+                messageCollectionRule = DirectCast(scenariorule, MessageCollectionRule)
+                messageCollectionRule.ApplyRule(files)
+            End If
+        Next
+    End Sub
+
+
+    'This method determines the IOD type of a message
+    Protected Function DetermineIodType(ByRef file As DvtkHighLevelInterface.Dicom.Files.DicomFile) As IODType
+        'What kind of message did we receive
+        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+        attribute = file.DataSet(Tags.SOPClassUID)
+        If attribute.Values(0).ToString() = SOPclass.RTDoseSOPClassUID Then
+            Return IODType.RTDose
+        ElseIf attribute.Values(0).ToString() = SOPclass.RTStructureSetSOPClassUID Then
+            Return IODType.RTStructureSet
+        ElseIf attribute.Values(0).ToString() = SOPclass.RTPlanDosimetricSOPClassUID Then
+            Return IODType.RTPlanDosimetric
+        ElseIf attribute.Values(0).ToString() = SOPclass.CTImageSOPClassUID Then
+            Return IODType.CTImage
+        ElseIf attribute.Values(0).ToString() = SOPclass.MRImageSOPClassUID Then
+            Return IODType.MRImage
+        ElseIf attribute.Values(0).ToString() = SOPclass.SpatialRegistrationSOPClassUID Then
+            Return IODType.SpatialRegistration
+        End If
+
+        m_logger.LogMessage("Could not determine IOD type of received message..")
+    End Function
+
+    'This method determines if a message is of a type known to the Test tool (definitions). returns true in case the message is of type CT Image, RT Structureset, RT Plan, or RT Dose
+    Protected Function KnownMessageType(ByRef file As DvtkHighLevelInterface.Dicom.Files.DicomFile) As Boolean
+        Dim messageSOPClassUID As String
+        Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute
+
+        'Retrieve the message sop class uid
+        attribute = file.DataSet(Tags.SOPClassUID)
+        messageSOPClassUID = attribute.Values(0)
+
+        'remove any spaces in the sop class uid
+        Dim space As Char = " "c
+        messageSOPClassUID = messageSOPClassUID.TrimStart(space)
+        messageSOPClassUID = messageSOPClassUID.TrimEnd(space)
+
+        'is the sop class uid a known uid?
+        Select Case messageSOPClassUID
+            Case SOPclass.RTDoseSOPClassUID
+                Return True
+            Case SOPclass.RTStructureSetSOPClassUID
+                Return True
+            Case SOPclass.RTPlanDosimetricSOPClassUID
+                Return True
+            Case SOPclass.CTImageSOPClassUID
+                Return True
+            Case SOPclass.PetImageSOPClassUID
+                Return True
+            Case SOPclass.MRImageSOPClassUID
+                Return True
+            Case SOPclass.SpatialRegistrationSOPClassUID
+                Return True
+            Case Else
+                m_logger.LogMessage("An unexpected SOP Class received with sop class uid '" + messageSOPClassUID + "').")
+                Return False
+        End Select
+    End Function
+
+End Class

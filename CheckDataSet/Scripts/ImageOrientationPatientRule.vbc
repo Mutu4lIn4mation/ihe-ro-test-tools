@@ -1,0 +1,87 @@
+Class ImageOrientationPatientRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Image Orientation Patient Rule", "", iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        If iodType = Me.IODTypeRule Then
+            Dim message As String
+
+            If Not dicomFile.DataSet.Exists(Tags.ImageOrientationPatient) Then
+                message = "The attribute: '" + Tags.GetTagName(Tags.ImageOrientationPatient) + "' (" + Tags.ImageOrientationPatient + ") is not present."
+                Me.SetError(message)
+            ElseIf Not dicomFile.DataSet(Tags.ImageOrientationPatient).VM = 6 Then
+                message = "The value multilicity is not correct form the '" + Tags.GetTagName(Tags.ImageOrientationPatient) + "' (" + Tags.ImageOrientationPatient + ") attribute."
+                Me.SetError(message)
+            Else
+                Try
+                    Dim foundToleranceError As Boolean = False
+                    Dim firstValue As Double = Me.ConvertToDouble(dicomFile.DataSet(Tags.ImageOrientationPatient).Values.Item(0))
+                    Dim secondValue As Double = Me.ConvertToDouble(dicomFile.DataSet(Tags.ImageOrientationPatient).Values.Item(1))
+                    Dim thirdValue As Double = Me.ConvertToDouble(dicomFile.DataSet(Tags.ImageOrientationPatient).Values.Item(2))
+                    Dim fourthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(Tags.ImageOrientationPatient).Values.Item(3))
+                    Dim fifthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(Tags.ImageOrientationPatient).Values.Item(4))
+                    Dim sixthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(Tags.ImageOrientationPatient).Values.Item(5))
+
+                    If (checkOneTolerance(firstValue) And _
+                            checkzeroTolerance(secondValue) And _
+                            checkzeroTolerance(thirdValue) And _
+                            checkzeroTolerance(fourthValue) And _
+                            checkOneTolerance(fifthValue) And _
+                            checkzeroTolerance(sixthValue)) Then
+                        message = "All the values of the '" + Tags.GetTagName(Tags.ImageOrientationPatient) + "' (" + Tags.ImageOrientationPatient + ") attribute are IHE-RO compliant."
+                        Me.SetValid(message)
+                    Else
+                        message = "One of the values of the '" + Tags.GetTagName(Tags.ImageOrientationPatient) + "' (" + Tags.ImageOrientationPatient + ") attribute is not compliant."
+                        Me.SetError(message)
+                    End If
+
+                    If dicomFile.DataSet.Exists(Tags.ImageType) And iodType = iodType.CTImage Then
+                        message = "The attribute: '" + Tags.GetTagName(Tags.ImageType) + "' (" + Tags.ImageType + ") is not present."
+
+                        If Not dicomFile.DataSet(Tags.ImageType).Values.Item(2) = "AXIAL" Then
+                            message = "The attribute: '" + Tags.GetTagName(Tags.ImageType) + "' (" + Tags.ImageType + ") has wrong value: " + dicomFile.DataSet(Tags.ImageType).Values.Item(2).ToString()
+                            Me.SetError(message)
+                        End If
+                    End If
+                Catch ex As System.Exception
+                    message = "One of the values of the '" + Tags.GetTagName(Tags.ImageOrientationPatient) + "' (" + Tags.ImageOrientationPatient + ") attribute is not a valid floating point value."
+                    Me.SetError(message)
+                End Try
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+
+    Function checkOneTolerance(ByVal number As Double) As Boolean
+        Dim foundToleranceError As Boolean = False
+        If number > 0 Then
+            If number < 0.999 Or number > 1.001 Then
+                foundToleranceError = True
+            End If
+        Else
+            If number < -1.001 Or number > -0.999 Then
+                foundToleranceError = True
+            End If
+        End If
+        Return Not foundToleranceError
+    End Function
+
+    Function checkzeroTolerance(ByVal number As Double) As Boolean
+        Dim foundToleranceError As Boolean = False
+
+        If number > 0.001 Or number < -0.001 Then
+            foundToleranceError = True
+        End If
+
+        Return Not foundToleranceError
+    End Function
+
+End Class

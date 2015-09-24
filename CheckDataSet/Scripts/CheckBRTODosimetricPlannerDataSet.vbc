@@ -1,0 +1,325 @@
+Class CheckBRTODosimetricPlannerDataSet
+    Inherits Scenario
+
+    Dim m_mediaSession As Dvtk.Sessions.MediaSession
+
+    Public Sub New(ByVal mediaSession As Dvtk.Sessions.MediaSession)
+
+        m_mediaSession = mediaSession
+
+        Dim contourerCheckDataSetSelectionDialog As ContourerCheckDataSetSelection = New ContourerCheckDataSetSelection
+        Dim CustomFolder As String
+
+        'Const DefaultEmptyReferenceDataset As String = "Scripts\EmptyReferenceDataSet.xml"
+
+        'Dim doc As Xml.XmlDocument = New Xml.XmlDocument()
+        'doc.Load(DefaultEmptyReferenceDataset)
+
+        'Dim datasetPath As Xml.XmlNode = doc.SelectSingleNode("//DataSet/DataSetPath")
+        'datasetPath.InnerText = "..\\..\\Datasets\\Custom\\CustomDataSet"
+
+        'Dim CTNode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/CTImageSet")
+        'Dim MRNode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/MRImageSet")
+        'Dim PETNode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/PETImageSet")
+        'Dim REGNode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/SpatialRegistration")
+        'Dim STRUCTNode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/RTStructureSet")
+        'Dim DOSENode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/RTDose")
+        'Dim GEOMETICPlanNode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/RTPlanGeometric")
+        'Dim DOSIMETRICPlanNode As Xml.XmlNode = doc.SelectSingleNode("//DataSet/RTPlanDosimetric")
+
+        'Dim DeleteDirInfo As New IO.DirectoryInfo("..\Datasets\Custom\CustomDataSet")
+        'DeleteDirInfo.Delete(True)
+
+        'Dim path As String = IO.Path.GetFullPath("..\Datasets\Custom\CustomDataSet")
+        'IO.Directory.CreateDirectory(path + "\CT")
+        'IO.Directory.CreateDirectory(path + "\MR")
+        'IO.Directory.CreateDirectory(path + "\PET")
+        'IO.Directory.CreateDirectory(path + "\REG")
+        'IO.Directory.CreateDirectory(path + "\RTSTRUCT")
+        'IO.Directory.CreateDirectory(path + "\RTDOSE")
+        'IO.Directory.CreateDirectory(path + "\GEOMETRICPLAN")
+        'IO.Directory.CreateDirectory(path + "\DOSIMETRICPLAN")
+
+        CustomFolder = "CustomDataSet"
+
+        contourerCheckDataSetSelectionDialog.Text = "Dosimetric plan selection"
+        contourerCheckDataSetSelectionDialog.lblReturnDataSet.Text = "Dosimetric plan path:"
+        contourerCheckDataSetSelectionDialog.btnSelectReceivedItem.Text = "Select dosimetric plan"
+        If Not String.IsNullOrEmpty(m_mediaSession.Manufacturer) Then
+            contourerCheckDataSetSelectionDialog.ofdReceivedDataSet.InitialDirectory = m_mediaSession.Manufacturer
+            contourerCheckDataSetSelectionDialog.ImageSetFolderBrowserDialog.SelectedPath = m_mediaSession.Manufacturer
+        End If
+        contourerCheckDataSetSelectionDialog.ShowDialog()
+
+        Dim receivedFilesArray(0) As DvtkHighLevelInterface.Dicom.Files.DicomFile
+        Dim receivedDicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+        Dim referencedStructureSet As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+        receivedDicomFile.Read(contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text)
+        receivedFilesArray(0) = receivedDicomFile
+
+        If (receivedDicomFile.DataSet.Exists(Tags.ReferencedStructureSetSOPInstanceUID)) Then
+            Dim structureSetSOPInstanceUID As String = receivedDicomFile.DataSet(Tags.ReferencedStructureSetSOPInstanceUID).Values(0).ToString()
+            Dim referencedObjects As New List(Of String)
+
+            'Begin Search structure set
+            Dim file As IO.FileInfo
+            Dim directory As String
+            Dim split() As String = contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text.Split("\")
+            directory = contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text.Substring(0, contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text.Length - split(split.Length - 1).Length)
+            Dim FOR1iodType As IODType
+
+            Dim dirInfo As IO.DirectoryInfo = New IO.DirectoryInfo(directory)
+            For Each file In dirInfo.GetFiles()
+
+                If (file.Name.EndsWith(".dcm")) Then
+                    Dim tempDICOMfile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                    Try
+                        tempDICOMfile.Read(file.FullName)
+                        If (structureSetSOPInstanceUID = tempDICOMfile.DataSet(Tags.SOPInstanceUID).Values(0).ToString()) Then
+                            referencedObjects.Add(file.FullName)
+                            'file.CopyTo(path + "\RTSTRUCT\" + file.Name, True)
+                            'STRUCTNode.InnerText = "RTSTRUCT\\" + file.Name
+                            referencedStructureSet = tempDICOMfile
+                        End If
+                    Catch ex As Exception
+                        Reporter.GetInstance.ReportWarningMessage(file.FullName + " cannot be read by DVTk")
+                    End Try
+                End If
+            Next
+
+            'End Search structure set
+
+            'Begin Search images in structure set
+            If Not referencedStructureSet Is Nothing Then
+                If (referencedStructureSet.DataSet.Exists(Tags.RTReferencedContourImageSequence)) Then
+                    Dim contourImageSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = referencedStructureSet.DataSet(Tags.RTReferencedContourImageSequence)
+
+                    Dim referencedSOPInstanceUIDs As New List(Of String)
+                    Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+                    Dim j As Integer
+                    For j = 1 To contourImageSequenceAttribute.ItemCount()
+                        seqItem = contourImageSequenceAttribute.GetItem(j)
+
+                        referencedSOPInstanceUIDs.Add(seqItem(Tags.ReferencedSOPInstanceUIDMOVE).Values(0).ToString())
+                    Next
+
+                    If (contourerCheckDataSetSelectionDialog.tbSelectedImageSet.Text = "") Then
+                        Dim split2() As String = contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text.Split("\")
+                        directory = contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text.Substring(0, contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text.Length - split2(split2.Length - 1).Length)
+                    Else
+                        directory = contourerCheckDataSetSelectionDialog.tbSelectedImageSet.Text
+                    End If
+
+                    dirInfo = New IO.DirectoryInfo(directory)
+                    For Each file In dirInfo.GetFiles()
+
+                        If (file.Name.EndsWith(".dcm")) Then
+                            Dim tempImage As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                            Try
+                                tempImage.Read(file.FullName)
+                                If referencedSOPInstanceUIDs.Contains(tempImage.DataSet(Tags.SOPInstanceUID).Values(0).ToString()) Then
+                                    referencedObjects.Add(file.FullName)
+
+                                    If (tempImage.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.CTImageSOPClassUID) Then
+                                        'file.CopyTo(path + "\CT\" + file.Name, True)
+                                        'Dim Child As Xml.XmlNode = doc.CreateNode("element", "CTImage", "")
+                                        'Child.InnerText = "CT\\" + file.Name
+                                        'CTNode.AppendChild(Child)
+                                        FOR1iodType = IODType.CTImage
+                                    ElseIf (tempImage.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.MRImageSOPClassUID) Then
+                                        'file.CopyTo(path + "\MR\" + file.Name, True)
+                                        'Dim Child As Xml.XmlNode = doc.CreateNode("element", "MRImage", "")
+                                        'Child.InnerText = "MR\\" + file.Name
+                                        'MRNode.AppendChild(Child)
+                                        FOR1iodType = IODType.MRImage
+                                    ElseIf (tempImage.DataSet(Tags.SOPClassUID).Values(0).ToString() = SOPclass.PetImageSOPClassUID) Then
+                                        'file.CopyTo(path + "\PET\" + file.Name, True)
+                                        'Dim Child As Xml.XmlNode = doc.CreateNode("element", "PETImage", "")
+                                        'Child.InnerText = "PET\\" + file.Name
+                                        'PETNode.AppendChild(Child)
+                                        FOR1iodType = IODType.PETImage
+                                    End If
+                                End If
+                            Catch ex As Exception
+                                Reporter.GetInstance.ReportWarningMessage(file.FullName + " cannot be read by DVTk")
+                            End Try
+                        End If
+                    Next
+
+                    'End Search images in structure set
+
+
+                    'doc.Save(IO.Path.GetFullPath("..\Sessionfiles\Scripts\CustomDataSet.xml"))
+
+                    'm_scenarioDatasetXmlFileName = "CustomDataSet.xml"
+
+                    referencedObjects.Add(contourerCheckDataSetSelectionDialog.tbSelectedStructureSet.Text)
+                    ReferenceDataSet.GetInstance.setReferencedDICOMFileNames(referencedObjects)
+                    Dim dicomFileNames() As String = referencedObjects.ToArray()
+
+                    Dim i As Integer
+                    Dim sendFilesArray() As DvtkHighLevelInterface.Dicom.Files.DicomFile
+
+                    ReDim sendFilesArray(dicomFileNames.Length - 1)
+
+
+                    For i = 0 To dicomFileNames.Length - 1
+                        Dim dicomFile As New DvtkHighLevelInterface.Dicom.Files.DicomFile
+                        dicomFile.Read(dicomFileNames(i))
+                        sendFilesArray(i) = dicomFile
+                    Next
+
+                    Dim validate As ValidateScenarioStep = New ValidateScenarioStep(sendFilesArray, receivedFilesArray)
+
+                    m_mediaSession.StartResultsGathering("CustomDatasetValidation.xml")
+
+                    m_mediaSession.ValidateMediaFiles(dicomFileNames)
+
+                    m_mediaSession.EndResultsGathering()
+
+                    ReferenceDataSet.GetInstance.ConvertXmlToHtml("..\ResultDicomValidation\", "Summary_CustomDatasetValidation.xml", "CustomDatasetValidation.html", True, Nothing)
+
+                    m_mediaSession.Manufacturer = directory
+                    m_mediaSession.SaveToFile()
+
+                    If Not (referencedSOPInstanceUIDs.Count = referencedObjects.Count - 2) Then
+                        Reporter.GetInstance.ReportWarningMessage("Not all referenced images are in the dataset " + referencedSOPInstanceUIDs.Count.ToString() + " are referenced in the structure set, " + (referencedObjects.Count - 2).ToString() + " images are in the dataset")
+                    End If
+
+                    If (referencedObjects.Count > 2) Then
+
+                        'C.7.1.1 Patient Module
+
+                        'Patient() 's Name	(0010,0010), same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.PatientName, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Patient ID	(0010,0020), same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.PatientID, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Patient() 's Birthdate	(0010,0030), same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.PatientsBirthDate, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Patient() 's Sex	(0010,0040), same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.PatientSex, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+
+                        'C.7.2.1 General Study Module		
+
+                        'Study Instance UID	(0020,000D), New value, but maybe the same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.StudyInstanceUID, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Study Date	(0008,0020), New value, but maybe the same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.StudyDate, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Study Time	(0008,0030), New value, but maybe the same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.StudyTime, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Referring(Physician)(0008,0090), New value, but maybe the same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.ReferringPhysiciansName, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Study ID	(0020,0010), New value, but maybe the same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.StudyID, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Accession Number	(0008,0050), New value, but maybe the same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.AccessionNumber, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Study Description	(0008,1030), New value, but maybe the same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.StudyDescription, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+
+                        'C.7.4.1 Frame Of Reference Module		
+                        'Frame of Reference UID	(0020,0052), same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.FrameofReferenceUID, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+                        'Position Reference Indicator (0020,1040), same as in reference data
+                        validate.AddRule(New CriticalAttributeMappingCustomDatasetRule(Tags.PositionReferenceIndicator, IODType.RTPlanDosimetric, FOR1iodType, ErrorSeverity.RuleError, CustomFolder))
+
+                        '--------------  End critical attribute mapping rules -------------------------------
+
+                        '============== RT-Plan (dosimetric)rules =======================================
+
+                        'C.8.8.13 RT Fraction Scheme		
+                        'Fraction Group Sequence	(300A,0070)	Only 1 item shall be present
+                        validate.AddRule(New NrIntOfSequenceItemRule(Tags.FractionGroupSequence, 1, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        '>Number of Brachy Application Setups 300A,00A0	value shall be 0
+                        validate.AddRule(New IsRequiredRule(Tags.NumberofBrachyApplicationSetups, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        validate.AddRule(New ValueRule(Tags.NumberofBrachyApplicationSetups, "0", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        'C.8.8.14 RT Beams Module		
+                        'Beam Sequence	(300A,00B0)	"Up to 100 beams should be supported, this rule is not tested
+
+                        'Beam Name	(300A,00C2)	
+                        '1. The Beam Name is unique within the Beam Sequence"
+                        validate.AddRule(New BeamNameIsUniqueRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        '2. Once a Beam Name is created, it will never change.
+                        'validate.AddRule(New BeamNameNotChangedCustomDataSetRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError, CustomFolder))
+
+                        '>Beam Type 300A,00C4 Value shall be STATIC or Dynamic
+                        validate.AddRule(New IsRequiredRule(Tags.BeamType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        Dim values(1) As String
+                        values(0) = "STATIC"
+                        values(1) = "DYNAMIC"
+                        validate.AddRule(New ValueListRule(Tags.BeamType, values, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        '>Radiation Type 300A,00C6 value: PHOTON
+                        validate.AddRule(New IsRequiredRule(Tags.RadiationType, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        validate.AddRule(New ValueRule(Tags.RadiationType, "PHOTON", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        '>Source-Axis Distance 300A,00B4 Shall be present
+                        validate.AddRule(New IsRequiredRule(Tags.SourceAxisDistance, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        'Beam Limiting Device Sequence	(300A,00B6)	
+                        'If >>RT Beam Limiting Device Type(300A,00B8) = X, Y, ASYMX or ASYMY then the sequence should contain 
+                        'descriptions of two sets of jaws, so 2 items should be present
+                        'else if  >>RT Beam Limiting Device Type(300A,00B8) = MLCX  or MLCY then the sequence shall report at 
+                        'least one set of MLC descriptions, so at least 1 item should be present"
+                        validate.AddRule(New BeamLimitingDeviceSequenceRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        'Number of Blocks (300A,00F0) 1. Up to 8 block items shall be suported (test this with script and dataset)
+                        'Block Sequence(300A,00FA) 2. Only one block with >>Block Type(300A,00F8) = APERTURE may be present in the 
+                        'all blocks"
+
+                        '>Referenced Patient Setup Number (300C,006A) Shall be present
+                        validate.AddRule(New IsRequiredRule(Tags.ReferencedPatientSetupNumber, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        '>Number of Wedges (300A,00D0) Shall be present
+                        validate.AddRule(New IsRequiredRule(Tags.NumberOfWedges, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        '>Number of Compensators (300A,00E0) Shall be present
+                        validate.AddRule(New IsRequiredRule(Tags.NumberOfCompensators, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        '>Number of Boli (300A,00ED) Shall be present
+                        validate.AddRule(New IsRequiredRule(Tags.NumberOfBoli, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        validate.AddRule(New BlockRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+                        'Block Number of Points	(300A,0104)	Value >= 3
+                        validate.AddRule(New BlockNumberofPointsRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        '>>Block Divergence 300A,00FA Value should be PRESENT
+                        validate.AddRule(New IsRequiredRule(Tags.BlockDivergence, IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        'Block Data	(300A,0106)	"1. Shall not be 0 points. One or more points should be present.
+                        '2.No boundary check done. See decision D.6"
+                        validate.AddRule(New BlockDataRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+
+                        '============== End RT-Plan (dosimetric)rules =======================================
+
+
+                        'C.12.1 SOP Common Module
+
+                        'SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object instance shall be assigned a new UID.
+                        'validate.AddRule(New SOPInstanceUIDRule(IODType.RTDose, ErrorSeverity.RuleError))
+                        'validate.AddRule(New SOPInstanceUIDRule(IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+                        'Specific Character Set (0008,0005) if present shall be the value "ISO_IR 100".
+                        validate.AddRule(New ValueInterRelationRule(Tags.SpecificCharacterSet, "ISO_IR 100", FOR1iodType, ErrorSeverity.RuleError))
+                        validate.AddRule(New ValueInterRelationRule(Tags.SpecificCharacterSet, "ISO_IR 100", IODType.RTStructureSet, ErrorSeverity.RuleError))
+
+                        'Specific Character Set (0008,0005) if present shall be the value "ISO_IR 100".
+                        validate.AddRule(New ValueRule(Tags.SpecificCharacterSet, "ISO_IR 100", IODType.RTPlanDosimetric, ErrorSeverity.RuleError))
+
+
+                        m_scenarioSteps.Add(validate)
+
+                    Else
+                        Reporter.GetInstance.ReportErrorMessage("Not one referenced image in the dataset")
+                    End If
+                Else
+                    Reporter.GetInstance.ReportErrorMessage("Selected RT Structure Set doesn't contain " + Tags.GetTagName(Tags.RTReferencedContourImageSequence) + "' (" + Tags.RTReferencedContourImageSequence + ")")
+                End If
+            Else
+                Reporter.GetInstance.ReportErrorMessage("RT Structure Set is not in the dataset")
+            End If
+        Else
+            Reporter.GetInstance.ReportErrorMessage("Selected Dosimetric plan doesn't contain " + Tags.GetTagName(Tags.ReferencedStructureSetSOPInstanceUID) + "' (" + Tags.ReferencedStructureSetSOPInstanceUID + ")")
+        End If
+
+
+    End Sub
+End Class

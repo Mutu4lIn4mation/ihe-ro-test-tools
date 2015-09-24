@@ -1,0 +1,181 @@
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class DosimetricPlannerCheckDataSetSelection
+    Inherits System.Windows.Forms.Form
+
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()> _
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
+
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Private Sub InitializeComponent()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.lbFOR1 = New System.Windows.Forms.ListBox()
+        Me.OK_Button = New System.Windows.Forms.Button()
+        Me.lblReturnDataSet = New System.Windows.Forms.Label()
+        Me.tbDosimetricPlanPath = New System.Windows.Forms.TextBox()
+        Me.ofdReceivedDataSet = New System.Windows.Forms.OpenFileDialog()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.btnSelectReceivedItem = New System.Windows.Forms.Button()
+        Me.btnSelectSecondReceivedItem = New System.Windows.Forms.Button()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.tbRTDosePath = New System.Windows.Forms.TextBox()
+        Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(38, 27)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(78, 13)
+        Me.Label1.TabIndex = 0
+        Me.Label1.Text = "FOR1 (Primary)"
+        '
+        'lbFOR1
+        '
+        Me.lbFOR1.FormattingEnabled = True
+        Me.lbFOR1.Items.AddRange(New Object() {"CT", "MR", "PET"})
+        Me.lbFOR1.Location = New System.Drawing.Point(154, 27)
+        Me.lbFOR1.Name = "lbFOR1"
+        Me.lbFOR1.Size = New System.Drawing.Size(120, 95)
+        Me.lbFOR1.TabIndex = 2
+        '
+        'OK_Button
+        '
+        Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.OK_Button.Location = New System.Drawing.Point(323, 376)
+        Me.OK_Button.Name = "OK_Button"
+        Me.OK_Button.Size = New System.Drawing.Size(110, 23)
+        Me.OK_Button.TabIndex = 4
+        Me.OK_Button.Text = "OK"
+        '
+        'lblReturnDataSet
+        '
+        Me.lblReturnDataSet.AutoSize = True
+        Me.lblReturnDataSet.Location = New System.Drawing.Point(6, 56)
+        Me.lblReturnDataSet.Name = "lblReturnDataSet"
+        Me.lblReturnDataSet.Size = New System.Drawing.Size(106, 13)
+        Me.lblReturnDataSet.TabIndex = 5
+        Me.lblReturnDataSet.Text = "Dosimetric plan path:"
+        '
+        'tbDosimetricPlanPath
+        '
+        Me.tbDosimetricPlanPath.Location = New System.Drawing.Point(118, 53)
+        Me.tbDosimetricPlanPath.Name = "tbDosimetricPlanPath"
+        Me.tbDosimetricPlanPath.ReadOnly = True
+        Me.tbDosimetricPlanPath.Size = New System.Drawing.Size(342, 20)
+        Me.tbDosimetricPlanPath.TabIndex = 6
+        '
+        'ofdReceivedDataSet
+        '
+        Me.ofdReceivedDataSet.DefaultExt = "dcm"
+        Me.ofdReceivedDataSet.FileName = "*.dcm"
+        Me.ofdReceivedDataSet.InitialDirectory = "c:\"
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.lbFOR1)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 13)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(330, 133)
+        Me.GroupBox1.TabIndex = 7
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Select items to send"
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.btnSelectSecondReceivedItem)
+        Me.GroupBox2.Controls.Add(Me.Label2)
+        Me.GroupBox2.Controls.Add(Me.tbRTDosePath)
+        Me.GroupBox2.Controls.Add(Me.btnSelectReceivedItem)
+        Me.GroupBox2.Controls.Add(Me.lblReturnDataSet)
+        Me.GroupBox2.Controls.Add(Me.tbDosimetricPlanPath)
+        Me.GroupBox2.Location = New System.Drawing.Point(15, 152)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(466, 201)
+        Me.GroupBox2.TabIndex = 8
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Select received item(s)"
+        '
+        'btnSelectReceivedItem
+        '
+        Me.btnSelectReceivedItem.Location = New System.Drawing.Point(9, 20)
+        Me.btnSelectReceivedItem.Name = "btnSelectReceivedItem"
+        Me.btnSelectReceivedItem.Size = New System.Drawing.Size(152, 23)
+        Me.btnSelectReceivedItem.TabIndex = 7
+        Me.btnSelectReceivedItem.Text = "Select dosimetric plan"
+        Me.btnSelectReceivedItem.UseVisualStyleBackColor = True
+        '
+        'btnSelectSecondReceivedItem
+        '
+        Me.btnSelectSecondReceivedItem.Location = New System.Drawing.Point(9, 98)
+        Me.btnSelectSecondReceivedItem.Name = "btnSelectSecondReceivedItem"
+        Me.btnSelectSecondReceivedItem.Size = New System.Drawing.Size(152, 23)
+        Me.btnSelectSecondReceivedItem.TabIndex = 10
+        Me.btnSelectSecondReceivedItem.Text = "Select RT Dose"
+        Me.btnSelectSecondReceivedItem.UseVisualStyleBackColor = True
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(6, 134)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(77, 13)
+        Me.Label2.TabIndex = 8
+        Me.Label2.Text = "RT Dose path:"
+        '
+        'tbRTDosePath
+        '
+        Me.tbRTDosePath.Location = New System.Drawing.Point(118, 131)
+        Me.tbRTDosePath.Name = "tbRTDosePath"
+        Me.tbRTDosePath.ReadOnly = True
+        Me.tbRTDosePath.Size = New System.Drawing.Size(342, 20)
+        Me.tbRTDosePath.TabIndex = 9
+        '
+        'DosimetricPlannerCheckDataSetSelection
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(493, 411)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.OK_Button)
+        Me.Name = "DosimetricPlannerCheckDataSetSelection"
+        Me.Text = "Dosimetric Planner Selection"
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        Me.ResumeLayout(False)
+
+    End Sub
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lbFOR1 As System.Windows.Forms.ListBox
+    Friend WithEvents OK_Button As System.Windows.Forms.Button
+    Friend WithEvents lblReturnDataSet As System.Windows.Forms.Label
+    Friend WithEvents tbDosimetricPlanPath As System.Windows.Forms.TextBox
+    Friend WithEvents ofdReceivedDataSet As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents btnSelectReceivedItem As System.Windows.Forms.Button
+    Friend WithEvents btnSelectSecondReceivedItem As System.Windows.Forms.Button
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents tbRTDosePath As System.Windows.Forms.TextBox
+End Class

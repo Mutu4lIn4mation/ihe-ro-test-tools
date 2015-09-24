@@ -1,0 +1,90 @@
+Class SOPInstanceUIDRule
+    Inherits AttributeRule
+
+    ' SOP Instance UID	(0008,0018)	If an application alters an Information Object instance, then the new Information Object  instance shall be assigned a new UID.	
+    'This rule checks that a new SOP Instance UID was generated, it should differ from its reference test data object equivalent
+    ' Script	DAR18: SOPInstanceUIDRule
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal referenceIOD As IODType)
+
+        MyBase.New("SOP Instance UID Rule", "", iodType, severity)
+        m_referenceIOD = referenceIOD
+    End Sub
+
+    Private m_referenceIOD As IODType
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+        Dim message As String = ""
+        Dim foundMatchingUID As Boolean = False
+
+        If iodType = IODTypeRule Then
+
+            If Not dicomFile.DataSet.Exists(Tags.SOPInstanceUID) Then
+                message = "'" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") is not present."
+            Else
+                Dim receivedUID As String = dicomFile.DataSet(Tags.SOPInstanceUID).Values.Item(0)
+                Dim refSeT As ReferenceDataSet = ReferenceDataSet.GetInstance()
+                Dim nrOfImageSets As Integer = refSeT.GetImageSetCount(m_referenceIOD)
+
+                'Now we compare the received UID with all the SOPInstaceUID's in the ReferenceTestDataset
+                Try
+                    'for performance reasons its important to check the oidtype before processing
+                    If iodType = iodType.CTImage Then
+                        Dim i As Integer = 1
+
+                        message = "No new '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") was generated for this CT-Image Object."
+                        While i <= refSeT.GetImageSetCount And Not foundMatchingUID
+                            Dim j As Integer = 1
+
+                            While j <= refSeT.GetImageCount(i, iodType.CTImage) And Not foundMatchingUID
+                                foundMatchingUID = CompareSOPInstanceUID(dicomFile.DataSet, refSeT.GetCTImage(i, j).DataSet)
+                                j += 1
+                            End While
+                            i += 1
+                        End While
+
+                    ElseIf iodType = iodType.RTDose Then
+                        foundMatchingUID = CompareSOPInstanceUID(dicomFile.DataSet, refSeT.GetRTDose().DataSet)
+                        message = "The '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") of the RTDose Object was not changed."
+                        message = "No new '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") was generated for this RTDose Object."
+                    ElseIf iodType = iodType.RTPlanDosimetric Then
+                        foundMatchingUID = CompareSOPInstanceUID(dicomFile.DataSet, refSeT.GetRTPlanDosimetric().DataSet)
+                        message = "No new '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") was generated for this RT Plan Object."
+                    ElseIf iodType = iodType.RTPlanGeometric Then
+                        foundMatchingUID = CompareSOPInstanceUID(dicomFile.DataSet, refSeT.GetRTPlanGeometric().DataSet)
+                        message = "No new '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") was generated for this RT Plan Object."
+                    ElseIf iodType = iodType.RTStructureSet Then
+                        foundMatchingUID = CompareSOPInstanceUID(dicomFile.DataSet, refSeT.GetRTStructureSet().DataSet)
+                        message = "No new '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") was generated for this RT StructureSet Object."
+                    End If
+
+                    If Not foundMatchingUID Then
+                        'foundmatching UIDs should still be false here. We have checked the complete dataset so we declare the rule Valid
+                        message = "New '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") has been generated accordingly."
+                        Me.SetValid(message)
+                    End If
+
+                Catch ex As System.Exception
+                    'Me.ErrSeverity = ErrorSeverity.RuleError
+                    SetError("Was not able to determine whether the dataset '" + Tags.GetTagName(Tags.SOPInstanceUID) + "' (" + Tags.SOPInstanceUID + ") has changed.")
+                End Try
+
+            End If
+
+            If Not Me.IsValid Then
+                Me.SetError(message)
+            End If
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+
+    'returns true when both instance uid's are equal
+    Function CompareSOPInstanceUID(ByVal first As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal second As DvtkHighLevelInterface.Dicom.Other.DataSet) As Boolean
+        If first(Tags.SOPInstanceUID).Values.Item(0) = second(Tags.SOPInstanceUID).Values.Item(0) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+End Class

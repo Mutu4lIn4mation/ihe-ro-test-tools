@@ -1,0 +1,91 @@
+Class SameFrameOfReferenceMappingCustomDatasetRule
+    Inherits MappingRule
+
+    Private m_tagSequence As String
+    Private m_folderName As String
+
+    Public Sub New(ByVal tagSequence As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity, ByVal folderName As String)
+
+        MyBase.New("Same Frame Of Reference Mapping Rule", iodType, severity)
+
+        m_tagSequence = tagSequence
+        m_folderName = folderName
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+        Dim message As String = ""
+        Dim frameOfReferenceUIDValue As String
+        Dim baseFrameOfReference As String
+        Dim frameOfReferenceUIDTag As String = "0x00200052"
+        Dim pass As Boolean = True
+        Dim pointCount As Integer = 0
+        Dim referencedImagesCount As Integer = 0
+        Dim refDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+
+        If dicomFile.DataSet.Exists(m_tagSequence) Then
+            'Get the frame of reference uid
+            frameOfReferenceUIDValue = dicomFile.DataSet.GetValues(m_tagSequence)(0)
+
+            'Check to which frame of refecence the DataSet if pointing
+            'Get the first CT image (if there is at least one)
+            If ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.CTImage).Count > 0 Then
+                refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.CTImage)(0).DataSet
+                baseFrameOfReference = refDataSet.GetValues(frameOfReferenceUIDTag)(0)
+                referencedImagesCount = referencedImagesCount + 1
+                If frameOfReferenceUIDValue.Equals(baseFrameOfReference) Then
+                    pointCount = pointCount + 1
+                End If
+            End If
+
+            If Not Me.IODTypeRule = iodType.MRImage Or Not Me.IODTypeRule = iodType.PETImage Then
+                'Get the first MR image (if there is at least one)
+                If ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.MRImage).Count > 0 Then
+                    refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.MRImage)(0).DataSet
+                    baseFrameOfReference = refDataSet.GetValues(frameOfReferenceUIDTag)(0)
+                    referencedImagesCount = referencedImagesCount + 1
+                    If frameOfReferenceUIDValue.Equals(baseFrameOfReference) Then
+                        pointCount = pointCount + 1
+                    End If
+                End If
+
+                'Get the first PET image (if there is at least one)
+                If ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.PETImage).Count > 0 Then
+                    refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.PETImage)(0).DataSet
+                    baseFrameOfReference = refDataSet.GetValues(frameOfReferenceUIDTag)(0)
+                    referencedImagesCount = referencedImagesCount + 1
+                    If frameOfReferenceUIDValue.Equals(baseFrameOfReference) Then
+                        pointCount = pointCount + 1
+                    End If
+                End If
+            End If
+
+
+            If pointCount = 0 Then
+                pass = False
+                message = "The " + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") does not point to one of the image sets"
+            Else
+                If pointCount = 1 Then
+                    message = "The " + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") points to the image sets correctly"
+                Else
+                    pass = False
+                    message = "Not all " + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") from the image sets do not point to each other, use a correct dataset"
+                End If
+
+            End If
+        Else
+            pass = False
+            message = "The " + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") does not exists"
+        End If
+
+        'If every modality is passed, then SetValid, else SetError
+        If pass Then
+            Me.SetValid(message)
+        Else
+            Me.SetError(message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+End Class

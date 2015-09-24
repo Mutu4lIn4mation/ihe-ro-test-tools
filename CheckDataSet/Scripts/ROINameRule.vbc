@@ -1,0 +1,58 @@
+Class ROINameRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("ROI Name Rule", "", iodType, severity)
+
+    End Sub
+    'Structure Set ROI Sequence
+    Private m_StructureSetROITagSequence As String = "0x30060020"
+    'RoiNumber
+    Private m_RoiName As String = "0x30060026"
+
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        If iodType = Me.IODTypeRule Then
+            Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+            Dim message As String
+            Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+            Dim roiNameValue As DvtkHighLevelInterface.Dicom.Other.Values
+            Dim roiNameValueCompare As DvtkHighLevelInterface.Dicom.Other.Values
+            Dim isUnique As Boolean = True
+
+            'Get Structure Set ROI Sequence
+            attribute = dicomFile.DataSet(m_StructureSetROITagSequence)
+
+            Dim i As Integer
+            Dim j As Integer
+            'Itterate through the items
+            For i = 1 To attribute.ItemCount()
+                seqItem = attribute.GetItem(i)
+                'Get RoiNumber Value
+                roiNameValue = seqItem.GetValues(m_RoiName)
+
+                For j = i + 1 To attribute.ItemCount()
+                    seqItem = attribute.GetItem(j)
+                    'Get RoiNumber Value
+                    roiNameValueCompare = seqItem.GetValues(m_RoiName)
+                    'Compare the found values
+                    If roiNameValue(0) = roiNameValueCompare(0) Then
+                        isUnique = False
+                    End If
+                Next
+            Next
+
+            If isUnique = True Then
+                message = "No equal ROINames (3006,0026) found"
+                Me.SetValid(message)
+            Else
+                message = "Equal ROINames (3006,0026) found"
+                Me.SetError(message)
+            End If
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

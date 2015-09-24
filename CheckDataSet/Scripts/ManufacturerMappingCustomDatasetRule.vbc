@@ -1,0 +1,74 @@
+Class ManufacturerMappingCustomDatasetRule
+    Inherits MappingRule
+
+    Private m_mayCopy As Boolean
+    Private spatialIODTypeRule As IODType
+    Private m_tagSequence As String
+    Private count As Integer = 0
+    Private spatialRegistrationArray As ArrayList = Nothing
+    Private m_folderName As String
+
+    Public Sub New(ByVal tagName As String, ByVal severity As ErrorSeverity, ByVal iodTypeToValidateWith As IODType, ByVal folderName As String)
+        MyBase.New("Manufacturer Mapping Rule", iodTypeToValidateWith, severity)
+        m_tagSequence = tagName
+        Me.spatialIODTypeRule = iodType.SpatialRegistration
+        m_folderName = folderName
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+        Dim valid As Boolean = False
+
+        Dim message As String
+
+        'check if the tags 0x00080070 or 0x00081090 are given, since these are the only 2 valid tags.
+        If m_tagSequence.Equals(Tags.Manufacturer) Or m_tagSequence.Equals(Tags.ManufacturersModelName) Then
+
+            Dim refDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = New DvtkHighLevelInterface.Dicom.Other.DataSet
+
+            'Select the reference test data set to use
+            If iodType = iodType.CTImage Then
+                refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.CTImage)(0).DataSet
+            ElseIf iodType = iodType.MRImage Then
+                refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.MRImage)(0).DataSet
+            ElseIf iodType = iodType.PETImage Then
+                refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.PETImage)(0).DataSet
+            ElseIf (iodType = iodType.RTStructureSet) Then
+                refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.RTStructureSet)(0).DataSet
+            ElseIf (iodType = iodType.SpatialRegistration) Then
+                refDataSet = ReferenceDataSet.GetInstance().GetCustomDatasetCStoreMessages(m_folderName, iodType.SpatialRegistration)(0).DataSet
+            End If
+
+            'Check for presence of the tag that needs to be checked
+            If Not dicomFile.DataSet.Exists(m_tagSequence) Then
+                message = "The attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") is not present."
+
+                'Check if the tag values are not the same
+            Else
+                If refDataSet(m_tagSequence).Values(0).Equals(dicomFile.DataSet(m_tagSequence).Values(0)) Then
+                    If m_tagSequence.Equals(Tags.Manufacturer) Then
+                        message = "Critical attribute mapping: the attribute: '" + Tags.GetTagName(m_tagSequence) + "' " + "' (" + m_tagSequence + ") has value " + dicomFile.DataSet(m_tagSequence).Values(0).ToString() + ", The manufacturer should insert their own identifier in this element"
+                    Else
+                        message = "Critical attribute mapping: the attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has value " + dicomFile.DataSet(m_tagSequence).Values(0).ToString() + ", The manufacturer should insert their own model name in this element"
+                    End If
+                Else
+                    message = "Critical attribute mapping: the attribute: '" + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") has new (New Source) value " + dicomFile.DataSet(m_tagSequence).Values(0).ToString()
+                    valid = True
+                End If
+            End If
+        Else
+            message = "Incorrect tag number " + Tags.GetTagName(m_tagSequence) + "' (" + m_tagSequence + ") when instantiating this rule"
+        End If
+
+        If valid Then
+            Me.SetValid(message)
+        Else
+            Me.SetError(message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+
+    End Sub
+End Class
+
+

@@ -1,0 +1,43 @@
+Class PixelSpacingRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Pixel Spacing Rule", "", iodType, severity)
+
+    End Sub
+
+    'Structure Set ROI Sequence
+    'RoiNumber
+
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        If iodType = Me.IODTypeRule And (iodType = iodType.CTImage Or iodType = iodType.RTDose) Then
+            Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+            Dim message As String
+
+            If dicomFile.DataSet.Exists(Tags.PixelSpacing) Then
+                If dicomFile.DataSet(Tags.PixelSpacing).Values(0).Equals(dicomFile.DataSet(Tags.PixelSpacing).Values(1)) Then
+                    message = "The attribute '" + Tags.GetTagName(Tags.PixelSpacing) + "' (" + Tags.PixelSpacing + ") is isotropic."
+                    Me.SetValid(message)
+                Else
+                    message = "The attribute '" + Tags.GetTagName(Tags.PixelSpacing) + "' (" + Tags.PixelSpacing + ") is non-sotropic."
+                    If iodType = iodType.CTImage Then
+                        'For CTImage IOD, non-isotropic pixels are outside the scope of the profile.
+                        Me.SetError(message)
+                    Else
+                        'For RT Dose IOD, pixel spacing may be nonisotropic
+                        Me.SetValid(message)
+                    End If
+                End If
+            Else
+                message = "The attribute '" + Tags.GetTagName(Tags.PixelSpacing) + "' (" + Tags.PixelSpacing + ") is not present"
+                Me.SetError(message)
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

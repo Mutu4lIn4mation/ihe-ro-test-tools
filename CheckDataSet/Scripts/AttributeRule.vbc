@@ -1,0 +1,32 @@
+MustInherit Class AttributeRule
+    Inherits Rule
+
+    Public Sub New(ByVal name As String, ByVal tagSequence As String, ByVal iodTypeRule As IODType, ByVal errorSeverity As ErrorSeverity)
+
+        MyBase.New(name, iodTypeRule, errorSeverity)
+        m_TagSequence = tagSequence
+
+    End Sub
+
+    Public MustOverride Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+    Protected m_TagSequence As String
+    Public Property TagSequence() As String
+        Get
+            Return m_TagSequence
+        End Get
+        Set(ByVal value As String)
+            m_TagSequence = value
+        End Set
+    End Property
+    'item = itemnumber in the sequence attribute
+    'sequenceTag= indicates which item should be raised
+    Public Function getItemInSQTag(ByVal item As Integer, ByVal sequenceItemTag As String) As String
+        'position indicates at which place the number should be raised, based upon the sequenceItemTag
+        Dim position As Integer = Len(sequenceItemTag) + 2
+        'the new tag sequence is constucted of the original left part, the item number and the original right part
+        Dim TagSequence As String = Left(m_TagSequence, position - 1) + item.ToString + Right(m_TagSequence, Len(m_TagSequence) - position)
+        Return TagSequence
+    End Function
+
+End Class

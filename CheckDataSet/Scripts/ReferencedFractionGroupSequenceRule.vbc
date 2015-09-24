@@ -1,0 +1,49 @@
+Class ReferencedFractionGroupSequenceRule
+    Inherits MessageCollectionRule
+
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Referenced Fraction Group Sequence Rule", iodType, severity)
+
+    End Sub
+
+    Private m_severity As ErrorSeverity
+    Private m_iodType As IODType
+    Private m_messageCollectionHelper As messageCollectionHelper
+
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection() As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+        Dim RtDoseDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim RtPlanDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim message As String
+
+        If m_iodType = IODType.RTDose Then
+
+            If m_messageCollectionHelper.GetRTDose Is Nothing Then
+                message = "No RT Dose Object received."
+            ElseIf m_messageCollectionHelper.GetRTPlan Is Nothing Then
+                message = "No RT Plan Object received."
+            Else
+                RtDoseDataSet = m_messageCollectionHelper.GetRTDose()
+                RtPlanDataSet = m_messageCollectionHelper.GetRTPlan()
+                'if reference rt plan seuqence is present 
+                If Not RtDoseDataSet.Exists(Tags.ReferencedRTPlanSequence) Then
+                    message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedRTPlanSequence) + "' (" + Tags.ReferencedRTPlanSequence + ") is not present so no need to check for the '" + Tags.GetTagName(Tags.ReferencedFractionGroupSequence) + "' (" + Tags.ReferencedFractionGroupSequence + ")"
+                    Me.SetValid(message)
+                ElseIf Not RtDoseDataSet.Exists(Tags.ReferencedFractionGroupSequence) Then
+                    message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedFractionGroupSequence) + "' (" + Tags.ReferencedFractionGroupSequence + ") is not present."
+                Else
+                    message = "The attribute: '" + Tags.GetTagName(Tags.ReferencedFractionGroupSequence) + "' (" + Tags.ReferencedFractionGroupSequence + ") is present, but should not be present."
+                End If
+            End If
+
+            If Not Me.IsValid Then
+                Me.SetError(message)
+            End If
+            Me.Report()
+        End If
+    End Sub
+End Class

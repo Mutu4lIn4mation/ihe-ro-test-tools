@@ -1,0 +1,84 @@
+Class BeamLimitingDeviceSequenceRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+        MyBase.New("Beam Limiting Device Sequence Rule", "", iodType, severity)
+    End Sub
+
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        Dim beamSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim beamLimitingDeviceSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim rtBeamLimitingDeviceTypeAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+        If (iodType = Me.IODTypeRule And (iodType = iodType.RTPlanDosimetric Or iodType = iodType.RTPlanGeometric)) Then
+            Dim attribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+            Dim message As String = ""
+            Dim done As Boolean = False
+            Dim valid As Boolean = False
+
+            If dicomFile.DataSet.Exists(Tags.BeamSequence) = False Then
+                message = "The attribute: '" + Tags.GetTagName(Tags.BeamSequence) + "' (" + Tags.BeamSequence + ") is not present."
+                Me.SetError(message)
+                done = True
+            End If
+
+            If done = False Then
+                beamSequenceAttribute = dicomFile.DataSet(Tags.BeamSequence)
+                Dim i As Integer
+                For i = 1 To beamSequenceAttribute.ItemCount()
+                    If done = False Then
+                        seqItem = beamSequenceAttribute.GetItem(i)
+                        If seqItem.Exists(Tags.BeamLimitingDeviceSequenceTagSequence) = False Then
+                            message = "The attribute: '" + Tags.GetTagName(Tags.RtBeamLimitingDeviceTypeTagSequence) + "' (" + Tags.RtBeamLimitingDeviceTypeTagSequence + ") is not present."
+                            valid = False
+                            done = True
+                        Else
+                            beamLimitingDeviceSequenceAttribute = seqItem(Tags.BeamLimitingDeviceSequenceTagSequence)
+                            Dim j As Integer
+                            Dim numberOfJAWs As Integer = 0
+                            Dim numberOfMLCs As Integer = 0
+                            For j = 1 To beamLimitingDeviceSequenceAttribute.ItemCount()
+                                rtBeamLimitingDeviceTypeAttribute = beamLimitingDeviceSequenceAttribute.GetItem(j)(Tags.RtBeamLimitingDeviceTypeTagSequence)
+
+                                If rtBeamLimitingDeviceTypeAttribute.Values(0).ToString() = "MLCX" Or rtBeamLimitingDeviceTypeAttribute.Values(0).ToString() = "MLCY" Then
+                                    numberOfMLCs = numberOfMLCs + 1
+                                Else
+                                    numberOfJAWs = numberOfJAWs + 1
+                                End If
+                            Next
+                            '2 Jaw descriptions should be present and/or 1 or more MLC descriptions
+                            If beamLimitingDeviceSequenceAttribute.ItemCount() = 0 Then
+                                message = "The attribute: '" + Tags.GetTagName(Tags.BeamLimitingDeviceSequenceTagSequence) + "' (" + Tags.BeamLimitingDeviceSequenceTagSequence + ") does not contain Jaws or MLCs"
+                                valid = False
+                                done = True
+                            ElseIf beamLimitingDeviceSequenceAttribute.ItemCount() > 1 And numberOfJAWs = 1 Then
+                                message = "The attribute: '" + Tags.GetTagName(Tags.BeamLimitingDeviceSequenceTagSequence) + "' (" + Tags.BeamLimitingDeviceSequenceTagSequence + ") only contains one JAW description"
+                                valid = False
+                                done = True
+                            ElseIf beamLimitingDeviceSequenceAttribute.ItemCount() > 1 And numberOfJAWs > 2 Then
+                                message = "The attribute: '" + Tags.GetTagName(Tags.BeamLimitingDeviceSequenceTagSequence) + "' (" + Tags.BeamLimitingDeviceSequenceTagSequence + ") contains " + numberOfJAWs.ToString() + " JAW descriptions"
+                                valid = False
+                                done = True
+                            Else
+                                message = "The attribute: '" + Tags.GetTagName(Tags.BeamLimitingDeviceSequenceTagSequence) + "' (" + Tags.BeamLimitingDeviceSequenceTagSequence + ") has valid number of JAWs and MLC descriptions"
+                                valid = True
+                            End If
+                        End If
+                    End If
+                Next
+            End If
+
+            If valid Then
+                Me.SetValid(message)
+            Else
+                Me.SetError(message)
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

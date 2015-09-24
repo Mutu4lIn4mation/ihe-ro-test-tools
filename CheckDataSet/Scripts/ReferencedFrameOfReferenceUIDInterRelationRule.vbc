@@ -1,0 +1,149 @@
+Class ReferencedFrameOfReferenceUIDInterRelationRule
+    Inherits MessageCollectionRule
+
+    Private message As String
+    Private frameOfReferenceUIDTag As String
+    Private referedDataset As String
+    Private m_messageCollectionHelper As messageCollectionHelper
+
+    Public Sub New(ByVal severity As ErrorSeverity, IODType As IODType)
+
+        MyBase.New("Referenced Frame Of Reference UID Inter Relation Rule", IODType, severity)
+        message = ""
+        frameOfReferenceUIDTag = Tags.ReferencedFrameofReferenceUID
+        referedDataset = ""
+    End Sub
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection() As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        m_messageCollectionHelper = New messageCollectionHelper(dataSetCollection)
+
+        Dim structureSetDataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim valid As Boolean = False
+
+        If m_messageCollectionHelper.GetStructureSet() Is Nothing Then
+            valid = False
+            message = "No RT Structure Set received"
+        Else
+            structureSetDataSet = m_messageCollectionHelper.GetStructureSet()
+            Dim referencedFrameOfReferenceUIDAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+            Dim structureSetROITagSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+            Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+            Dim structureSetROITagSequence As String = Tags.StructureSetROITagSequence
+            Dim referencedFrameOfReferenceUIDTagSequence As String = Tags.ReferencedFrameOfReferenceUIDTagSequence
+            Dim oldReferencedFrameOfReferenceUIDValue As String = ""
+            Dim referencedFrameOfReferenceUIDValue As String
+
+            Dim done As Boolean = False
+            Dim dataset As Boolean = False
+
+            'Check if Structure Set ROI Sequence is present
+            If structureSetDataSet.Exists(structureSetROITagSequence) = False Then
+                valid = False
+                message = "The sequence: '" + Tags.GetTagName(structureSetROITagSequence) + "' (" + structureSetROITagSequence + ") is not present."
+            Else
+                'Get Structure Set ROI Sequence from dataset
+                structureSetROITagSequenceAttribute = structureSetDataSet(structureSetROITagSequence)
+                Dim i As Integer
+                'Itterate through the items
+
+                If structureSetROITagSequenceAttribute.ItemCount() = 0 Then
+                    valid = False
+                    message = "The sequence: '" + Tags.GetTagName(structureSetROITagSequence) + "' (" + structureSetROITagSequence + ") does not contain items"
+                Else
+                    For i = 1 To structureSetROITagSequenceAttribute.ItemCount()
+                        seqItem = structureSetROITagSequenceAttribute.GetItem(i)
+                        'Get referencedFrameOfReferenceUID Value
+                        referencedFrameOfReferenceUIDValue = seqItem.GetValues(referencedFrameOfReferenceUIDTagSequence)(0)
+
+                        'If one referencedFrameOfReferenceUIDValue is not equal to frameOfReferenceUIDValue
+                        'Then stop searching
+                        If done = False Then
+                            If oldReferencedFrameOfReferenceUIDValue = "" Then
+                                oldReferencedFrameOfReferenceUIDValue = referencedFrameOfReferenceUIDValue
+                            End If
+
+                            If oldReferencedFrameOfReferenceUIDValue = referencedFrameOfReferenceUIDValue Then
+                                If Not checkReferencedFrameOfReferenceUID(referencedFrameOfReferenceUIDValue) Then
+                                    done = True
+                                    valid = False
+                                    message = "ReferencedFrameOfReferenceUID is not equal to any of the recieved frameOfReferenceUID's found in the dataset"
+                                Else
+                                    valid = True
+                                End If
+                            Else
+                                valid = False
+                                message = "Invalid structure set: the referencedFrameOfReferenceUID's do not all point to the same frame of reference" + Environment.NewLine + "Expected value: " + oldReferencedFrameOfReferenceUIDValue + " found value: " + referencedFrameOfReferenceUIDValue
+                            End If
+                        End If
+                    Next i
+                End If
+            End If
+        End If
+
+        If valid = True Then
+            message = "ReferencedFrameOfReferenceUID equal to frameOfReferenceUIDValue of " + referedDataset
+            Me.SetValid(message)
+        Else
+            Me.SetError(message)
+        End If
+
+        'Reporter, write to results, if there is anything to report
+        Me.Report()
+    End Sub
+    'Get the correcponding Base frame of reference from the given dataset.
+    Private Function getFrameOfReference(ByVal dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet, ByVal uidTag As String) As String
+        Dim baseFrameOfReference As String
+
+        'Get the frame of reference from the spatial ragistration
+        baseFrameOfReference = dataSet.GetValues(uidTag)(0)
+
+        Return baseFrameOfReference
+    End Function
+    'Find check if the base frame of refernce is pointing to one of the image modality's
+    Private Function checkReferencedFrameOfReferenceUID(ByVal ReferencedFrameOfReferenceUID As String) As Boolean
+        Dim dataSet As DvtkHighLevelInterface.Dicom.Other.DataSet = Nothing
+        Dim frameOfRefernce As String = ""
+        Dim pass As Boolean = False
+
+        'Check to which frame of refecence the DataSet if pointing
+        'Get the first CT image (if there is at least one)
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.CTImage) > 0 Then
+            dataSet = m_messageCollectionHelper.GetSliceImage(IODType.CTImage, 1)
+
+            frameOfRefernce = dataSet.GetValues(Tags.FrameofReferenceUID)(0)
+
+            If frameOfRefernce.Equals(ReferencedFrameOfReferenceUID) Then
+                referedDataset = "CT"
+                pass = True
+
+            End If
+        End If
+
+        'Get the first MR image (if there is at least one)
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.MRImage) > 0 Then
+            dataSet = m_messageCollectionHelper.GetSliceImage(IODType.MRImage, 1)
+
+            frameOfRefernce = dataSet.GetValues(Tags.FrameofReferenceUID)(0)
+
+            If frameOfRefernce.Equals(ReferencedFrameOfReferenceUID) Then
+                referedDataset = "MR"
+                pass = True
+
+            End If
+        End If
+
+        'Get the first PET image (if there is at least one)
+        If m_messageCollectionHelper.GetNumberOfSliceImages(IODType.PETImage) > 0 Then
+            dataSet = m_messageCollectionHelper.GetSliceImage(IODType.PETImage, 1)
+
+            frameOfRefernce = dataSet.GetValues(Tags.FrameofReferenceUID)(0)
+
+            If frameOfRefernce.Equals(ReferencedFrameOfReferenceUID) Then
+                referedDataset = "PET"
+                pass = True
+            End If
+        End If
+
+        Return pass
+    End Function
+End Class

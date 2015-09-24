@@ -1,0 +1,116 @@
+Class CorrectIdentityMatrixRule
+    Inherits AttributeRule
+
+    'an identity matrix must have 1/0/0/0/0/1/0/0/0/0/1/0/0/0/0/1 as its content
+
+    Public Sub New(ByVal TagSequence As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Correct Identity Matrix Rule", TagSequence, iodType, severity)
+
+    End Sub
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+
+        If iodType = Me.IODTypeRule Then
+            Dim message As String = ""
+
+            Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+
+            If Not dicomFile.DataSet.Exists(m_TagSequence) Then
+                message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present."
+                Me.SetError(message)
+            ElseIf Not dicomFile.DataSet(m_TagSequence).VM = 16 Then
+                message = "The attribute: '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain 16 values as would be expected of a 4x4 matrix"
+                Me.SetError(message)
+            Else
+                Dim firstValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(0))
+                Dim secondValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(1))
+                Dim thirdValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(2))
+                Dim fourthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(3))
+                Dim fifthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(4))
+                Dim sixthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(5))
+                Dim seventhValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(6))
+                Dim eighthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(7))
+                Dim ninthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(8))
+                Dim tenthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(9))
+                Dim eleventhValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(10))
+                Dim twelfthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(11))
+                Dim thirteenthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(12))
+                Dim fourteenthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(13))
+                Dim fifteenthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(14))
+                Dim sixteenthValue As Double = Me.ConvertToDouble(dicomFile.DataSet(m_TagSequence).Values.Item(15))
+                If Not firstValue = 1 Then
+                    message += "Position (1,1) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 1" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not secondValue = 0 Then
+                    message += "Position (1,2) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not thirdValue = 0 Then
+                    message += "Position (1,3) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not fourthValue = 0 Then
+                    message += "Position (1,4) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not fifthValue = 0 Then
+                    message += "Position (2,1) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not sixthValue = 1 Then
+                    message += "Position (2,2) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 1" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not seventhValue = 0 Then
+                    message += "Position (2,3) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not eighthValue = 0 Then
+                    message += "Position (2,4) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not ninthValue = 0 Then
+                    message += "Position (3,1) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not tenthValue = 0 Then
+                    message += "Position (3,2) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not eleventhValue = 1 Then
+                    message += "Position (3,3) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 1" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not twelfthValue = 0 Then
+                    message += "Position (3,4) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not thirteenthValue = 0 Then
+                    message += "Position (4,1) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not fourteenthValue = 0 Then
+                    message += "Position (4,2) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not fifteenthValue = 0 Then
+                    message += "Position (4,3) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 0" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If Not sixteenthValue = 1 Then
+                    message += "Position (4,4) of the '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") does not contain the value 1" + System.Environment.NewLine
+                    Me.SetError(message)
+                End If
+                If message = "" Then
+                    message = "The '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is correct"
+                    Me.SetValid(message)
+                End If
+            End If
+
+            'Reporter, write to results, if there is anything to report
+            Me.Report()
+        End If
+    End Sub
+End Class

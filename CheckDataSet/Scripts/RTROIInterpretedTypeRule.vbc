@@ -1,0 +1,158 @@
+Class RTROIInterpretedTypeRule
+    Inherits AttributeRule
+
+    Public Sub New(ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("RT ROI Interpreted Type Rule", "", iodType, severity)
+
+    End Sub
+    Private m_iodType As IODType
+    Private m_valid As Boolean = False
+    Private m_message As String
+
+    Public Overrides Sub ApplyRule(ByRef dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile, ByVal iodType As IODType)
+        Dim done As Boolean = False
+
+        Dim seqItem As DvtkHighLevelInterface.Dicom.Other.SequenceItem = Nothing
+        Dim rtROIObservationsSequenceAttribute As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+        Dim referencedROINumberValueArray As Array
+        Dim isRTROIInterpretedTypePresentArray As Array
+
+        If iodType = IODTypeRule Then
+
+            Dim RTROIObservationsSequence As DvtkHighLevelInterface.Dicom.Other.Attribute = Nothing
+
+            '1. When there are Referenced ROI numbers with the same value OR ROI Physical Properties Sequence(3006,00B0) is PRESENT in this sequence item, 
+            'this attribute should be present in at least once in those sequence items 
+
+
+            If dicomFile.DataSet.Exists(Tags.RTROIObservationsSequence) = False Then
+                m_valid = False
+                done = True
+                m_message = "The attribute: '" + Tags.GetTagName(Tags.RTROIObservationsSequence) + "' (" + Tags.RTROIObservationsSequence + ") is not present."
+            End If
+
+            If iodType = IODTypeRule And done = False Then
+                rtROIObservationsSequenceAttribute = dicomFile.DataSet(Tags.RTROIObservationsSequence)
+                referencedROINumberValueArray = Array.CreateInstance(GetType(String), rtROIObservationsSequenceAttribute.ItemCount())
+                isRTROIInterpretedTypePresentArray = Array.CreateInstance(GetType(Boolean), rtROIObservationsSequenceAttribute.ItemCount())
+
+                Dim i As Integer
+                For i = 1 To rtROIObservationsSequenceAttribute.ItemCount()
+                    If done = False Then
+                        seqItem = rtROIObservationsSequenceAttribute.GetItem(i)
+                        'Check if the Referenced ROI Number exsists
+                        If seqItem.Exists(Tags.ReferencedROINumberTag) = False Then
+                            m_valid = False
+                            done = True
+                            m_message = "'" + Tags.GetTagName(Tags.ReferencedROINumberTag) + "' (" + Tags.ReferencedROINumberTag + ") not present in Sequence item: " + i.ToString()
+                        Else
+                            referencedROINumberValueArray(i - 1) = seqItem(Tags.ReferencedROINumberTag).Values(0).ToString()
+                        End If
+                        'Check if RT ROI Interpreted Type exsist
+                        If seqItem.Exists(Tags.RTROIInterpretedType) = False Then
+                            isRTROIInterpretedTypePresentArray(i - 1) = False
+                        Else
+                            isRTROIInterpretedTypePresentArray(i - 1) = True
+                        End If
+                    End If
+                Next
+            End If
+
+
+            Dim j As Integer
+            Dim isRTROIInterpretedTypePresent As Boolean = True
+            Dim roiNumberValueWithoutRoiInterpetedType As String = ""
+            done = False
+
+            For j = 0 To isRTROIInterpretedTypePresentArray.Length() - 1
+                If isRTROIInterpretedTypePresentArray(j) = False And done = False Then
+                    isRTROIInterpretedTypePresent = False
+                    Dim k As Integer
+                    For k = 1 To referencedROINumberValueArray.Length() - 1
+                        If Not k = j Then
+                            If referencedROINumberValueArray(k) = referencedROINumberValueArray(j) Then
+                                If isRTROIInterpretedTypePresentArray(k) = True Then
+                                    isRTROIInterpretedTypePresent = True
+                                    done = True
+                                    roiNumberValueWithoutRoiInterpetedType = referencedROINumberValueArray(j)
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
+            Next
+
+            If Not isRTROIInterpretedTypePresent Then
+                m_valid = False
+                done = True
+                m_message = "'" + Tags.GetTagName(Tags.RTROIInterpretedType) + "' (" + Tags.RTROIInterpretedType + ") missing in items with '" + Tags.GetTagName(Tags.ReferencedROINumberTag) + "' (" + Tags.ReferencedROINumberTag + ")" + roiNumberValueWithoutRoiInterpetedType
+                Me.SetError(m_message)
+            Else
+                m_valid = True
+                m_message = "Every'" + Tags.GetTagName(Tags.ReferencedROINumberTag) + "' (" + Tags.ReferencedROINumberTag + ") has a '" + Tags.GetTagName(Tags.RTROIInterpretedType) + "' (" + Tags.RTROIInterpretedType + ")"
+                Me.SetValid(m_message)
+            End If
+            Me.Report()
+
+            Dim found1 As Boolean = False
+            Dim found2 As Boolean = False
+            Dim m_ValueListClosed_Planar(10) As String
+            m_ValueListClosed_Planar(0) = "EXTERNAL"
+            m_ValueListClosed_Planar(1) = "PTV"
+            m_ValueListClosed_Planar(2) = "CTV"
+            m_ValueListClosed_Planar(3) = "GTV"
+            m_ValueListClosed_Planar(4) = "TREATED_VOLUME"
+            m_ValueListClosed_Planar(5) = "IRRAD_VOLUME"
+            m_ValueListClosed_Planar(6) = "BOLUS"
+            m_ValueListClosed_Planar(7) = "AVOIDANCE"
+            m_ValueListClosed_Planar(8) = "ORGAN"
+            m_ValueListClosed_Planar(9) = "MARKER"
+            m_ValueListClosed_Planar(10) = "CONTRAST_AGENT"
+            m_ValueListClosed_Planar(11) = "CAVITY"
+
+            Dim m_ValueListCPoint(2) As String
+            m_ValueListCPoint(0) = "MARKER"
+            m_ValueListCPoint(1) = "ISOCENTER"
+            m_ValueListCPoint(2) = "REGISTRATION"
+
+            If Not dicomFile.DataSet.Exists(Tags.ContourGeometricType) Then
+            ElseIf dicomFile.DataSet(Tags.ContourGeometricType).Values.Item(0) = "CLOSED_PLANAR" Then
+                For n As Integer = 0 To m_ValueListClosed_Planar.Length - 1
+                    If dicomFile.DataSet(Tags.RTROIObservationsSequence + "[1]" + Tags.RTROIInterpretedType).Values.Item(0) = m_ValueListClosed_Planar(n) Then
+                        found1 = True
+                    End If
+                Next
+                If found1 = False Then
+                    m_valid = False
+                    m_message = "'" + Tags.GetTagName(Tags.RTROIInterpretedType) + "' (" + Tags.RTROIInterpretedType + ") is not the value of the given options"
+                    Me.SetError(m_message)
+                Else
+                    m_valid = True
+                    m_message = "'" + Tags.GetTagName(Tags.RTROIInterpretedType) + "' (" + Tags.RTROIInterpretedType + ") has a correct value"
+                    Me.SetValid(m_message)
+                End If
+                Me.Report()
+            ElseIf dicomFile.DataSet(Tags.ContourGeometricType).Values.Item(0) = "POINT" Then
+                For n As Integer = 0 To m_ValueListCPoint.Length - 1
+                    If dicomFile.DataSet(Tags.RTROIObservationsSequence + "[1]" + Tags.RTROIInterpretedType).Values.Item(0) = m_ValueListCPoint(n) Then
+                        found2 = True
+                    End If
+                Next
+                If found2 = False Then
+                    m_valid = False
+                    m_message = "'" + Tags.GetTagName(Tags.RTROIInterpretedType) + "' (" + Tags.RTROIInterpretedType + ") is not the value of the given options"
+                    Me.SetError(m_message)
+                Else
+                    m_valid = True
+                    m_message = "'" + Tags.GetTagName(Tags.RTROIInterpretedType) + "' (" + Tags.RTROIInterpretedType + ") has a correct value"
+                    Me.SetValid(m_message)
+                End If
+                Me.Report()
+            End If
+
+        End If
+
+    End Sub
+
+End Class

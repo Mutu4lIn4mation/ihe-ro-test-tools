@@ -1,0 +1,164 @@
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class ContourerCheckDataSetSelection
+    Inherits System.Windows.Forms.Form
+
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()> _
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
+
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Private Sub InitializeComponent()
+        Me.OK_Button = New System.Windows.Forms.Button()
+        Me.lblReturnDataSet = New System.Windows.Forms.Label()
+        Me.tbSelectedStructureSet = New System.Windows.Forms.TextBox()
+        Me.ofdReceivedDataSet = New System.Windows.Forms.OpenFileDialog()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.btnSelectReceivedItem = New System.Windows.Forms.Button()
+        Me.btnSelectImageSet = New System.Windows.Forms.Button()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.tbSelectedImageSet = New System.Windows.Forms.TextBox()
+        Me.ImageSetFolderBrowserDialog = New System.Windows.Forms.FolderBrowserDialog()
+        Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'OK_Button
+        '
+        Me.OK_Button.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.OK_Button.Location = New System.Drawing.Point(275, 280)
+        Me.OK_Button.Name = "OK_Button"
+        Me.OK_Button.Size = New System.Drawing.Size(110, 23)
+        Me.OK_Button.TabIndex = 4
+        Me.OK_Button.Text = "OK"
+        '
+        'lblReturnDataSet
+        '
+        Me.lblReturnDataSet.AutoSize = True
+        Me.lblReturnDataSet.Location = New System.Drawing.Point(6, 56)
+        Me.lblReturnDataSet.Name = "lblReturnDataSet"
+        Me.lblReturnDataSet.Size = New System.Drawing.Size(93, 13)
+        Me.lblReturnDataSet.TabIndex = 5
+        Me.lblReturnDataSet.Text = "StructureSet path:"
+        '
+        'tbSelectedStructureSet
+        '
+        Me.tbSelectedStructureSet.Location = New System.Drawing.Point(100, 53)
+        Me.tbSelectedStructureSet.Name = "tbSelectedStructureSet"
+        Me.tbSelectedStructureSet.ReadOnly = True
+        Me.tbSelectedStructureSet.Size = New System.Drawing.Size(267, 20)
+        Me.tbSelectedStructureSet.TabIndex = 6
+        '
+        'ofdReceivedDataSet
+        '
+        Me.ofdReceivedDataSet.DefaultExt = "dcm"
+        Me.ofdReceivedDataSet.FileName = "*.dcm"
+        Me.ofdReceivedDataSet.InitialDirectory = "c:\"
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.btnSelectImageSet)
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.tbSelectedImageSet)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 13)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(370, 160)
+        Me.GroupBox1.TabIndex = 7
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Select image set(s) directory"
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.btnSelectReceivedItem)
+        Me.GroupBox2.Controls.Add(Me.lblReturnDataSet)
+        Me.GroupBox2.Controls.Add(Me.tbSelectedStructureSet)
+        Me.GroupBox2.Location = New System.Drawing.Point(15, 179)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(370, 79)
+        Me.GroupBox2.TabIndex = 8
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Select received item"
+        '
+        'btnSelectReceivedItem
+        '
+        Me.btnSelectReceivedItem.Location = New System.Drawing.Point(9, 20)
+        Me.btnSelectReceivedItem.Name = "btnSelectReceivedItem"
+        Me.btnSelectReceivedItem.Size = New System.Drawing.Size(152, 23)
+        Me.btnSelectReceivedItem.TabIndex = 7
+        Me.btnSelectReceivedItem.Text = "Select structure set"
+        Me.btnSelectReceivedItem.UseVisualStyleBackColor = True
+        '
+        'btnSelectImageSet
+        '
+        Me.btnSelectImageSet.Location = New System.Drawing.Point(9, 37)
+        Me.btnSelectImageSet.Name = "btnSelectImageSet"
+        Me.btnSelectImageSet.Size = New System.Drawing.Size(152, 23)
+        Me.btnSelectImageSet.TabIndex = 10
+        Me.btnSelectImageSet.Text = "Select Image set"
+        Me.btnSelectImageSet.UseVisualStyleBackColor = True
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(6, 73)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(91, 13)
+        Me.Label1.TabIndex = 8
+        Me.Label1.Text = "Image set(s) path:"
+        '
+        'tbSelectedImageSet
+        '
+        Me.tbSelectedImageSet.Location = New System.Drawing.Point(100, 70)
+        Me.tbSelectedImageSet.Name = "tbSelectedImageSet"
+        Me.tbSelectedImageSet.ReadOnly = True
+        Me.tbSelectedImageSet.Size = New System.Drawing.Size(267, 20)
+        Me.tbSelectedImageSet.TabIndex = 9
+        '
+        'ImageSetFolderBrowserDialog
+        '
+        Me.ImageSetFolderBrowserDialog.RootFolder = System.Environment.SpecialFolder.MyComputer
+        Me.ImageSetFolderBrowserDialog.ShowNewFolderButton = False
+        '
+        'ContourerCheckDataSetSelection
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(397, 315)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.OK_Button)
+        Me.Name = "ContourerCheckDataSetSelection"
+        Me.Text = "RegisteredContourerSelection"
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        Me.ResumeLayout(False)
+
+    End Sub
+    Friend WithEvents OK_Button As System.Windows.Forms.Button
+    Friend WithEvents lblReturnDataSet As System.Windows.Forms.Label
+    Friend WithEvents tbSelectedStructureSet As System.Windows.Forms.TextBox
+    Friend WithEvents ofdReceivedDataSet As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents btnSelectReceivedItem As System.Windows.Forms.Button
+    Friend WithEvents btnSelectImageSet As System.Windows.Forms.Button
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents tbSelectedImageSet As System.Windows.Forms.TextBox
+    Friend WithEvents ImageSetFolderBrowserDialog As System.Windows.Forms.FolderBrowserDialog
+End Class

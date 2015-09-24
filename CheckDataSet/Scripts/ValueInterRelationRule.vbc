@@ -1,0 +1,59 @@
+Class ValueInterRelationRule
+    Inherits MessageCollectionRule
+    ''' <summary>
+    ''' this rule verifies if the value in this attribute is a correct one, according to the value that is provided
+    ''' </summary>
+    ''' <param name="valueTag">the attribute that needs to be checked</param>
+    ''' <param name="value">contains the value which the attribute may have</param>
+    ''' <param name="iodType"></param>
+    ''' <param name="severity"></param>
+    ''' <remarks></remarks>
+
+    Public Sub New(ByVal valueTag As String, ByVal value As String, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+
+        MyClass.New(valueTag, value, 1, iodType, severity)
+
+
+    End Sub
+
+    Public Sub New(ByVal valueTag As String, ByVal value As String, ByVal itemIndex As Integer, ByVal iodType As IODType, ByVal severity As ErrorSeverity)
+
+        MyBase.New("Value Rule", iodType, severity)
+
+        m_TagSequence = valueTag
+        m_Value = value
+        m_ItemIndex = itemIndex
+
+    End Sub
+
+    Private m_TagSequence As String
+    Private m_Value As String
+    Private m_SequenceItemTag As String
+    Private m_ItemIndex As Integer
+
+    Public Overrides Sub ApplyRule(ByRef dataSetCollection() As DvtkHighLevelInterface.Dicom.Files.DicomFile)
+        Dim message As String = ""
+        Dim dicomFile As DvtkHighLevelInterface.Dicom.Files.DicomFile
+
+        For Each dicomFile In dataSetCollection
+            Dim iodType As IODType = ReferenceDataSet.GetInstance.DetermineIodType(dicomFile)
+
+            If iodType = IODTypeRule Then
+
+                If Not dicomFile.DataSet.Exists(m_TagSequence) Then
+                    message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") is not present in the dataset."
+                    Me.SetValid(message)
+                ElseIf Not dicomFile.DataSet(m_TagSequence).Values.Item(0) = m_Value Then
+                    message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains the value: " + dicomFile.DataSet(m_TagSequence).Values.Item(0).ToString() + " but should contain the value: " + m_Value + "."
+                    Me.SetError(message)
+                Else
+                    message = "The attribute '" + Tags.GetTagName(m_TagSequence) + "' (" + m_TagSequence + ") contains the value: " + m_Value + "."
+                    Me.SetValid(message)
+                End If
+                Me.Report()
+            End If
+        Next
+    End Sub
+
+End Class
