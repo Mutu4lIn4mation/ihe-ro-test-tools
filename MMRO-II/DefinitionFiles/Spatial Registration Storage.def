@@ -5986,7 +5986,7 @@ MODULE "General Series Module" M
                       |"XC") "Modality" 
 (0x0020000E,1,UI,1) "Series Instance UID" 
 (0x00200011,2,IS,1) "Series Number" 
-(0x00185100,2C,CS,1,D,"FFDL"
+(0x00185100,3C,CS,1,D,"FFDL"
                       |"FFDR"
                       |"FFP"
                       |"FFS"

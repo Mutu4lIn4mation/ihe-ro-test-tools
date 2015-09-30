@@ -296,6 +296,7 @@ Public Class Tags
     Public Shared ReadOnly RTReferencedSeriesSequence As String = String.Format("{0}[1]/{1}", RTReferencedStudySequence, "0x30060014")
 
     Public Shared ReadOnly RTReferencedContourImageSequence As String = String.Format("{0}[1]/{1}", RTReferencedSeriesSequence, "0x30060016")
+    Public Shared ReadOnly RTReferencedSeriesSequenceSeriesInstanceUID As String = String.Format("{0}[1]/{1}", RTReferencedSeriesSequence, "0x0020000E")
     Public Shared ReadOnly RTReferencedSOPClassUID As String = String.Format("{0}[1]/{1}", RTReferencedContourImageSequence, "0x00081150")
 
     Public Shared ReadOnly ReferencedFrameofReferenceUID As String = String.Format("{0}[1]/{1}", ReferencedFrameofReferenceSequence, "0x00200052")
@@ -531,6 +532,9 @@ Public Class Tags
     'added by RVDH for move request
 
     Public Shared ReadOnly ReferencedSeriesSequenceMOVE As String = "0x00081115"
+    Public Shared ReadOnly ReferencedSeriesSequence1RefInstanceSeq As String = String.Format("{0}[1]/{1}", ReferencedSeriesSequenceMOVE, "0x0008114A")
+    Public Shared ReadOnly ReferencedSeriesSequence2RefInstanceSeq As String = String.Format("{0}[2]/{1}", ReferencedSeriesSequenceMOVE, "0x0008114A")
+
     Public Shared ReadOnly retrieveAETitleMOVE As String = "0x00080054"
     Public Shared ReadOnly ReferencedSOPSequenceMOVE As String = "0x00081199"
     Public Shared ReadOnly ReferencedSOPInstanceUIDMOVE As String = "0x00081155"
