@@ -1,0 +1,51 @@
+7.4.6.1;RT Image Module;;
+Attribute Name;Tag;Presence;Attribute Note
+Bits Allocated;(0028,0100);R+*;Shall have Enumerated Value 16 if Value 3 of Image Type (0008,0008) is DRR.
+Bits Stored;(0028,0101);R+*;Shall have Enumerated Value 16 if Value 3 of Image Type (0008,0008) is DRR.
+Pixel Representation;(0028,0103);R+*;Enumerated Values shall be 0000H (unsigned integer)
+Pixel Intensity Relationship Sign;(0028,1041);R+*;(See Issue 12)
+RT Image Label;(3002,0002);R;User-defined label for RT Image.
+RT Image Description;(3002,0004);O;User-defined description of RT Image.
+Image Type;(0008,0008);R+*;The producer may produce any of the following types.¶The consumer must be able to consume all of the following types.¶Image identification characteristics (see Section C.7.6.1.1.2). RT Images shall use one of the following Defined Terms for Value:¶Digitally reconstructed radiographs = DERIVED\SECONDARY\DRR¶Simulator Images  = ORIGINAL\PRIMARY\SIMULATOR¶Portal Images = ORIGINAL\PRIMARY\PORTAL¶Radiographic Images = ORIGINAL\PRIMARY\RADIOGRAPH¶Fluence Images = DERIVED\SECONDARY\FLUENCE¶The Image Type shall solely characterize the type of the image as it was created. Any other use, e.g. to mark as digitally reconstructed RT Image (DRR) as PORTAL to specify an intended imaging procedure at the treatment session or alike is prohibited. That kind of information has to be conveyed either in imaging instructions as part of a DICOM Worklist interface, or in the Planned Verification Image Sequence (300A,00CA) where DICOM Worklist is not yet in place.¶Therefore the values ORIGINAL\PRIMARY\PORTAL and ORIGINAL\PRIMARY\RADIOGRAPH shall only be used for RT Images being Reference Images, if an image was effectively acquired at a treatment machine.
+X-Ray Image Receptor Translation;(3002,000D);O;If absent, shall be interpreted as (0,0,0).¶If present must not be ignored.
+X-Ray Image Receptor Angle;(3002,000E);O;If absent, shall be interpreted as 0.0.¶If present, must have a value and must not be ignored.
+RT Image Orientation;(3002,0010);RC+;Required if RT Image Plane (3002,000C) is NON_NORMAL.¶If present, must have a value and must not be ignored.
+Image Plane Pixel Spacing;(3002,0011);R+;Shall have a value.
+RT Image Position;(3002,0012);R+;Shall have a value.
+Radiation Machine SAD;(3002,0022);R+;Shall have a value.
+RT Image SID;(3002,0026);R+;Shall have a value.
+Source to Reference Object Distance;(3002,0028);R+;Shall not be present.
+Referenced RT Plan Sequence;(300C,0002);R+;Shall be present.
+>Include ‘SOP Instance Reference Macro' Table 10-11;;;
+Referenced Beam Number;(300C,0006);RC+*;Shall be present if the beam reference is known.
+Referenced Fraction Group Number;(300C,0022);O;
+Fraction Number;(3002,0029);RC+;Shall be present if Value 3 of Image Type (0008,0008) is DRR and the image is created in the context of a particular fraction.
+Exposure Sequence;(3002,0030);-;
+>Primary Fluence Mode Sequence;(3002,0050);RC+*;Shall be preserved, if received from the original source application.
+>Meterset Exposure;(3002,0032);RC+;Shall be preserved, if received from the original source application.
+>Diaphragm Position;(3002,0034);RC+;Shall not be present, if Value 3 of Image Type (0008,0008) is not SIMULATOR.
+>Gantry Angle;(300A,011E);RC+;Shall be preserved, if received from the original source
+>Gantry Pitch Angle;(300A,014A);RC+;Shall be preserved, if received from the original source 
+>Beam Limiting Device Angle;(300A,0120);RC+;Shall be preserved, if received from the original source 
+>Patient Support Angle;(300A,0122);RC+;Shall be preserved, if received from the original source 
+>Table Top Pitch Angle;(300A,0140);RC+;Shall be preserved, if received from the original source 
+>Table Top Roll Angle;(300A,0144);RC+;Shall be preserved, if received from the original source 
+>Table Top Vertical Position;(300A,0128);RC+;Shall be preserved, if received from the original source 
+>Table Top Longitudinal Position;(300A,0129);RC+;Shall be preserved, if received from the original source 
+>Table Top Lateral Position;(300A,012A);RC+;Shall be preserved, if received from the original source
+>Number of Blocks;(300A,00F0);-;
+>Block Sequence;(300A,00F4);-;Shall not be present, if Value 3 of Image Type (0008,0008) is DRR.
+>>Block Number of Points;(300A,0104);R+;Shall have a value.
+>>Block Data;(300A,0106);R+;Shall have a value.
+Gantry Angle;(300A,011E);R+;Shall contain the angle of the imaging source, along the coordinate system as specified in DICOM for that attribute.
+Gantry Pitch Angle;(300A,014A);R+;Shall contain the angle of the imaging source, along the coordinate system as specified in DICOM for that attribute.
+Patient Support Angle;(300A,0122);R+;Shall have a value.
+Table Top Eccentric Axis Distance;(300A,0124);R+;Shall not be present.
+Table Top Eccentric Angle;(300A,0125);R+;Shall not be present.
+Table Top Pitch Angle;(300A,0140);R+;Shall have a value.
+Table Top Roll Angle;(300A,0144);R+;Shall have a value.
+Table Top Vertical Position;(300A,0128);RC+;Shall not be present, if Value 3 of Image Type (0008,0008) is DRR. Shall be preserved, if received from the original source 
+Table Top Longitudinal Position;(300A,0129);RC+;Shall not be present, if Value 3 of Image Type (0008,0008) is DRR. Shall be preserved, if received from the original source 
+Table Top Lateral Position;(300A,012A);RC+;Shall not be present, if Value 3 of Image Type (0008,0008) is DRR. Shall be preserved, if received from the original source 
+Isocenter Position;(300A,012C);R+;Shall have a value.
+Patient Position;(0018,5100);R+;Shall have a value.

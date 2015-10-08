@@ -1,0 +1,33 @@
+7.3.2.1;RT Image;;;
+IE;Module;Reference;Usage;IHE-RO Usage
+Patient;Patient;C.7.1.1;M;M
+;;;;See 7.4.1.1.1
+;Clinical Trial Subject;C.7.1.3;U;U
+Study;General Study;C.7.2.1;M;M
+;;;;See 7.4.1.2.1
+;Patient Study;C.7.2.2;U;U
+;Clinical Trial Study;C.7.2.3;U;U
+Series;RT Series;C.8.8.1;M;M
+;;;;See 7.4.1.4.1
+;Clinical Trial Series;C.7.3.2;U;
+Frame of Reference;Frame of Reference;C.7.4.1;U;R
+;;;;See 7.4.1.7.1
+Equipment;General Equipment;C.7.5.1;M;M
+;;;;See 7.4.1.5.1
+Image;General Image;C.7.6.1;M;M
+;;;;See 7.4.1.8.1
+;Image Pixel;C.7.6.3;M;M
+;Contrast/Bolus;C.7.6.4;C - Required if contrast media was used in this image;C
+;Cine;C.7.6.5;C - Required if multi-frame image is a cine image.;C
+;Multi-frame;C.7.6.6;C - Required if pixel data is multi-frame data.;C
+;Device;C.7.6.12;U;U
+;RT Image;C.8.8.2;M;M
+;;;;See 7.4.6.1.1
+;Modality LUT;C.11.1;U;U
+;VOI LUT;C.11.2;U;U
+;Approval;C.8.8.16;U;U
+;SOP Common;C.12.1;M;M
+;;;;See 7.4.1.6.1
+;Common Instance Reference;C.12.2;U;R
+;Frame Extraction;C.12.3;C - Required if the SOP Instance was created in response to a Frame-Level retrieve request;C
+Frame of Reference, Isocenter and Patient Position;;;;
